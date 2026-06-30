@@ -196,6 +196,9 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                                   onToggleAvailable: () => ref
                                       .read(draftProvider.notifier)
                                       .toggleItemAvailable(item.id),
+                                  onToggleActive: () => ref
+                                      .read(draftProvider.notifier)
+                                      .toggleItemActive(item.id),
                                 );
                               },
                             ),
@@ -244,6 +247,7 @@ class _ItemTile extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final VoidCallback onToggleAvailable;
+  final VoidCallback onToggleActive;
 
   const _ItemTile({
     required this.item,
@@ -252,6 +256,7 @@ class _ItemTile extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     required this.onToggleAvailable,
+    required this.onToggleActive,
   });
 
   @override
@@ -275,23 +280,43 @@ class _ItemTile extends StatelessWidget {
           item.name,
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: item.available ? null : Colors.grey,
+            color: !item.active
+                ? Colors.grey
+                : item.available
+                    ? null
+                    : Colors.grey,
           ),
         ),
         subtitle: Text(
-          '₹${item.price.toStringAsFixed(0)}  ·  $sectionName'
-          '${item.isBestseller ? '  ·  ⭐' : ''}',
-          style: const TextStyle(fontSize: 12),
+          !item.active
+              ? 'Hidden from menu'
+              : '₹${item.price.toStringAsFixed(0)}  ·  $sectionName'
+                  '${item.isBestseller ? '  ·  ⭐' : ''}',
+          style: TextStyle(
+            fontSize: 12,
+            color: !item.active ? Colors.orange[700] : null,
+          ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Switch(
-              value: item.available,
-              onChanged: (_) => onToggleAvailable(),
-              activeThumbColor: const Color(0xFF2E7D32),
-            ),
+            if (item.active)
+              Switch(
+                value: item.available,
+                onChanged: (_) => onToggleAvailable(),
+                activeThumbColor: const Color(0xFF2E7D32),
+              ),
             if (canManage) ...[
+              IconButton(
+                icon: Icon(
+                  item.active
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  color: item.active ? null : Colors.orange[700],
+                ),
+                tooltip: item.active ? 'Hide from menu' : 'Show on menu',
+                onPressed: onToggleActive,
+              ),
               IconButton(
                 icon: const Icon(Icons.edit_outlined),
                 tooltip: 'Edit',

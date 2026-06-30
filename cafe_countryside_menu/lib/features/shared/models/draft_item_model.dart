@@ -9,6 +9,7 @@ class DraftItemModel {
   final String ingredients;
   final String imageUrl;
   final String cloudinaryPublicId;
+  final bool active;
   final bool isVeg;
   final bool isBestseller;
   final bool available;
@@ -28,6 +29,7 @@ class DraftItemModel {
     required this.ingredients,
     required this.imageUrl,
     required this.cloudinaryPublicId,
+    this.active = true,
     required this.isVeg,
     required this.isBestseller,
     required this.available,
@@ -48,6 +50,7 @@ class DraftItemModel {
         ingredients: json['ingredients'] as String? ?? '',
         imageUrl: json['imageUrl'] as String? ?? '',
         cloudinaryPublicId: json['cloudinaryPublicId'] as String? ?? '',
+        active: json['active'] as bool? ?? true,
         isVeg: json['isVeg'] as bool? ?? true,
         isBestseller: json['isBestseller'] as bool? ?? false,
         available: json['available'] as bool? ?? true,
@@ -70,6 +73,7 @@ class DraftItemModel {
         'ingredients': ingredients,
         'imageUrl': imageUrl,
         'cloudinaryPublicId': cloudinaryPublicId,
+        'active': active,
         'isVeg': isVeg,
         'isBestseller': isBestseller,
         'available': available,
@@ -90,6 +94,7 @@ class DraftItemModel {
     String? ingredients,
     String? imageUrl,
     String? cloudinaryPublicId,
+    bool? active,
     bool? isVeg,
     bool? isBestseller,
     bool? available,
@@ -109,6 +114,7 @@ class DraftItemModel {
         ingredients: ingredients ?? this.ingredients,
         imageUrl: imageUrl ?? this.imageUrl,
         cloudinaryPublicId: cloudinaryPublicId ?? this.cloudinaryPublicId,
+        active: active ?? this.active,
         isVeg: isVeg ?? this.isVeg,
         isBestseller: isBestseller ?? this.isBestseller,
         available: available ?? this.available,

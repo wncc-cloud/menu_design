@@ -192,6 +192,18 @@ class DraftNotifier extends _$DraftNotifier {
     await _save(draft.copyWith(items: items));
   }
 
+  Future<void> toggleItemActive(String itemId) async {
+    final draft = _draft();
+    if (draft == null) return;
+    final now = DateTime.now();
+    final items = draft.items
+        .map((i) => i.id == itemId
+            ? i.copyWith(active: !i.active, updatedAt: now)
+            : i)
+        .toList();
+    await _save(draft.copyWith(items: items));
+  }
+
   // ── Publish ───────────────────────────────────────────────────────────────
 
   Future<void> publishMenu() async {

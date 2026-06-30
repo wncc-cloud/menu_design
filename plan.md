@@ -1,4 +1,3 @@
-
 # Why Not Cafe - Menu Website & Admin
 
 Version: 7.0 — FROZEN
@@ -42,25 +41,30 @@ Firebase Spark Plan gives you the following limits for free.
 None of these require a credit card.
 
 Firestore
+
 - 1 GiB total storage
 - 50,000 reads per day
 - 20,000 writes per day
 - 20,000 deletes per day
 
 Cloudinary (replaces Firebase Storage — Firebase Storage requires Blaze plan for new projects)
+
 - 25 monthly credits (1 credit = 1 GB storage OR 1 GB bandwidth)
 - No credit card required
 - Practical limit: comfortably supports a cafe with up to ~80 items at 100 visitors/day
 - At 300 items with heavy traffic, credits may be exceeded — upgrade to paid Cloudinary plan at that scale
 
 Firebase Hosting
+
 - 10 GB storage
 - 360 MB data transfer per day (for the app files, not images)
 
 Firebase Authentication
+
 - Unlimited
 
 Firebase Analytics
+
 - Unlimited
 
 What this means for your cafe:
@@ -204,8 +208,8 @@ No credit card required. Free plan gives 25 monthly credits.
 After signing in:
 
 1. Note your Cloud Name shown in the Dashboard (top left). You will need this.
-
 2. Create an unsigned upload preset:
+
    - Go to Settings → Upload → Upload presets
    - Click "Add upload preset"
    - Set "Signing mode" to "Unsigned"
@@ -214,8 +218,8 @@ After signing in:
      (This auto-resizes and compresses images on Cloudinary's side as a safety net)
    - Click "Save"
    - Note the preset name (e.g. "ml_default" or whatever you named it)
-
 3. You now have two values needed in the app:
+
    - Cloud Name: dzhfgtolf
    - Upload Preset Name: cafe_countryside_unsigned
 
@@ -266,6 +270,7 @@ Search "Firebase" → install "Firebase" by Google.
 Sign in with the same Google account used for your Firebase project.
 
 This lets you:
+
 - Browse your Firestore database directly in the VSCode sidebar
 - View and manage Storage files
 - Run Firebase emulators (for local testing)
@@ -290,8 +295,7 @@ is done through the terminal inside VSCode. Use View → Terminal to open it.
 All commands in this document (firebase login, flutter build, firebase deploy, etc.)
 are run in the VSCode integrated terminal. You never need to open a separate terminal app.
 
-Open it with:  Ctrl + ` (backtick)  on Windows/Linux
-               Cmd  + ` (backtick)  on Mac
+Open it with:  Ctrl + `(backtick)  on Windows/Linux                Cmd  +` (backtick)  on Mac
 
 ## 3.2 Install Flutter
 
@@ -375,6 +379,7 @@ flutterfire configure
 ```
 
 Follow the prompts:
+
 - Select your Firebase project from the list
 - Select platforms: web only (press space to select, enter to confirm)
 
@@ -577,6 +582,7 @@ Step F: Deploy the app with proper security rules (see Security Rules section).
 Roles and their permissions:
 
 owner
+
 - Manage sections
 - Manage items
 - Manage availability
@@ -587,6 +593,7 @@ owner
 - Publish menu
 
 manager
+
 - Manage sections
 - Manage items
 - Manage availability
@@ -595,6 +602,7 @@ manager
 - Publish menu
 
 staff
+
 - Change item availability only (toggle available/unavailable)
 
 The UI should be designed so permissions can be extended later.
@@ -614,6 +622,7 @@ Do NOT make the public site read individual item documents.
 Use a snapshot document containing all public data.
 
 With 300 items and 100 visitors per day:
+
 - Per-document approach = 30,000+ reads/day (hits free limit)
 - Snapshot approach = 100-200 reads/day (very safe)
 
@@ -652,6 +661,7 @@ Separated from menu so a menu publish does not overwrite business details.
 One document: businesses/default
 
 Fields:
+
 - businessId: "default"
 - cafeName: string
 - logoUrl: string (Cloudinary secure URL, e.g. https://res.cloudinary.com/{cloud}/image/upload/...)
@@ -865,6 +875,7 @@ Features:
 Responsive design. Works on mobile and desktop.
 
 The public site makes exactly 2 Firestore reads on load:
+
 1. businesses/default (cached for the session, not re-read)
 2. menu/current (re-read every 5 minutes)
 
@@ -976,11 +987,13 @@ Endpoint: `https://api.cloudinary.com/v1_1/{cloudName}/image/upload`
 Method: POST multipart/form-data
 
 Fields:
+
 - `file`: the compressed image bytes
 - `upload_preset`: your unsigned preset name (from Step 2.3)
 - `public_id`: `cafe_menu/item_{itemId}` (use item ID to make it predictable)
 
 Returns JSON:
+
 - `secure_url`: full HTTPS URL to the image (store as imageUrl)
 - `public_id`: Cloudinary's identifier (store as cloudinaryPublicId)
 
@@ -989,6 +1002,7 @@ Returns JSON:
 Use flutter_image_compress package.
 
 IMPORTANT — Flutter Web compatibility:
+
 - Do NOT use compressWithFile or compressAndGetFile — these throw exceptions on web.
 - Use compressWithList only (takes Uint8List bytes, returns Uint8List bytes).
 - The package uses the "pica" JavaScript library on web.
@@ -996,6 +1010,7 @@ IMPORTANT — Flutter Web compatibility:
 - image_picker returns XFile — use xFile.readAsBytes() to get Uint8List for compression.
 
 Compression targets:
+
 - Recommended size: 80–120 KB per image
 - Maximum allowed: 150 KB per image
 - Maximum resolution: 800×800 pixels
@@ -1017,10 +1032,12 @@ automatically replaces the old one in Cloudinary (same public_id = overwrite).
 ## What to store in Firestore after upload
 
 In the item object inside menuDraft/data:
+
 - imageUrl: the secure_url returned by Cloudinary (full HTTPS URL)
 - cloudinaryPublicId: the public_id returned by Cloudinary (e.g. cafe_menu/item_abc123)
 
 In businesses/default after logo upload:
+
 - logoUrl: the secure_url returned by Cloudinary
 - logoCloudinaryId: the public_id (cafe_menu/logo)
 
@@ -1361,7 +1378,7 @@ First, set your active Firebase project:
 firebase use <your-project-id>
 ```
 
-Replace <your-project-id> with the actual ID from Firebase Console → Project Settings.
+Replace <your-project-id></your> with the actual ID from Firebase Console → Project Settings.
 Example: `firebase use cafe-countryside-menu-abc12`
 
 Then initialize:
@@ -1371,6 +1388,7 @@ firebase init hosting
 ```
 
 Answer the prompts:
+
 - Use an existing project → select your Firebase project
 - Public directory: build/web
 - Configure as single-page app: Yes
@@ -1418,12 +1436,14 @@ Do not run `firebase deploy --only storage`.
 Cloudinary uses an unsigned upload preset instead of server-side rules.
 
 Security posture of unsigned uploads:
+
 - Anyone who knows your cloud name and preset name can upload images to your Cloudinary account
 - This consumes your bandwidth/storage credits
 - They cannot access or modify your Firestore data (still protected by Firestore rules)
 - Risk is low for a cafe menu app — the admin UI is the only place uploads are triggered
 
 To limit damage if the preset is ever misused:
+
 - In Cloudinary → Settings → Upload → your preset:
   - Max file size: 500KB
   - Allowed formats: jpg, png only
@@ -1488,6 +1508,7 @@ If you accidentally delete the menu or overwrite it with bad data, there is no u
 Add an "Export Menu JSON" button to the admin Dashboard page.
 
 When clicked:
+
 1. App reads menu/current from Firestore
 2. Converts to formatted JSON string
 3. Triggers a browser download of menu-backup-YYYY-MM-DD.json
@@ -1527,11 +1548,13 @@ businessId field is in all items and sections from day one.
 Cloudinary public_id uses cafe_menu/item_{itemId} from day one.
 
 When adding multiple cafes later, no existing structure changes:
+
 - Add businesses/cafe2 document
 - Filter menuDraft by businessId
 - Create menu/cafe2 for the second cafe's snapshot
 
 Features skipped for MVP but easy to add later:
+
 - Publish history (menuHistory collection, one document per publish, metadata only)
 - Offers and coupons (new collection, reference sectionId or itemId)
 - QR code generation for table menus (client-side, free packages exist)
@@ -1559,21 +1582,16 @@ Document these honestly. Do not pretend they do not exist.
 
 1. Concurrent admin edits: Two admins editing different items at the same moment
    will cause one edit to overwrite the other. Acceptable for 1-2 admin users.
-
 2. Availability time uses device clock: Not server time. Customers with wrong device
    clocks see incorrect availability. No fix without Cloud Functions.
-
 3. No real-time updates on public site: Menu updates appear within 5 minutes for
    customers who already have the page open. Acceptable for a cafe.
-
 4. Flutter Web SEO: The site cannot be found via Google search. Traffic must come
    from QR codes, Instagram, WhatsApp, or Google Maps links. Plan your marketing accordingly.
-
 5. Cloudinary bandwidth cap: Free plan gives 25 monthly credits (1 credit = 1GB bandwidth).
    A cafe with 60 items at 100 visitors/day uses ~11 credits/month — well within limits.
    At 300 items with heavy traffic, credits may be exceeded. Upgrade to paid Cloudinary plan at that scale.
    Compress all images to 80–120KB before upload to stay within limits as long as possible.
-
 6. Hosting data transfer: Flutter Web app is 2-5MB. At 360MB/day transfer limit,
    you can serve 70-180 first-time visitors per day before caching kicks in.
    Repeat visitors use browser cache and do not count against this limit.
@@ -1588,6 +1606,7 @@ Each phase produces something working and deployable.
 ## Phase 0: Foundation (do before writing any feature code)
 
 Manual steps (follow Steps 1-8 in this document):
+
 - Create Firebase project
 - Enable Firestore, Auth, Storage, Hosting
 - Install Flutter, Firebase CLI, FlutterFire CLI
@@ -1666,6 +1685,72 @@ At end of Phase 4: Full menu management including images and cafe details.
 - Do a manual backup export and save to git
 
 At end of Phase 5: The project is production-ready and safe to share with customers.
+
+## Phase 6: Hide Items and Sections
+
+Allows an admin to silently hide any item or section from the public menu without
+deleting it. Hidden items and sections remain in the draft for future use.
+
+This is different from the existing availability toggle:
+- available: false → item shows on the public menu with an "Unavailable" badge
+- active: false    → item is completely invisible on the public menu
+
+Sections already support active: false (implemented in Phase 3).
+Phase 6 extends this to individual items.
+
+### Data model change
+
+Add active field to DraftItemModel:
+
+- active: boolean (default: true)
+
+This field already exists in DraftSectionModel. The pattern is the same.
+
+The active field is NOT included in menu/current (the public snapshot).
+Items where active is false are simply excluded from the publish output,
+just like inactive sections are already excluded.
+
+### Draft repository change
+
+In DraftRepository.publishMenu(), extend the existing filter:
+
+Before (sections only):
+  final activeSections = draft.sortedSections.where((s) => s.active).toList()
+  final publishableItems = draft.sortedItems
+      .where((item) => activeSectionIds.contains(item.sectionId))
+
+After (sections and items):
+  final activeSections = draft.sortedSections.where((s) => s.active).toList()
+  final publishableItems = draft.sortedItems
+      .where((item) => activeSectionIds.contains(item.sectionId) && item.active)
+
+### Admin UI change
+
+Items page: add a hide/show toggle button next to each item tile.
+
+The toggle should be visually distinct from the availability switch:
+- Use an eye icon (Icons.visibility / Icons.visibility_off) rather than a Switch
+- Hidden items appear greyed out in the admin list so the admin can see them
+- A small "Hidden from menu" label appears under the item name when active is false
+
+The existing availability Switch remains unchanged.
+
+Permission: same as canManageItems (owner and manager only, not staff).
+
+### No public website change required
+
+The public menu already only renders items from menu/current.
+Since hidden items are excluded at publish time, they never appear.
+No change needed in the public menu code.
+
+### Summary of files to change
+
+- lib/features/shared/models/draft_item_model.dart   (add active field, default true)
+- lib/features/shared/repositories/draft_repository.dart  (filter active items at publish)
+- lib/features/admin/items/items_page.dart            (hide/show toggle button on each tile)
+
+At end of Phase 6: Admin can hide individual items from the public menu without
+deleting them. Hidden items remain in the draft and can be made visible again at any time.
 
 ---
 

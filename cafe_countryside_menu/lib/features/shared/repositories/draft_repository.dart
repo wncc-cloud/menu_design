@@ -89,7 +89,8 @@ class DraftRepository {
           draft.sortedSections.where((s) => s.active).toList();
       final activeSectionIds = activeSections.map((s) => s.id).toSet();
       final publishableItems = draft.sortedItems
-          .where((item) => activeSectionIds.contains(item.sectionId))
+          .where((item) =>
+              activeSectionIds.contains(item.sectionId) && item.active)
           .toList();
 
       // cloudinaryPublicId kept: Phase 1 ItemModel uses it for image URLs.
