@@ -17,94 +17,101 @@ class ItemCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Opacity(
         opacity: isAvailable ? 1.0 : 0.55,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (imageUrl != null)
-              SizedBox(
-                height: 160,
-                width: double.infinity,
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => const SizedBox.shrink(),
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _VegIndicator(isVeg: item.isVeg),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          item.name,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        item.formattedPrice,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                      ),
-                    ],
-                  ),
-                  if (item.isBestseller || !isAvailable) ...[
-                    const SizedBox(height: 6),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 4,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (item.isBestseller) const _BestsellerBadge(),
-                        if (!isAvailable)
-                          _UnavailableBadge(
-                            // If item.available is true but outside time window,
-                            // show the window so the customer knows when to come back.
-                            showWindow: item.available && item.availableFrom.isNotEmpty,
-                            from: item.availableFrom,
-                            till: item.availableTill,
+                        _VegIndicator(isVeg: item.isVeg),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            item.name,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
+                        ),
                       ],
                     ),
-                  ],
-                  if (item.description.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      item.description,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(color: Colors.grey[700]),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                  if (item.ingredients.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
-                      'Ingredients: ${item.ingredients}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[500],
-                            fontStyle: FontStyle.italic,
+                      item.formattedPrice,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
+                    if (item.isBestseller || !isAvailable) ...[
+                      const SizedBox(height: 6),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: [
+                          if (item.isBestseller) const _BestsellerBadge(),
+                          if (!isAvailable)
+                            _UnavailableBadge(
+                              showWindow: item.available &&
+                                  item.availableFrom.isNotEmpty,
+                              from: item.availableFrom,
+                              till: item.availableTill,
+                            ),
+                        ],
+                      ),
+                    ],
+                    if (item.description.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        item.description,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(color: Colors.grey[700]),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                    if (item.ingredients.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        'Ingredients: ${item.ingredients}',
+                        style:
+                            Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Colors.grey[500],
+                                  fontStyle: FontStyle.italic,
+                                ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
-          ],
+              if (imageUrl != null) ...[
+                const SizedBox(width: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: SizedBox(
+                    width: 90,
+                    height: 90,
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );

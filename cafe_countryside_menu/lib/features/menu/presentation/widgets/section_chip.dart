@@ -29,7 +29,7 @@ class SectionChipBar extends StatelessWidget {
           ),
           ...sections.map(
             (s) => _SectionChip(
-              label: s.name,
+              label: s.icon.isNotEmpty ? '${s.icon} ${s.name}' : s.name,
               selected: selectedId == s.id,
               onTap: () => onSelected(s.id),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../shared/models/draft_item_model.dart';
 import '../../shared/models/draft_section_model.dart';
@@ -85,7 +86,12 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
         title:
             const Text('Items', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
-          if (canManage)
+          if (canManage) ...[
+            IconButton(
+              icon: const Icon(Icons.upload_file),
+              tooltip: 'Bulk Import',
+              onPressed: () => context.go('/admin/items/import'),
+            ),
             IconButton(
               icon: const Icon(Icons.add),
               tooltip: 'Add item',
@@ -95,6 +101,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                 _showAddDialog(sections);
               },
             ),
+          ],
         ],
       ),
       body: Column(

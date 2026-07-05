@@ -204,6 +204,24 @@ class DraftNotifier extends _$DraftNotifier {
     await _save(draft.copyWith(items: items));
   }
 
+  // ── Bulk Import ───────────────────────────────────────────────────────────
+
+  Future<void> appendBulkImport({
+    required List<DraftSectionModel> newSections,
+    required List<DraftItemModel> newItems,
+  }) async {
+    // Don't touch `state` here — BulkImportPage never ref.watches draftProvider,
+    // so the notifier may be auto-disposed by the time the Firestore write
+    // returns, which would throw "Ref used after disposed".
+    // The draftStreamProvider stream picks up the Firestore change automatically.
+    final draft = _draft();
+    if (draft == null) return;
+    await _save(draft.copyWith(
+      sections: [...draft.sections, ...newSections],
+      items: [...draft.items, ...newItems],
+    ));
+  }
+
   // ── Publish ───────────────────────────────────────────────────────────────
 
   Future<void> publishMenu() async {
