@@ -1,3 +1,5 @@
+oydlp
+
 # Why Not Cafe — How The System Works
 
 This document explains the whole system in plain English.
@@ -245,6 +247,7 @@ and publish them all at once — customers never see half-done work.
 ```
 
 The publish button is available to:
+
 - Owner → always
 - Manager → always
 - Staff → cannot publish (staff can only toggle available/unavailable)

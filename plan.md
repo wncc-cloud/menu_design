@@ -1,3 +1,5 @@
+`ede
+
 # Why Not Cafe - Menu Website & Admin
 
 Version: 7.0 — FROZEN
@@ -1692,6 +1694,7 @@ Allows an admin to silently hide any item or section from the public menu withou
 deleting it. Hidden items and sections remain in the draft for future use.
 
 This is different from the existing availability toggle:
+
 - available: false → item shows on the public menu with an "Unavailable" badge
 - active: false    → item is completely invisible on the public menu
 
@@ -1729,6 +1732,7 @@ After (sections and items):
 Items page: add a hide/show toggle button next to each item tile.
 
 The toggle should be visually distinct from the availability switch:
+
 - Use an eye icon (Icons.visibility / Icons.visibility_off) rather than a Switch
 - Hidden items appear greyed out in the admin list so the admin can see them
 - A small "Hidden from menu" label appears under the item name when active is false

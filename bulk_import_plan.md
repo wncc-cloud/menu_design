@@ -4,24 +4,25 @@
 
 One sheet named **"Menu Items"**.
 
-| Col | Header | Required | Type | Format / Notes |
-|-----|--------|----------|------|----------------|
-| A | Section | ✅ | Text | Type section name — matches existing (case-insensitive) or creates new |
-| B | Section Icon | — | Text | Type an emoji e.g. ☕ 🍕 🥗 (blank = no icon) |
-| C | Item Name | ✅ | Text | Free text |
-| D | Price (₹) | ✅ | Number | Must be ≥ 0, whole or decimal |
-| E | Description | — | Text | Free text |
-| F | Ingredients | — | Text | Free text |
-| G | Veg | ✅ | Text | Type YES or NO (case-insensitive, validated on import) |
-| H | Bestseller | — | Text | YES / NO / blank (blank = NO) |
-| I | Available | — | Text | YES / NO / blank (blank = YES) |
-| J | Available From | — | Text | 24-hr format: HH:MM e.g. 07:00 (blank = always) |
-| K | Available Till | — | Text | 24-hr format: HH:MM e.g. 23:00 (blank = always) |
-| L | Active (Visible) | — | Text | YES / NO / blank (blank = YES) |
+| Col | Header           | Required | Type   | Format / Notes                                                          |
+| --- | ---------------- | -------- | ------ | ----------------------------------------------------------------------- |
+| A   | Section          | ✅       | Text   | Type section name — matches existing (case-insensitive) or creates new |
+| B   | Section Icon     | —       | Text   | Type an emoji e.g. ☕ 🍕 🥗 (blank = no icon)                           |
+| C   | Item Name        | ✅       | Text   | Free text                                                               |
+| D   | Price (₹)       | ✅       | Number | Must be ≥ 0, whole or decimal                                          |
+| E   | Description      | —       | Text   | Free text                                                               |
+| F   | Ingredients      | —       | Text   | Free text                                                               |
+| G   | Veg              | ✅       | Text   | Type YES or NO (case-insensitive, validated on import)                  |
+| H   | Bestseller       | —       | Text   | YES / NO / blank (blank = NO)                                           |
+| I   | Available        | —       | Text   | YES / NO / blank (blank = YES)                                          |
+| J   | Available From   | —       | Text   | 24-hr format: HH:MM e.g. 07:00 (blank = always)                         |
+| K   | Available Till   | —       | Text   | 24-hr format: HH:MM e.g. 23:00 (blank = always)                         |
+| L   | Active (Visible) | —       | Text   | YES / NO / blank (blank = YES)                                          |
 
 **Total columns: 12**
 
 ### Notes on the sheet
+
 - Row 1: Instruction banner (light yellow bg, bold):
   `"Fill from row 3. Max 100 items per upload. Type a NEW section name to create one. Section Icon is optional (emoji). Leave optional columns blank for defaults."`
 - Row 2: Headers (bold, dark green background, white text)
@@ -32,6 +33,7 @@ One sheet named **"Menu Items"**.
 - Columns J and K: free text (time format validated on import, not in-sheet)
 
 ### Section Icon behaviour
+
 - The icon is tied to the **section**, not the item. If two rows share the same section name but different icons, the **first occurrence wins**.
 - If the section already exists in the draft, its icon is **not overwritten** — existing sections keep their current icon.
 - Only newly created sections get the icon from the sheet.
@@ -43,30 +45,31 @@ One sheet named **"Menu Items"**.
 All errors are collected first and shown together. Upload is blocked until every error is fixed.
 **Pre-checks run before per-row validation. If a pre-check fails, stop immediately (do not continue to row validation).**
 
-| # | Rule | Error message |
-|---|------|---------------|
-| 0a | No sheet named "Menu Items" in the file | "Sheet 'Menu Items' not found. Download the sample template to get the correct format." |
-| 0b | More than 100 data rows | "File has N items. Maximum allowed per upload is 100." |
-| 1 | Row completely empty → skip silently | — |
-| 2 | Section (A) empty | Row N: Section is required |
-| 3 | Item Name (C) empty | Row N: Item Name is required |
-| 4 | Price (D) empty or not a number | Row N: Price must be a number |
-| 5 | Price (D) < 0 | Row N: Price cannot be negative |
-| 6 | Veg (G) not YES/NO | Row N: Veg must be YES or NO |
-| 7 | Bestseller (H) not YES/NO/blank | Row N: Bestseller must be YES, NO, or blank |
-| 8 | Available (I) not YES/NO/blank | Row N: Available must be YES, NO, or blank |
-| 9 | Available From (J) set but not HH:MM | Row N: Available From must be HH:MM (e.g. 07:00) |
-| 10 | Available Till (K) set but not HH:MM | Row N: Available Till must be HH:MM (e.g. 23:00) |
-| 11 | Only one of From/Till is set | Row N: Set both Available From and Available Till together, or leave both blank |
-| 12 | Active (L) not YES/NO/blank | Row N: Active must be YES, NO, or blank |
-| 13 | Duplicate item name **within the uploaded sheet** | Row N: Item name "X" appears more than once in this file |
-| 14 | Item name **already exists in the current draft** | Row N: Item "X" already exists in the menu draft |
+| #  | Rule                                                   | Error message                                                                           |
+| -- | ------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| 0a | No sheet named "Menu Items" in the file                | "Sheet 'Menu Items' not found. Download the sample template to get the correct format." |
+| 0b | More than 100 data rows                                | "File has N items. Maximum allowed per upload is 100."                                  |
+| 1  | Row completely empty → skip silently                  | —                                                                                      |
+| 2  | Section (A) empty                                      | Row N: Section is required                                                              |
+| 3  | Item Name (C) empty                                    | Row N: Item Name is required                                                            |
+| 4  | Price (D) empty or not a number                        | Row N: Price must be a number                                                           |
+| 5  | Price (D) < 0                                          | Row N: Price cannot be negative                                                         |
+| 6  | Veg (G) not YES/NO                                     | Row N: Veg must be YES or NO                                                            |
+| 7  | Bestseller (H) not YES/NO/blank                        | Row N: Bestseller must be YES, NO, or blank                                             |
+| 8  | Available (I) not YES/NO/blank                         | Row N: Available must be YES, NO, or blank                                              |
+| 9  | Available From (J) set but not HH:MM                   | Row N: Available From must be HH:MM (e.g. 07:00)                                        |
+| 10 | Available Till (K) set but not HH:MM                   | Row N: Available Till must be HH:MM (e.g. 23:00)                                        |
+| 11 | Only one of From/Till is set                           | Row N: Set both Available From and Available Till together, or leave both blank         |
+| 12 | Active (L) not YES/NO/blank                            | Row N: Active must be YES, NO, or blank                                                 |
+| 13 | Duplicate item name**within the uploaded sheet** | Row N: Item name "X" appears more than once in this file                                |
+| 14 | Item name**already exists in the current draft** | Row N: Item "X" already exists in the menu draft                                        |
 
 ---
 
 ## Append Logic
 
 ### Sections
+
 1. Load all existing sections from the current draft.
 2. For each unique section name in the Excel (case-insensitive match against existing):
    - **Match found** → use existing section `id`. Icon is NOT updated.
@@ -74,6 +77,7 @@ All errors are collected first and shown together. Upload is blocked until every
 3. New sections are appended to `draft.sections`.
 
 ### Items
+
 1. For each valid row:
    - New UUID for `id`.
    - `sectionId` resolved from the section step above.
@@ -86,28 +90,30 @@ All errors are collected first and shown together. Upload is blocked until every
 
 ### Defaults for blank optional columns
 
-| Field | Default |
-|-------|---------|
-| Section Icon (B) | `""` |
-| Description (E) | `""` |
-| Ingredients (F) | `""` |
-| Bestseller (H) | `false` |
-| Available (I) | `true` |
-| Available From (J) | `""` |
-| Available Till (K) | `""` |
-| Active (L) | `true` |
+| Field              | Default   |
+| ------------------ | --------- |
+| Section Icon (B)   | `""`    |
+| Description (E)    | `""`    |
+| Ingredients (F)    | `""`    |
+| Bestseller (H)     | `false` |
+| Available (I)      | `true`  |
+| Available From (J) | `""`    |
+| Available Till (K) | `""`    |
+| Active (L)         | `true`  |
 
 ---
 
 ## UI Flow
 
 ### Entry point
+
 Admin Items page AppBar → second icon button: `Icons.upload_file`, tooltip "Bulk Import".
 Navigates to `/admin/items/import`.
 
 ### Bulk Import Page
 
 **Step 1 — Landing**
+
 ```
 Bulk Import
 
@@ -116,6 +122,7 @@ Bulk Import
 ```
 
 **Step 2a — Errors found**
+
 ```
 ❌ 3 errors found — fix the file and re-upload
 
@@ -127,6 +134,7 @@ Bulk Import
 ```
 
 **Step 2b — Validation passed**
+
 ```
 ✅ Ready to import
 
@@ -143,6 +151,7 @@ Bulk Import
 ```
 
 **Step 3 — After confirming**
+
 - Spinner while writing to Firestore
 - Success snackbar: "14 items added to draft. Publish to go live."
 - Navigate back to Items page
@@ -160,6 +169,7 @@ No conflicts with existing packages.
 ## Files to Create / Modify
 
 ### New files
+
 ```
 lib/features/admin/items/bulk_import/
   bulk_import_service.dart    — generate template xlsx, parse + validate uploaded file
@@ -169,12 +179,12 @@ lib/features/admin/items/bulk_import/
 
 ### Modified files
 
-| File | Change |
-|------|--------|
-| `pubspec.yaml` | Add `excel: ^4.x` |
-| `lib/router.dart` | Add route `/admin/items/import` |
-| `lib/features/admin/items/items_page.dart` | Add upload icon in AppBar |
-| `lib/features/admin/sections/sections_provider.dart` | Add `appendBulkImport(newSections, newItems)` method on `DraftNotifier` (NOT draft_repository — must go through `_save()` to stamp `draftUpdatedAt` and `updatedBy`) |
+| File                                                   | Change                                                                                                                                                                         |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `pubspec.yaml`                                       | Add`excel: ^4.x`                                                                                                                                                             |
+| `lib/router.dart`                                    | Add route`/admin/items/import`                                                                                                                                               |
+| `lib/features/admin/items/items_page.dart`           | Add upload icon in AppBar                                                                                                                                                      |
+| `lib/features/admin/sections/sections_provider.dart` | Add`appendBulkImport(newSections, newItems)` method on `DraftNotifier` (NOT draft_repository — must go through `_save()` to stamp `draftUpdatedAt` and `updatedBy`) |
 
 ---
 
@@ -212,6 +222,7 @@ import 'bulk_import_result.dart'; // same directory — BulkImportResult, BulkIm
 ```
 
 Path math (from `lib/features/admin/items/bulk_import/`):
+
 - `../` → `lib/features/admin/items/`
 - `../../` → `lib/features/admin/`
 - `../../../` → `lib/features/`  ← shared is here
@@ -248,6 +259,7 @@ excel.save(fileName: 'menu_import_template.xlsx');
 ```
 
 **ExcelColor constants to use:**
+
 - Instruction banner background: `ExcelColor.yellow50` (= `#FFFFFDE7`, very light yellow — confirmed exists)
 - Header row background: `ExcelColor.green800` (= `#FF2E7D32` — exactly matches the app's green)
 - Header row text: `ExcelColor.white`
