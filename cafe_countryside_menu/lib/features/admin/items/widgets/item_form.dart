@@ -35,6 +35,7 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
   late bool _isVeg;
   late bool _isBestseller;
   late bool _available;
+  late bool _requiresKitchen;
 
   late String _imageUrl;
   late String _cloudinaryPublicId;
@@ -56,6 +57,7 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
     _isVeg = e?.isVeg ?? true;
     _isBestseller = e?.isBestseller ?? false;
     _available = e?.available ?? true;
+    _requiresKitchen = e?.requiresKitchen ?? true;
     _imageUrl = e?.imageUrl ?? '';
     _cloudinaryPublicId = e?.cloudinaryPublicId ?? '';
   }
@@ -156,6 +158,7 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
       available: _available,
       availableFrom: _fromCtrl.text.trim(),
       availableTill: _tillCtrl.text.trim(),
+      requiresKitchen: _requiresKitchen,
       sortOrder: widget.existing?.sortOrder ?? 0,
       businessId: 'default',
       createdAt: widget.existing?.createdAt ?? now,
@@ -299,6 +302,12 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
                   label: 'Available now',
                   value: _available,
                   onChanged: (v) => setState(() => _available = v),
+                  activeColor: const Color(0xFF2E7D32),
+                ),
+                _ToggleRow(
+                  label: 'Needs kitchen preparation?',
+                  value: _requiresKitchen,
+                  onChanged: (v) => setState(() => _requiresKitchen = v),
                   activeColor: const Color(0xFF2E7D32),
                 ),
               ],

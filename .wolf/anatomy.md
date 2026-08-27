@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-07-04T17:27:56.292Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-08-20T10:50:19.498Z
 > Files: 365 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -523,7 +523,7 @@
 
 ## cafe_countryside_menu/lib/features/admin/items/widgets/
 
-- `item_form.dart` — Stateful widget: ItemFormDialog (~3760 tok)
+- `item_form.dart` — Stateful widget: ItemFormDialog (~3866 tok)
 
 ## cafe_countryside_menu/lib/features/admin/profile/
 
@@ -572,7 +572,7 @@
 - `admin_model.dart` — Declares AdminRole (~319 tok)
 - `business_model.dart` — Declares BusinessModel (~754 tok)
 - `draft_data.dart` — Declares DraftData (~664 tok)
-- `draft_item_model.dart` — Declares DraftItemModel (~1142 tok)
+- `draft_item_model.dart` — Class: DraftItemModel (~1213 tok)
 - `draft_section_model.dart` — Declares DraftSectionModel (~527 tok)
 
 ## cafe_countryside_menu/lib/features/shared/permissions/
@@ -583,7 +583,7 @@
 
 - `admin_repository.dart` — Declares AdminRepository (~136 tok)
 - `business_repository.dart` — Declares BusinessRepository (~218 tok)
-- `draft_repository.dart` — Declares DraftRepository (~1234 tok)
+- `draft_repository.dart` — Class: DraftRepository (~1250 tok)
 
 ## cafe_countryside_menu/lib/features/shared/services/
 
@@ -602,5 +602,5 @@
 
 ## cafe_countryside_menu/web/
 
-- `index.html` — cafe_countryside_menu (~455 tok)
-- `manifest.json` (~268 tok)
+- `index.html` — Why Not? Cafe Countryside - Menu (~688 tok)
+- `manifest.json` (~274 tok)

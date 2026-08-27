@@ -122,6 +122,7 @@ class DraftRepository {
                   'available': item.available,
                   'availableFrom': item.availableFrom,
                   'availableTill': item.availableTill,
+                  'requiresKitchen': item.requiresKitchen,
                   'sortOrder': item.sortOrder,
                 })
             .toList(),

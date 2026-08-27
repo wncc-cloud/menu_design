@@ -1,4 +1,21 @@
 {
   "version": 1,
-  "bugs": []
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-08-20T10:50:13.697Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/web/index.html",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 15→27 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-08-20T10:50:13.697Z"
+    }
+  ]
 }
