@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
+import 'core/services/pos_app_check_service.dart';
 import 'firebase_options.dart';
 import 'router.dart';
 
@@ -10,6 +11,8 @@ void main() async {
   usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Never fatal — see PosAppCheckService.activate()'s own doc.
+  await PosAppCheckService.activate();
   runApp(const ProviderScope(child: CafeApp()));
 }
 

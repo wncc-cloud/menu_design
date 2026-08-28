@@ -1,20 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../order/providers/cart_provider.dart';
 import '../../models/item_model.dart';
 
-class ItemCard extends StatelessWidget {
+class ItemCard extends ConsumerWidget {
   final ItemModel item;
 
   const ItemCard({super.key, required this.item});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isAvailable = item.isCurrentlyAvailable;
     final imageUrl = item.cloudinaryImageUrl;
+
+    // Café-owner ask: make what's already selected visible right on the
+    // menu grid, not just inside the cart — this is purely local
+    // Riverpod state (cartProvider isn't keepAlive, see its own doc
+    // comment), so losing it on a refresh is expected/fine, not a bug.
+    final cartLines = ref.watch(cartProvider).where((l) => l.menuItemId == item.id);
+    final quantity = cartLines.isEmpty ? 0 : cartLines.first.quantity;
+    final isSelected = quantity > 0;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       clipBehavior: Clip.antiAlias,
+      color: isSelected ? const Color(0xFFE8F5E9) : null,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(4),
+        side: isSelected
+            ? const BorderSide(color: Color(0xFF2E7D32), width: 1.5)
+            : BorderSide.none,
+      ),
       child: Opacity(
         opacity: isAvailable ? 1.0 : 0.55,
         child: Padding(
@@ -43,12 +60,46 @@ class ItemCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      item.formattedPrice,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
+                    Row(
+                      children: [
+                        Text(
+                          item.formattedPrice,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        ),
+                        const Spacer(),
+                        // phase_plan/phase11_6.md Build step 2 — the
+                        // first tap handler this card has ever had.
+                        // Reuses the SAME isAvailable check the card's
+                        // own dimming treatment already computes above
+                        // — never a separate, driftable copy of the
+                        // available/time-window logic. Once quantity >
+                        // 0, swaps to a [ − qty + ] stepper right on
+                        // the card (Swiggy/Zomato-familiar pattern) so
+                        // adjusting doesn't require opening the cart.
+                        if (!isSelected)
+                          IconButton(
+                            tooltip: isAvailable ? 'Add to cart' : 'Unavailable',
+                            onPressed:
+                                isAvailable ? () => ref.read(cartProvider.notifier).addItem(item) : null,
+                            icon: const Icon(Icons.add_circle),
+                            iconSize: 32,
+                            color: const Color(0xFF2E7D32),
+                            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                          )
+                        else
+                          _QuantityStepper(
+                            quantity: quantity,
+                            onDecrement: () => ref
+                                .read(cartProvider.notifier)
+                                .setQuantity(item.id, quantity - 1),
+                            onIncrement: () => ref
+                                .read(cartProvider.notifier)
+                                .setQuantity(item.id, quantity + 1),
                           ),
+                      ],
                     ),
                     if (item.isBestseller || !isAvailable) ...[
                       const SizedBox(height: 6),
@@ -113,6 +164,58 @@ class ItemCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _QuantityStepper extends StatelessWidget {
+  final int quantity;
+  final VoidCallback onDecrement;
+  final VoidCallback onIncrement;
+
+  const _QuantityStepper({
+    required this.quantity,
+    required this.onDecrement,
+    required this.onIncrement,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF2E7D32),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            tooltip: quantity == 1 ? 'Remove from cart' : 'Decrease quantity',
+            onPressed: onDecrement,
+            icon: const Icon(Icons.remove, size: 18),
+            color: Colors.white,
+            // Material's 48x48dp minimum touch target — the compact/
+            // tight version here was actually harder to tap than the
+            // plain + button it replaces, the opposite of the ask.
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+          ),
+          SizedBox(
+            width: 22,
+            child: Text(
+              '$quantity',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Increase quantity',
+            onPressed: onIncrement,
+            icon: const Icon(Icons.add, size: 18),
+            color: Colors.white,
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+          ),
+        ],
       ),
     );
   }

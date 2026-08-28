@@ -15,6 +15,17 @@ class ItemModel {
   final String cloudinaryPublicId;
   final int sortOrder;
 
+  /// `phase_plan/phase11_5.md` (billing_cafe repo) — already written
+  /// into the raw `menu/current` document by `draft_repository.dart`'s
+  /// `publishMenu()` (from the admin-side `DraftItemModel`, which has
+  /// had this field since 2026-08-18), but never parsed back out here
+  /// until now — the gap this fix closes. Defaults `true` (kitchen-
+  /// routed) when absent, matching billing_cafe's own "missing field
+  /// means kitchen-routed" convention for the same raw field, so every
+  /// item published before this field existed keeps behaving exactly
+  /// as it always has.
+  final bool requiresKitchen;
+
   const ItemModel({
     required this.id,
     required this.sectionId,
@@ -29,6 +40,7 @@ class ItemModel {
     this.ingredients = '',
     this.cloudinaryPublicId = '',
     this.sortOrder = 0,
+    this.requiresKitchen = true,
   });
 
   factory ItemModel.fromJson(Map<String, dynamic> json) {
@@ -46,6 +58,7 @@ class ItemModel {
       ingredients: json['ingredients'] as String? ?? '',
       cloudinaryPublicId: json['cloudinaryPublicId'] as String? ?? '',
       sortOrder: json['sortOrder'] as int? ?? 0,
+      requiresKitchen: json['requiresKitchen'] as bool? ?? true,
     );
   }
 
@@ -63,6 +76,7 @@ class ItemModel {
         'ingredients': ingredients,
         'cloudinaryPublicId': cloudinaryPublicId,
         'sortOrder': sortOrder,
+        'requiresKitchen': requiresKitchen,
       };
 
   // Returns false if marked unavailable, or outside its time window.

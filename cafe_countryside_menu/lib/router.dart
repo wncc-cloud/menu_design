@@ -13,6 +13,8 @@ import 'features/admin/profile/profile_page.dart';
 import 'features/admin/sections/sections_page.dart';
 import 'features/admin/settings/settings_page.dart';
 import 'features/menu/presentation/menu_page.dart';
+import 'features/order/presentation/checkout_page.dart';
+import 'features/order/presentation/order_status_page.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -34,6 +36,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/',
       builder: (_, _) => const MenuPage(),
+    ),
+    GoRoute(
+      path: '/checkout',
+      builder: (_, _) => const CheckoutPage(),
+    ),
+    GoRoute(
+      path: '/order-status/:requestId',
+      builder: (_, state) => OrderStatusPage(requestId: state.pathParameters['requestId']!),
     ),
     GoRoute(
       path: '/admin',

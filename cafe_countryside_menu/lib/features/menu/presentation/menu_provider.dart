@@ -11,6 +11,12 @@ import '../../shared/repositories/business_repository.dart';
 
 part 'menu_provider.g.dart';
 
+/// Sentinel `selectedSectionId` for the admin-toggleable "Best Sellers"
+/// chip — filters by `item.isBestseller` instead of a real section id,
+/// since it's derived from an existing per-item flag, not a genuine
+/// `sections` document.
+const bestsellersSectionId = '__bestsellers__';
+
 class MenuFilterState {
   final String searchQuery;
   final String? selectedSectionId;
@@ -84,7 +90,9 @@ List<ItemModel> filteredItems(Ref ref) {
     data: (menu) {
       if (menu == null) return [];
       var items = menu.items;
-      if (filter.selectedSectionId != null) {
+      if (filter.selectedSectionId == bestsellersSectionId) {
+        items = items.where((i) => i.isBestseller).toList();
+      } else if (filter.selectedSectionId != null) {
         items = items.where((i) => i.sectionId == filter.selectedSectionId).toList();
       }
       if (filter.searchQuery.isNotEmpty) {

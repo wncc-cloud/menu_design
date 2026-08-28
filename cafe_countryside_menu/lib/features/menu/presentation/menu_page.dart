@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+
+import 'package:go_router/go_router.dart';
 
 import '../models/item_model.dart';
 import '../models/menu_snapshot_model.dart';
+import '../models/section_model.dart';
+import '../../../core/services/external_link_service.dart';
+import '../../order/providers/cart_provider.dart';
 import '../../shared/models/business_model.dart';
 import 'menu_provider.dart';
 import 'widgets/item_card.dart';
@@ -66,6 +69,10 @@ class _MenuPageState extends ConsumerState<MenuPage> {
             tooltip: 'Refresh menu',
             onPressed: () => ref.invalidate(menuControllerProvider),
           ),
+          // phase_plan/phase11_6.md — the only way to actually reach
+          // /checkout; not called out explicitly in that doc's file
+          // list, but required for the feature to be reachable at all.
+          _CartButton(itemCount: ref.watch(cartProvider).fold<int>(0, (sum, l) => sum + l.quantity)),
         ],
       ),
       body: menuAsync.when(
@@ -104,6 +111,11 @@ class _MenuPageState extends ConsumerState<MenuPage> {
                 business: business,
               ),
       ),
+      // Café-owner ask: a persistent bottom cart bar (Swiggy/Zomato
+      // pattern) so the running item count/total is always visible
+      // without scrolling back up to the AppBar's cart icon. Renders
+      // nothing (SizedBox.shrink) while the cart is empty.
+      bottomNavigationBar: const _BottomCartBar(),
     );
   }
 }
@@ -136,7 +148,11 @@ class _MenuContent extends ConsumerWidget {
         ),
         if (menu.sections.isNotEmpty)
           SectionChipBar(
-            sections: menu.sections,
+            sections: [
+              if (business?.showBestsellersTab ?? true)
+                const SectionModel(id: bestsellersSectionId, name: 'Best Sellers', icon: '⭐'),
+              ...menu.sections,
+            ],
             selectedId: filter.selectedSectionId,
             onSelected: (id) =>
                 ref.read(menuFilterProvider.notifier).setSection(id),
@@ -171,23 +187,6 @@ class _CafeInfoStrip extends StatelessWidget {
   final BusinessModel? business;
 
   const _CafeInfoStrip({this.business});
-
-  void _open(String url) {
-    if (url.startsWith('tel:')) {
-      // tel: links navigate the current tab — no popup blocker concern.
-      html.window.location.href = url;
-    } else {
-      // Programmatic anchor click bypasses mobile Chrome's popup blocker.
-      // window.open(_blank) is blocked even from synchronous gestures in
-      // Flutter Web's CanvasKit touch path on Android Chrome.
-      final a = html.AnchorElement(href: url)
-        ..target = '_blank'
-        ..rel = 'noopener noreferrer';
-      html.document.body?.append(a);
-      a.click();
-      a.remove();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +228,7 @@ class _CafeInfoStrip extends StatelessWidget {
         children: items
             .map(
               (item) => GestureDetector(
-                onTap: item.url != null ? () => _open(item.url!) : null,
+                onTap: item.url != null ? () => openExternalLink(item.url!) : null,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -262,6 +261,91 @@ class _StripItem {
   final String label;
   final String? url;
   const _StripItem({required this.icon, required this.label, this.url});
+}
+
+class _BottomCartBar extends ConsumerWidget {
+  const _BottomCartBar();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cart = ref.watch(cartProvider);
+    if (cart.isEmpty) return const SizedBox.shrink();
+
+    final itemCount = cart.fold<int>(0, (sum, l) => sum + l.quantity);
+    final totalPaise = cart.fold<int>(0, (sum, l) => sum + l.lineTotalPaise);
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        child: Material(
+          color: const Color(0xFF2E7D32),
+          borderRadius: BorderRadius.circular(10),
+          elevation: 4,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () => context.push('/checkout'),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '$itemCount item${itemCount == 1 ? '' : 's'} · ₹${(totalPaise / 100).toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                  const Text(
+                    'View Cart',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CartButton extends StatelessWidget {
+  final int itemCount;
+  const _CartButton({required this.itemCount});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.shopping_cart_outlined),
+          tooltip: 'Checkout',
+          onPressed: itemCount == 0 ? null : () => context.push('/checkout'),
+        ),
+        if (itemCount > 0)
+          Positioned(
+            top: 6,
+            right: 6,
+            child: Container(
+              padding: const EdgeInsets.all(3),
+              decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+              constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+              child: Text(
+                '$itemCount',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
 }
 
 class _ItemsList extends StatelessWidget {

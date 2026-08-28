@@ -10,6 +10,24 @@ class BusinessModel {
   final String instagram;
   final String mapsUrl;
   final String openingHours;
+
+  /// phase_plan/phase11_6.md (billing_cafe repo) — how many minutes a
+  /// customer self-order request stays claimable before it expires.
+  /// Read by the checkout flow to compute `expiresAt`; bounded 1-25 in
+  /// the Settings form (the POS project's Security Rules ceiling is 30
+  /// minutes with some slack, so this stays comfortably under that
+  /// rather than letting an Admin configure a value the rules would
+  /// then silently reject at every customer's submit time).
+  final int orderRequestExpiryMinutes;
+
+  /// Café-owner ask: a "Best Sellers" chip in the section filter bar,
+  /// right after "All" — filters to items with `isBestseller: true`
+  /// (a pseudo-section, not a real `sections` document, since it's
+  /// derived from an existing per-item flag rather than a new
+  /// category). Admin-toggleable so it can be hidden at any time
+  /// without touching individual items' bestseller flags.
+  final bool showBestsellersTab;
+
   final DateTime? updatedAt;
 
   const BusinessModel({
@@ -22,6 +40,8 @@ class BusinessModel {
     required this.instagram,
     required this.mapsUrl,
     required this.openingHours,
+    this.orderRequestExpiryMinutes = 3,
+    this.showBestsellersTab = true,
     this.updatedAt,
   });
 
@@ -47,6 +67,8 @@ class BusinessModel {
         instagram: json['instagram'] as String? ?? '',
         mapsUrl: json['mapsUrl'] as String? ?? '',
         openingHours: json['openingHours'] as String? ?? '',
+        orderRequestExpiryMinutes: (json['orderRequestExpiryMinutes'] as num?)?.toInt() ?? 3,
+        showBestsellersTab: json['showBestsellersTab'] as bool? ?? true,
         updatedAt: (json['updatedAt'] as Timestamp?)?.toDate(),
       );
 
@@ -60,6 +82,8 @@ class BusinessModel {
         'instagram': instagram,
         'mapsUrl': mapsUrl,
         'openingHours': openingHours,
+        'orderRequestExpiryMinutes': orderRequestExpiryMinutes,
+        'showBestsellersTab': showBestsellersTab,
         if (updatedAt != null) 'updatedAt': Timestamp.fromDate(updatedAt!),
       };
 
@@ -73,6 +97,8 @@ class BusinessModel {
     String? instagram,
     String? mapsUrl,
     String? openingHours,
+    int? orderRequestExpiryMinutes,
+    bool? showBestsellersTab,
     DateTime? updatedAt,
   }) =>
       BusinessModel(
@@ -85,6 +111,8 @@ class BusinessModel {
         instagram: instagram ?? this.instagram,
         mapsUrl: mapsUrl ?? this.mapsUrl,
         openingHours: openingHours ?? this.openingHours,
+        orderRequestExpiryMinutes: orderRequestExpiryMinutes ?? this.orderRequestExpiryMinutes,
+        showBestsellersTab: showBestsellersTab ?? this.showBestsellersTab,
         updatedAt: updatedAt ?? this.updatedAt,
       );
 }
