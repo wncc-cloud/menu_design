@@ -145,6 +145,10 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     final business = ref.watch(businessProvider).asData?.value;
     final expiryMinutes = business?.orderRequestExpiryMinutes ?? 3;
     final subtotalPaise = cart.fold<int>(0, (sum, l) => sum + l.lineTotalPaise);
+    // Admin kill-switch — closes the loophole of a bookmarked/typed
+    // /checkout URL still working after ordering's been turned off,
+    // even though the menu page already hides every entry point to it.
+    final selfOrderEnabled = business?.selfOrderEnabled ?? false;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F8E9),
@@ -153,7 +157,18 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
         foregroundColor: Colors.white,
         title: const Text('Checkout', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
-      body: cart.isEmpty
+      body: !selfOrderEnabled
+          ? const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Text(
+                  "Self-ordering isn't available right now — please order at the counter.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ),
+            )
+          : cart.isEmpty
           ? const Center(
               child: Padding(
                 padding: EdgeInsets.all(24),

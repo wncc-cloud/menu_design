@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-08-20T10:50:19.498Z
-> Files: 365 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-08-28T18:54:39.698Z
+> Files: 367 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -541,7 +541,7 @@
 
 ## cafe_countryside_menu/lib/features/admin/settings/
 
-- `settings_page.dart` — Stateful widget: _LogoPreview (~3234 tok)
+- `settings_page.dart` — Flutter widget (~4088 tok)
 - `settings_provider.dart` — Riverpod provider (~231 tok)
 - `settings_provider.g.dart` — SettingsBusinessRepositoryProvider: debugGetCreateSourceHash, debugGetCreateSourceHash (~768 tok)
 
@@ -557,20 +557,24 @@
 
 ## cafe_countryside_menu/lib/features/menu/presentation/
 
-- `menu_page.dart` — ignore: avoid_web_libraries_in_flutter (~2251 tok)
+- `menu_page.dart` — Stateful widget: _CafeInfoStrip (~3184 tok)
 - `menu_provider.dart` — Riverpod provider (~734 tok)
 - `menu_provider.g.dart` — MenuRepositoryProvider: debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash (~1637 tok)
 
 ## cafe_countryside_menu/lib/features/menu/presentation/widgets/
 
-- `item_card.dart` — Stateless widget: ItemCard (~1744 tok)
+- `item_card.dart` — Stateless widget: _QuantityStepper (~3039 tok)
 - `search_bar.dart` — Stateless widget: MenuSearchBar (~350 tok)
 - `section_chip.dart` — Stateless widget: SectionChipBar (~483 tok)
+
+## cafe_countryside_menu/lib/features/order/presentation/
+
+- `checkout_page.dart` — Stateful widget: _CartLineTile (~3018 tok)
 
 ## cafe_countryside_menu/lib/features/shared/models/
 
 - `admin_model.dart` — Declares AdminRole (~319 tok)
-- `business_model.dart` — Declares BusinessModel (~754 tok)
+- `business_model.dart` — Class: BusinessModel (~1364 tok)
 - `draft_data.dart` — Declares DraftData (~664 tok)
 - `draft_item_model.dart` — Class: DraftItemModel (~1213 tok)
 - `draft_section_model.dart` — Declares DraftSectionModel (~527 tok)
@@ -595,6 +599,10 @@
 
 - `loading_widget.dart` (~0 tok)
 - `publish_banner.dart` — PublishBanner: build (~603 tok)
+
+## cafe_countryside_menu/phase_plan/
+
+- `customer_ux_psychology.md` — Customer UX/Psychology Pass — Cafe Countryside Menu (~2061 tok)
 
 ## cafe_countryside_menu/test/
 

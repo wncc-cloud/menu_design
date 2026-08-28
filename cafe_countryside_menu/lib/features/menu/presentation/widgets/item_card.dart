@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../order/providers/cart_provider.dart';
 import '../../models/item_model.dart';
+import '../menu_provider.dart';
 
 class ItemCard extends ConsumerWidget {
   final ItemModel item;
@@ -21,6 +22,10 @@ class ItemCard extends ConsumerWidget {
     final cartLines = ref.watch(cartProvider).where((l) => l.menuItemId == item.id);
     final quantity = cartLines.isEmpty ? 0 : cartLines.first.quantity;
     final isSelected = quantity > 0;
+    // Admin kill-switch (Settings > Self-Order) — no add-to-cart
+    // affordance at all while ordering is disabled, so there's nothing
+    // left dangling once the cart button/bar are hidden elsewhere.
+    final selfOrderEnabled = ref.watch(businessProvider).asData?.value?.selfOrderEnabled ?? false;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -79,7 +84,9 @@ class ItemCard extends ConsumerWidget {
                         // 0, swaps to a [ − qty + ] stepper right on
                         // the card (Swiggy/Zomato-familiar pattern) so
                         // adjusting doesn't require opening the cart.
-                        if (!isSelected)
+                        if (!selfOrderEnabled)
+                          const SizedBox.shrink()
+                        else if (!isSelected)
                           IconButton(
                             tooltip: isAvailable ? 'Add to cart' : 'Unavailable',
                             onPressed:

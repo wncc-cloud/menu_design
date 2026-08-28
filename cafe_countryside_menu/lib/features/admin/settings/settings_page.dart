@@ -27,6 +27,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   BusinessModel? _current;
   bool _showBestsellersTab = true;
+  bool _selfOrderEnabled = false;
   bool _saving = false;
   bool _logoUploading = false;
   String? _saveError;
@@ -66,6 +67,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     _hoursCtrl.text = b.openingHours;
     _expiryCtrl.text = b.orderRequestExpiryMinutes.toString();
     _showBestsellersTab = b.showBestsellersTab;
+    _selfOrderEnabled = b.selfOrderEnabled;
   }
 
   BusinessModel _buildFromControllers() {
@@ -78,6 +80,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       openingHours: _hoursCtrl.text.trim(),
       orderRequestExpiryMinutes: int.tryParse(_expiryCtrl.text.trim()) ?? base.orderRequestExpiryMinutes,
       showBestsellersTab: _showBestsellersTab,
+      selfOrderEnabled: _selfOrderEnabled,
     );
   }
 
@@ -306,6 +309,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
                   _SectionLabel('Self-Order'),
                   const SizedBox(height: 12),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Enable self-ordering'),
+                    subtitle: const Text(
+                      'Lets customers add items to a cart and place an order '
+                      'from their phone. Turning this off immediately hides '
+                      'the cart and checkout from the menu — use this if '
+                      'something goes wrong and you need to stop new orders '
+                      'right away. Orders already placed are not affected.',
+                    ),
+                    value: _selfOrderEnabled,
+                    onChanged: (v) => setState(() => _selfOrderEnabled = v),
+                  ),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _expiryCtrl,
                     decoration: const InputDecoration(

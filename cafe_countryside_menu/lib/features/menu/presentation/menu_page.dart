@@ -72,7 +72,10 @@ class _MenuPageState extends ConsumerState<MenuPage> {
           // phase_plan/phase11_6.md — the only way to actually reach
           // /checkout; not called out explicitly in that doc's file
           // list, but required for the feature to be reachable at all.
-          _CartButton(itemCount: ref.watch(cartProvider).fold<int>(0, (sum, l) => sum + l.quantity)),
+          // Hidden entirely while selfOrderEnabled is off (admin
+          // kill-switch) so there's no dead entry point left visible.
+          if (business?.selfOrderEnabled ?? false)
+            _CartButton(itemCount: ref.watch(cartProvider).fold<int>(0, (sum, l) => sum + l.quantity)),
         ],
       ),
       body: menuAsync.when(
@@ -268,6 +271,9 @@ class _BottomCartBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selfOrderEnabled = ref.watch(businessProvider).asData?.value?.selfOrderEnabled ?? false;
+    if (!selfOrderEnabled) return const SizedBox.shrink();
+
     final cart = ref.watch(cartProvider);
     if (cart.isEmpty) return const SizedBox.shrink();
 
