@@ -12,11 +12,10 @@ part of 'order_request_provider.dart';
 /// config (Firebase web API keys/project ids aren't secrets — same
 /// convention already used throughout billing_cafe's own
 /// `firebase_options_pos.dart`), matching the values already hardcoded
-/// in `core/services/pos_app_check_service.dart`'s `_devOptions`.
-/// Point this at `why-not-cafe-prod` once this app is ready to go live
-/// against prod — no dev/prod flavor concept exists in this project
-/// yet, so this is hardcoded to dev for now rather than building one
-/// just for this.
+/// in `core/services/pos_app_check_service.dart`'s `_posOptions`.
+/// Points at `why-not-cafe-prod` (2026-08-29 — no dev/prod flavor
+/// concept exists in this project, so this is a plain hardcoded swap,
+/// not a toggle).
 
 @ProviderFor(orderRequestRepository)
 final orderRequestRepositoryProvider = OrderRequestRepositoryProvider._();
@@ -25,11 +24,10 @@ final orderRequestRepositoryProvider = OrderRequestRepositoryProvider._();
 /// config (Firebase web API keys/project ids aren't secrets — same
 /// convention already used throughout billing_cafe's own
 /// `firebase_options_pos.dart`), matching the values already hardcoded
-/// in `core/services/pos_app_check_service.dart`'s `_devOptions`.
-/// Point this at `why-not-cafe-prod` once this app is ready to go live
-/// against prod — no dev/prod flavor concept exists in this project
-/// yet, so this is hardcoded to dev for now rather than building one
-/// just for this.
+/// in `core/services/pos_app_check_service.dart`'s `_posOptions`.
+/// Points at `why-not-cafe-prod` (2026-08-29 — no dev/prod flavor
+/// concept exists in this project, so this is a plain hardcoded swap,
+/// not a toggle).
 
 final class OrderRequestRepositoryProvider
     extends
@@ -43,11 +41,10 @@ final class OrderRequestRepositoryProvider
   /// config (Firebase web API keys/project ids aren't secrets — same
   /// convention already used throughout billing_cafe's own
   /// `firebase_options_pos.dart`), matching the values already hardcoded
-  /// in `core/services/pos_app_check_service.dart`'s `_devOptions`.
-  /// Point this at `why-not-cafe-prod` once this app is ready to go live
-  /// against prod — no dev/prod flavor concept exists in this project
-  /// yet, so this is hardcoded to dev for now rather than building one
-  /// just for this.
+  /// in `core/services/pos_app_check_service.dart`'s `_posOptions`.
+  /// Points at `why-not-cafe-prod` (2026-08-29 — no dev/prod flavor
+  /// concept exists in this project, so this is a plain hardcoded swap,
+  /// not a toggle).
   OrderRequestRepositoryProvider._()
     : super(
         from: null,
@@ -83,4 +80,4 @@ final class OrderRequestRepositoryProvider
 }
 
 String _$orderRequestRepositoryHash() =>
-    r'1e7e541d45abd79ad9e869c921a5b9c4a597b733';
+    r'eb7bc0361cb4cd17d09469733c60d4fc79f20de2';

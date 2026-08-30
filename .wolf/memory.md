@@ -75,3 +75,27 @@
 | 00:24 | Edited cafe_countryside_menu/phase_plan/customer_ux_psychology.md | expanded (+6 lines) | ~151 |
 | 00:24 | Edited cafe_countryside_menu/phase_plan/customer_ux_psychology.md | 7→12 lines | ~165 |
 | 00:24 | Session end: 19 writes across 6 files (business_model.dart, settings_page.dart, menu_page.dart, item_card.dart, checkout_page.dart) | 18 reads | ~11446 tok |
+| 01:51 | Session end: 19 writes across 6 files (business_model.dart, settings_page.dart, menu_page.dart, item_card.dart, checkout_page.dart) | 18 reads | ~11446 tok |
+| 01:55 | Session end: 19 writes across 6 files (business_model.dart, settings_page.dart, menu_page.dart, item_card.dart, checkout_page.dart) | 18 reads | ~11446 tok |
+| 02:45 | Cross-repo efficiency audit fix: guarded _pollOnce() against expiresAt before fetch and before scheduling Timer.periodic | cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart | fixed unbounded self-order status poll (billing_cafe phase_plan/phase11_9.md Task 1) | ~1200 |
+| 02:45 | Widened MenuController's background refresh Timer.periodic from 5 to 20 minutes, made constant public for testability | cafe_countryside_menu/lib/features/menu/presentation/menu_provider.dart | fixed unbounded menu refresh cost (billing_cafe phase_plan/phase11_9.md Task 3) | ~600 |
+| 02:45 | Split dart:html usage into conditional import (web impl + VM-safe stub) after discovering flutter test can't compile a widget test that transitively imports it | cafe_countryside_menu/lib/core/services/external_link_service.dart, external_link_service_web.dart, external_link_service_stub.dart | flutter test now passes on plain VM platform, no --platform chrome needed | ~900 |
+| 02:45 | Added widget test asserting poll Timer stops once expiresAt passes, plus happy-path (claimed-before-expiry) regression test | cafe_countryside_menu/test/order_status_page_test.dart | 2 new tests, both pass | ~1400 |
+| 02:45 | Added test pinning the widened menu refresh interval constant | cafe_countryside_menu/test/menu_provider_test.dart | 1 new test, passes | ~300 |
+| 02:45 | Session end: flutter analyze clean (2 pre-existing dart:html deprecation infos, unrelated); flutter test 43/43 passing (40 baseline + 3 new) | order_status_page.dart, menu_provider.dart, external_link_service*.dart, 2 new test files | verified no regressions | ~9000 |
+
+## Session: 2026-08-29 14:50
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 14:55 | Deployed to prod (Firebase Hosting) from add-customer-order-functionality branch, uncommitted WIP included, tests skipped per user | cafe_countryside_menu/build/web | success: https://cafe-countryside-menu.web.app | ~1200 |
+
+## Session: 2026-08-30 13:39
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-08-30 15:06
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|

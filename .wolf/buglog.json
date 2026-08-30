@@ -7,7 +7,7 @@
       "error_message": "Significant refactor of ",
       "file": "cafe_countryside_menu/web/index.html",
       "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 15→27 lines (3 removed)",
+      "fix": "Rewrote 15\u219227 lines (3 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -71,7 +71,7 @@
       "error_message": "Significant refactor of ",
       "file": "cafe_countryside_menu/phase_plan/customer_ux_psychology.md",
       "root_cause": "7 lines replaced/restructured",
-      "fix": "Rewrote 7→11 lines (7 removed) | Also: ## Open questions for you; 1. Priority order above is my read of impact-vs-ef",
+      "fix": "Rewrote 7\u219211 lines (7 removed) | Also: ## Open questions for you; 1. Priority order above is my read of impact-vs-ef",
       "tags": [
         "auto-detected",
         "refactor",
@@ -80,6 +80,60 @@
       "related_bugs": [],
       "occurrences": 2,
       "last_seen": "2026-08-28T18:54:39.742Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-08-29T00:00:00.000Z",
+      "error_message": "Self-order status poll never stops after the request's expiresAt passes (cross-repo efficiency audit finding, phase_plan/phase11_9.md Task 1 in sibling billing_cafe repo)",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+      "root_cause": "_pollOnce() only cancelled _pollTimer when linkedOrderNumber was set. There was no check anywhere in the poll body against expiresAt, so an unclaimed request whose countdown reached zero kept firing a real Firestore REST GET (via OrderRequestRepository.getRequest, not a cheap SDK listener) on the poll interval forever, for as long as the browser tab stayed open (e.g. backgrounded on a phone, not closed). Separately, the Timer.periodic that starts the recurring poll was also created unconditionally on any response with expiresAt set, even one that was already in the past.",
+      "fix": "Added a guard at the top of _pollOnce(): if _expiresAt is set and DateTime.now() is after it, cancel _pollTimer and return before making the REST call. Also guarded the Timer.periodic creation itself (`_pollTimer == null && expiresAt != null && !DateTime.now().isAfter(expiresAt)`) so a poll that already comes back expired never schedules a recurring timer in the first place.",
+      "tags": [
+        "efficiency",
+        "firestore-quota",
+        "timer-leak",
+        "order-status",
+        "cross-repo-audit"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-08-29T00:00:00.000Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-08-29T00:00:00.000Z",
+      "error_message": "Menu page's 5-minute background refresh timer has no upper bound on tab-open time (cross-repo efficiency audit finding, phase_plan/phase11_9.md Task 3 in sibling billing_cafe repo)",
+      "file": "cafe_countryside_menu/lib/features/menu/presentation/menu_provider.dart",
+      "root_cause": "MenuController (@Riverpod(keepAlive: true)) started a Timer.periodic(Duration(minutes: 5)) that calls ref.invalidateSelf() for as long as the controller instance is alive \u2014 i.e. for as long as a customer's browser tab is open, uncapped. This is the public, highest-traffic page in the app, so cost scales with real customer visits. No app-lifecycle/visibility hook (dart:html visibilitychange, WidgetsBindingObserver, etc.) exists anywhere in this codebase to pause the timer on a hidden tab.",
+      "fix": "Widened the interval from 5 to 20 minutes (renamed the constant from private _menuRefreshInterval to public menuRefreshInterval so it's directly assertable from test/menu_provider_test.dart). Chose the interval-widen mitigation over building a pause/resume-on-visibility mechanism since no lifecycle hook already existed in the codebase to build on top of, per the audit's own stated tradeoff.",
+      "tags": [
+        "efficiency",
+        "firestore-quota",
+        "menu-provider",
+        "cross-repo-audit"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-08-29T00:00:00.000Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-08-29T00:00:00.000Z",
+      "error_message": "flutter test fails to compile test/order_status_page_test.dart: \"Dart library 'dart:html' is not available on this platform\"",
+      "file": "cafe_countryside_menu/lib/core/services/external_link_service.dart",
+      "root_cause": "external_link_service.dart unconditionally imported dart:html. flutter test's default reporter runs on the Dart VM (not the web compile target), which has no dart:html. No prior test file happened to transitively import this file (via order_status_page.dart or menu_page.dart's _CafeInfoStrip), so the gap was latent until test/order_status_page_test.dart (added for bug-006's fix) became the first to pull it in. Confirmed this is fixable without a browser: `flutter test --platform chrome` does compile and pass, but that's an extra flag nothing in this repo's tooling documents, so plain `flutter test` should just work.",
+      "fix": "Split external_link_service.dart into a conditional import: external_link_service_web.dart (the original dart:html implementation, used when dart.library.html is available) and external_link_service_stub.dart (a no-op fallback for the VM). external_link_service.dart itself now just dispatches via `import 'external_link_service_stub.dart' if (dart.library.html) 'external_link_service_web.dart' as impl;`. Production web behavior is unchanged.",
+      "tags": [
+        "dart:html",
+        "flutter-test",
+        "conditional-import",
+        "vm-platform"
+      ],
+      "related_bugs": [
+        "bug-006"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-08-29T00:00:00.000Z"
     }
   ]
 }

@@ -55,6 +55,13 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
   /// known state in place; the next scheduled poll tries again.
   Future<void> _pollOnce() async {
     if (_linkedOrderNumber != null) return;
+    // The window already closed — don't spend a Firestore read just to
+    // discover that. `_expiresAt` is only known after the first
+    // successful poll, so this is a no-op until then.
+    if (_expiresAt != null && DateTime.now().isAfter(_expiresAt!)) {
+      _pollTimer?.cancel();
+      return;
+    }
     try {
       final data = await ref.read(orderRequestRepositoryProvider).getRequest(widget.requestId);
       if (!mounted) return;
@@ -78,7 +85,7 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
       // orderRequestExpiryMinutes, since the first poll happens right
       // after submit) so ~18 polls happen regardless of how long the
       // café owner has configured the window to be.
-      if (_pollTimer == null && expiresAt != null) {
+      if (_pollTimer == null && expiresAt != null && !DateTime.now().isAfter(expiresAt)) {
         final intervalSeconds = calculatePollIntervalSeconds(expiresAt: expiresAt, now: DateTime.now());
         _pollTimer = Timer.periodic(Duration(seconds: intervalSeconds), (_) => _pollOnce());
       }
@@ -114,8 +121,14 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
       // shouldn't wander off before this screen (or a screenshot of it)
       // is in hand.
       return _StatusScaffold(
+        badge: const _StatusPill(
+          text: 'CONFIRMED',
+          color: Color(0xFF2E7D32),
+          textColor: Colors.white,
+        ),
         icon: Icons.check_circle,
         iconColor: const Color(0xFF2E7D32),
+        heroColor: const Color(0xFF2E7D32),
         title: 'Order confirmed!',
         heroLabel: 'YOUR ORDER NUMBER',
         heroValue: '#$_linkedOrderNumber',
@@ -187,13 +200,25 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
     // Waiting — the CODE is what the customer needs to give the cashier
     // to be found among possibly many pending requests, so it's the
     // hero element, bigger and higher-contrast than the countdown.
+    //
+    // Café-owner ask (round 2): customers were still walking away
+    // thinking the order was placed. Root cause — this screen reused
+    // the exact same green hero card as the CONFIRMED screen, which
+    // reads as "success" before anyone even reads the words. Green is
+    // now reserved for confirmed-only; this state uses amber/orange
+    // (the universal "wait / not done yet" signal) plus an explicit
+    // pulsing "PENDING" badge and a 2-step tracker, so the page is
+    // unmistakably a different, unfinished state at a glance.
     return _StatusScaffold(
-      // Café-owner ask: this screen was reading as passive ("something
-      // is happening, just wait") when the customer actually has to DO
-      // something — walk to the counter and hand over the code. Led
-      // with an action ("Go to the counter"), not a status ("Waiting").
+      badge: const _StatusPill(
+        text: 'PENDING — NOT PLACED YET',
+        color: Color(0xFFE65100),
+        textColor: Colors.white,
+        pulse: true,
+      ),
       icon: Icons.storefront_outlined,
-      iconColor: const Color(0xFF2E7D32),
+      iconColor: const Color(0xFFE65100),
+      heroColor: const Color(0xFFE65100),
       title: 'Go to the counter to place your order',
       heroLabel: 'YOUR ORDER CODE',
       heroValue: _shortCode ?? '····',
@@ -204,6 +229,7 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
       ),
       subtitle: 'This code expires in $minutes:${seconds.toString().padLeft(2, '0')} '
           'if not confirmed.',
+      extra: const _StepTracker(),
     );
   }
 }
@@ -214,8 +240,10 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
 /// so the code/order-number can be the biggest, highest-contrast thing
 /// on the page, with an explicit instruction banner underneath it.
 class _StatusScaffold extends StatelessWidget {
+  final Widget? badge;
   final IconData icon;
   final Color iconColor;
+  final Color heroColor;
   final String title;
   final String heroLabel;
   final String heroValue;
@@ -225,8 +253,10 @@ class _StatusScaffold extends StatelessWidget {
   final Widget? button;
 
   const _StatusScaffold({
+    this.badge,
     required this.icon,
     required this.iconColor,
+    this.heroColor = const Color(0xFF2E7D32),
     required this.title,
     required this.heroLabel,
     required this.heroValue,
@@ -243,6 +273,10 @@ class _StatusScaffold extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (badge != null) ...[
+            badge!,
+            const SizedBox(height: 14),
+          ],
           Icon(icon, size: 40, color: iconColor),
           const SizedBox(height: 8),
           Text(
@@ -259,11 +293,11 @@ class _StatusScaffold extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 360),
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFF2E7D32),
+              color: heroColor,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF2E7D32).withValues(alpha: 0.3),
+                  color: heroColor.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -312,6 +346,139 @@ class _StatusScaffold extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+/// A small pill above the hero icon stating the order's state in words
+/// ("PENDING — NOT PLACED YET" / "CONFIRMED") before the customer reads
+/// anything else. `pulse` adds a breathing dot — reserved for the
+/// pending state, since a moving element reads as "still in progress"
+/// and a static one (confirmed) reads as settled/done.
+class _StatusPill extends StatefulWidget {
+  final String text;
+  final Color color;
+  final Color textColor;
+  final bool pulse;
+
+  const _StatusPill({
+    required this.text,
+    required this.color,
+    required this.textColor,
+    this.pulse = false,
+  });
+
+  @override
+  State<_StatusPill> createState() => _StatusPillState();
+}
+
+class _StatusPillState extends State<_StatusPill> with SingleTickerProviderStateMixin {
+  AnimationController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.pulse) {
+      _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))
+        ..repeat(reverse: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = _controller;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+      decoration: BoxDecoration(
+        color: widget.color,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (controller != null)
+            FadeTransition(
+              opacity: Tween<double>(begin: 0.3, end: 1.0).animate(controller),
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(color: widget.textColor, shape: BoxShape.circle),
+              ),
+            )
+          else
+            Icon(Icons.check, size: 12, color: widget.textColor),
+          const SizedBox(width: 8),
+          Text(
+            widget.text,
+            style: TextStyle(
+              color: widget.textColor,
+              fontWeight: FontWeight.w800,
+              fontSize: 12,
+              letterSpacing: 0.8,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 2-step tracker on the pending screen only — gives the customer an
+/// explicit mental model ("I'm on step 1 of 2") instead of an open-ended
+/// "waiting" feeling, which is what let people assume step 1 (place the
+/// order) was already done.
+class _StepTracker extends StatelessWidget {
+  const _StepTracker();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _step(number: '1', label: 'Show code', active: true),
+        Container(
+          width: 28,
+          height: 2,
+          margin: const EdgeInsets.symmetric(horizontal: 6),
+          color: const Color(0xFFE0E0E0),
+        ),
+        _step(number: '2', label: 'Pay & confirm', active: false),
+      ],
+    );
+  }
+
+  Widget _step({required String number, required String label, required bool active}) {
+    final accent = const Color(0xFFE65100);
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 12,
+          backgroundColor: active ? accent : const Color(0xFFEEEEEE),
+          child: Text(
+            number,
+            style: TextStyle(
+              color: active ? Colors.white : Colors.grey[600],
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: active ? accent : Colors.grey[500],
+            fontWeight: active ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ],
     );
   }
 }

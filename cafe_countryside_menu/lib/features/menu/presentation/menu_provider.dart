@@ -32,7 +32,17 @@ MenuRepository menuRepository(Ref ref) {
   return MenuRepository(FirebaseFirestore.instance);
 }
 
-// keepAlive so the 5-minute refresh timer persists for the entire app session.
+// Widened from 5 to 20 minutes (see phase_plan/phase11_9.md Task 3 in the
+// sibling billing_cafe repo): a menu price/availability change doesn't need
+// to reach every already-open tab within 5 minutes, and this is the
+// public, highest-traffic page in the app — cost scales with real customer
+// visits, uncapped for as long as a tab stays open. No existing
+// app-lifecycle/visibility hook exists in this codebase to pause the timer
+// on hidden tabs, so a wider interval is the lower-effort, still-safe fix.
+// Not private — asserted directly in menu_provider_test.dart.
+const menuRefreshInterval = Duration(minutes: 20);
+
+// keepAlive so the refresh timer persists for the entire app session.
 @Riverpod(keepAlive: true)
 class MenuController extends _$MenuController {
   Timer? _refreshTimer;
@@ -40,7 +50,7 @@ class MenuController extends _$MenuController {
   @override
   Future<MenuSnapshotModel?> build() async {
     ref.onDispose(() => _refreshTimer?.cancel());
-    _refreshTimer = Timer.periodic(const Duration(minutes: 5), (_) {
+    _refreshTimer = Timer.periodic(menuRefreshInterval, (_) {
       ref.invalidateSelf();
     });
     return ref.read(menuRepositoryProvider).fetchMenu();

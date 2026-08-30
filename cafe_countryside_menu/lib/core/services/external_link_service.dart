@@ -1,21 +1,12 @@
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+// Conditional import: dart:html only exists on the web compile target, not
+// on the VM `flutter test` runs on by default. Discovered while adding
+// test/order_status_page_test.dart — that test transitively imports this
+// file (via order_status_page.dart) and previously failed to even compile
+// under `flutter test`'s default VM platform. The web implementation is
+// unchanged; non-web (tests) gets a no-op stub.
+import 'external_link_service_stub.dart' if (dart.library.html) 'external_link_service_web.dart' as impl;
 
-/// Opens an external URL from a Flutter Web page. `tel:` links navigate
-/// the current tab (no popup blocker concern); everything else uses a
-/// programmatic anchor click, which bypasses mobile Chrome's popup
-/// blocker where a plain `window.open` from a Flutter tap handler does
-/// not (confirmed in `_CafeInfoStrip`, the original call site this was
-/// extracted from once a second real caller needed the same behavior).
-void openExternalLink(String url) {
-  if (url.startsWith('tel:')) {
-    html.window.location.href = url;
-  } else {
-    final a = html.AnchorElement(href: url)
-      ..target = '_blank'
-      ..rel = 'noopener noreferrer';
-    html.document.body?.append(a);
-    a.click();
-    a.remove();
-  }
-}
+/// Opens an external URL from a Flutter Web page. See
+/// `external_link_service_web.dart` for the real implementation and its
+/// popup-blocker rationale.
+void openExternalLink(String url) => impl.openExternalLink(url);

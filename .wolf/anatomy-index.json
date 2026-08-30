@@ -1,0 +1,1129 @@
+{
+  "version": 1,
+  "meta": {
+    "lastScanned": "2026-08-28T22:17:02.281Z",
+    "fileCount": 124,
+    "hits": 0,
+    "misses": 0,
+    "renderedHash": "6f8ffcd70e9321de6bab8db7bdbb7018a045b268ab6d3496e091204be5f0c8b7",
+    "storeUpdatedAt": "2026-08-28T22:17:02.283Z"
+  },
+  "files": {
+    ".claude/rules/openwolf.md": {
+      "description": "",
+      "tokens": 313,
+      "hash": "1e3e33a15594bdff",
+      "size": 1256,
+      "mtimeMs": 1783186076155.7695,
+      "updatedAt": "2026-08-28T22:17:02.188Z",
+      "source": "scan"
+    },
+    ".claude/settings.json": {
+      "description": "",
+      "tokens": 441,
+      "hash": "1c7d9688f61c6078",
+      "size": 1543,
+      "mtimeMs": 1783186076155.4,
+      "updatedAt": "2026-08-28T22:17:02.188Z",
+      "source": "scan"
+    },
+    ".gitignore": {
+      "description": "Git ignore rules",
+      "tokens": 126,
+      "hash": "8d494c75370cdf0d",
+      "size": 472,
+      "mtimeMs": 1782809511758.4365,
+      "updatedAt": "2026-08-28T22:17:02.189Z",
+      "source": "scan"
+    },
+    "bulk_import_plan.md": {
+      "description": "Bulk Import Plan — Cafe Countryside Menu",
+      "tokens": 5741,
+      "hash": "2330a407c3f7da61",
+      "size": 23412,
+      "mtimeMs": 1783235493215.7358,
+      "updatedAt": "2026-08-28T22:17:02.190Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/build_resolvers/sdk.sum.deps": {
+      "description": "",
+      "tokens": 59,
+      "hash": "885b2bff6f330d0b",
+      "size": 219,
+      "mtimeMs": 1787950829902.3555,
+      "updatedAt": "2026-08-28T22:17:02.191Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/dartpad/web_plugin_registrant.dart": {
+      "description": "Flutter web plugin registrant file.",
+      "tokens": 353,
+      "hash": "eb0512285eff1c16",
+      "size": 1235,
+      "mtimeMs": 1787922579806.4297,
+      "updatedAt": "2026-08-28T22:17:02.192Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/.filecache": {
+      "description": "",
+      "tokens": 86962,
+      "hash": "b87017b133eeed22",
+      "size": 326104,
+      "mtimeMs": 1787951352693.2302,
+      "updatedAt": "2026-08-28T22:17:02.195Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/app.dill.deps": {
+      "description": "",
+      "tokens": 61642,
+      "hash": "b85fd1f95836497c",
+      "size": 231156,
+      "mtimeMs": 1787951020832.584,
+      "updatedAt": "2026-08-28T22:17:02.196Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/dart_build_result.json": {
+      "description": "",
+      "tokens": 40,
+      "hash": "617a85971737ca6d",
+      "size": 137,
+      "mtimeMs": 1787922580734.3616,
+      "updatedAt": "2026-08-28T22:17:02.197Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/dart_build.d": {
+      "description": "",
+      "tokens": 43,
+      "hash": "de8662e12846197a",
+      "size": 160,
+      "mtimeMs": 1787922580735.1057,
+      "updatedAt": "2026-08-28T22:17:02.197Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/dart_build.stamp": {
+      "description": "",
+      "tokens": 152,
+      "hash": "598bd9003cd9af2f",
+      "size": 569,
+      "mtimeMs": 1787922580737.076,
+      "updatedAt": "2026-08-28T22:17:02.198Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/dart2js.d": {
+      "description": "",
+      "tokens": 51031,
+      "hash": "72372b4cf1f78f41",
+      "size": 191365,
+      "mtimeMs": 1787951350348.7412,
+      "updatedAt": "2026-08-28T22:17:02.200Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/dart2js.stamp": {
+      "description": "",
+      "tokens": 52330,
+      "hash": "8de17aa804845eb2",
+      "size": 196237,
+      "mtimeMs": 1787951350412.6028,
+      "updatedAt": "2026-08-28T22:17:02.203Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/dart2wasm.stamp": {
+      "description": "",
+      "tokens": 149,
+      "hash": "9cc27af89305d780",
+      "size": 557,
+      "mtimeMs": 1787951341674.8853,
+      "updatedAt": "2026-08-28T22:17:02.204Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/flutter_assets.d": {
+      "description": "",
+      "tokens": 2935,
+      "hash": "9394654902df9318",
+      "size": 11003,
+      "mtimeMs": 1787951352343.3286,
+      "updatedAt": "2026-08-28T22:17:02.205Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/gen_localizations.stamp": {
+      "description": "",
+      "tokens": 7,
+      "hash": "cc720a324af5727c",
+      "size": 26,
+      "mtimeMs": 1787950935789.1174,
+      "updatedAt": "2026-08-28T22:17:02.206Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/main.dart": {
+      "description": "@dart=3.12",
+      "tokens": 225,
+      "hash": "81c2263428075f12",
+      "size": 786,
+      "mtimeMs": 1787922580767.506,
+      "updatedAt": "2026-08-28T22:17:02.208Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/main.dart.js.deps": {
+      "description": "",
+      "tokens": 61628,
+      "hash": "4eb12420e7a80af0",
+      "size": 231105,
+      "mtimeMs": 1787951350146.2559,
+      "updatedAt": "2026-08-28T22:17:02.214Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/outputs.json": {
+      "description": "",
+      "tokens": 618,
+      "hash": "c43c2e68f4fe7fd8",
+      "size": 2163,
+      "mtimeMs": 1787951352712.7502,
+      "updatedAt": "2026-08-28T22:17:02.216Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/service_worker.d": {
+      "description": "",
+      "tokens": 1188,
+      "hash": "e005cb9ce1ceaea3",
+      "size": 4452,
+      "mtimeMs": 1787951352685.7402,
+      "updatedAt": "2026-08-28T22:17:02.217Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/web_entrypoint.stamp": {
+      "description": "",
+      "tokens": 74,
+      "hash": "f76d82fd5d8f5ad4",
+      "size": 276,
+      "mtimeMs": 1787922580767.9875,
+      "updatedAt": "2026-08-28T22:17:02.218Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/web_plugin_registrant.dart": {
+      "description": "Flutter web plugin registrant file.",
+      "tokens": 353,
+      "hash": "eb0512285eff1c16",
+      "size": 1235,
+      "mtimeMs": 1787922580766.9915,
+      "updatedAt": "2026-08-28T22:17:02.219Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/web_release_bundle.stamp": {
+      "description": "",
+      "tokens": 3577,
+      "hash": "c84bdcaad2b8a579",
+      "size": 13411,
+      "mtimeMs": 1787951352387.108,
+      "updatedAt": "2026-08-28T22:17:02.219Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/web_resources.d": {
+      "description": "",
+      "tokens": 413,
+      "hash": "05d02e9c104f270a",
+      "size": 1548,
+      "mtimeMs": 1787951352348.1106,
+      "updatedAt": "2026-08-28T22:17:02.220Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/web_service_worker.stamp": {
+      "description": "",
+      "tokens": 1214,
+      "hash": "8c2b2d133e46292f",
+      "size": 4552,
+      "mtimeMs": 1787951352686.3953,
+      "updatedAt": "2026-08-28T22:17:02.221Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/web_static_assets.stamp": {
+      "description": "",
+      "tokens": 872,
+      "hash": "1eb1d35b26941d6a",
+      "size": 3269,
+      "mtimeMs": 1787950936889.3403,
+      "updatedAt": "2026-08-28T22:17:02.228Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/web_templated_files.stamp": {
+      "description": "",
+      "tokens": 164,
+      "hash": "36f5d0d2a43d958b",
+      "size": 612,
+      "mtimeMs": 1787950936925.5679,
+      "updatedAt": "2026-08-28T22:17:02.228Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/flutter_build/dart_plugin_registrant.dart": {
+      "description": "This file is generated from template in file `flutter_tools/lib/src/flutter_plugins.dart`.",
+      "tokens": 2193,
+      "hash": "1a1c6f3f75477cf1",
+      "size": 7674,
+      "mtimeMs": 1787927864615.3926,
+      "updatedAt": "2026-08-28T22:17:02.229Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/package_config.json": {
+      "description": "",
+      "tokens": 7913,
+      "hash": "6bc39c97138f71cc",
+      "size": 27694,
+      "mtimeMs": 1787922579508.042,
+      "updatedAt": "2026-08-28T22:17:02.229Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/package_graph.json": {
+      "description": "",
+      "tokens": 8037,
+      "hash": "bf9862dbcf4e36c5",
+      "size": 28128,
+      "mtimeMs": 1787922579509.4778,
+      "updatedAt": "2026-08-28T22:17:02.230Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.dart_tool/version": {
+      "description": "",
+      "tokens": 2,
+      "hash": "1f1b617c14f48812",
+      "size": 6,
+      "mtimeMs": 1787922579521.146,
+      "updatedAt": "2026-08-28T22:17:02.231Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.firebase/hosting.YnVpbGQvd2Vi.cache": {
+      "description": "",
+      "tokens": 1104,
+      "hash": "1ca41c82c6148817",
+      "size": 4138,
+      "mtimeMs": 1787951395386.9807,
+      "updatedAt": "2026-08-28T22:17:02.232Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.firebaserc": {
+      "description": "",
+      "tokens": 17,
+      "hash": "6dfddfa1c62ffc0e",
+      "size": 63,
+      "mtimeMs": 1782664171118.3613,
+      "updatedAt": "2026-08-28T22:17:02.232Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.flutter-plugins-dependencies": {
+      "description": "",
+      "tokens": 2747,
+      "hash": "89bc7604711b676f",
+      "size": 10301,
+      "mtimeMs": 1787922579742.8918,
+      "updatedAt": "2026-08-28T22:17:02.232Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.gitignore": {
+      "description": "Git ignore rules",
+      "tokens": 188,
+      "hash": "4a8d984279954e04",
+      "size": 703,
+      "mtimeMs": 1782658485823.5752,
+      "updatedAt": "2026-08-28T22:17:02.232Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/.metadata": {
+      "description": "This file tracks properties of this Flutter project.",
+      "tokens": 258,
+      "hash": "b7713b75d4cd74a2",
+      "size": 964,
+      "mtimeMs": 1782658485998.1494,
+      "updatedAt": "2026-08-28T22:17:02.233Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/analysis_options.yaml": {
+      "description": "This file configures the analyzer, which statically analyzes Dart code to",
+      "tokens": 406,
+      "hash": "e0ea485cfdbc3e12",
+      "size": 1420,
+      "mtimeMs": 1782658485883.6929,
+      "updatedAt": "2026-08-28T22:17:02.233Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/cafe_countryside_menu.iml": {
+      "description": "",
+      "tokens": 225,
+      "hash": "078556ebd66f23ee",
+      "size": 842,
+      "mtimeMs": 1782658485821.2158,
+      "updatedAt": "2026-08-28T22:17:02.234Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/firebase.json": {
+      "description": "",
+      "tokens": 173,
+      "hash": "419da0b7622fd545",
+      "size": 604,
+      "mtimeMs": 1782696417001.7866,
+      "updatedAt": "2026-08-28T22:17:02.235Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/firestore.indexes.json": {
+      "description": "",
+      "tokens": 13,
+      "hash": "6742255415c36daf",
+      "size": 44,
+      "mtimeMs": 1782664500678.3352,
+      "updatedAt": "2026-08-28T22:17:02.235Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/firestore.rules": {
+      "description": "isSignedIn: isAdmin, isOwner",
+      "tokens": 306,
+      "hash": "c6622cdb621c3f97",
+      "size": 1147,
+      "mtimeMs": 1782664496880.4023,
+      "updatedAt": "2026-08-28T22:17:02.236Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/core/constants/app_constants.dart": {
+      "description": "Declares AppConstants",
+      "tokens": 216,
+      "hash": "adfa3208d5923a6f",
+      "size": 753,
+      "mtimeMs": 1782658904057.9985,
+      "updatedAt": "2026-08-28T22:17:02.237Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/core/errors/app_exceptions.dart": {
+      "description": "",
+      "tokens": 0,
+      "hash": "e3b0c44298fc1c14",
+      "size": 0,
+      "mtimeMs": 1782658805159.771,
+      "updatedAt": "2026-08-28T22:17:02.237Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/core/extensions/string_extensions.dart": {
+      "description": "",
+      "tokens": 0,
+      "hash": "e3b0c44298fc1c14",
+      "size": 0,
+      "mtimeMs": 1782658805159.6382,
+      "updatedAt": "2026-08-28T22:17:02.237Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/core/services/external_link_service_stub.dart": {
+      "description": "/ Non-web fallback for `external_link_service.dart`'s conditional import.",
+      "tokens": 162,
+      "hash": "58da8076885976f7",
+      "size": 569,
+      "mtimeMs": 1787955364570.6016,
+      "updatedAt": "2026-08-28T22:17:02.238Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/core/services/external_link_service_web.dart": {
+      "description": "ignore: avoid_web_libraries_in_flutter",
+      "tokens": 227,
+      "hash": "56bdc1706c83e56d",
+      "size": 794,
+      "mtimeMs": 1787955357323.9685,
+      "updatedAt": "2026-08-28T22:17:02.238Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/core/services/external_link_service.dart": {
+      "description": "Conditional import: dart:html only exists on the web compile target, not",
+      "tokens": 214,
+      "hash": "7931365491fa11d8",
+      "size": 750,
+      "mtimeMs": 1787955371271.8357,
+      "updatedAt": "2026-08-28T22:17:02.239Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/core/services/pos_app_check_service.dart": {
+      "description": "Firebase App Check for the POS (billing_cafe) project's Firestore",
+      "tokens": 1731,
+      "hash": "c2e2747214fc9a1f",
+      "size": 6084,
+      "mtimeMs": 1787950766980.8452,
+      "updatedAt": "2026-08-28T22:17:02.239Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/auth/access_denied_page.dart": {
+      "description": "AccessDeniedPage: build",
+      "tokens": 552,
+      "hash": "53b0317814adaaad",
+      "size": 1932,
+      "mtimeMs": 1782697460091.8237,
+      "updatedAt": "2026-08-28T22:17:02.242Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/auth/admin_guard.dart": {
+      "description": "/ Wraps every protected admin page.",
+      "tokens": 262,
+      "hash": "3ae443ba8d335e7f",
+      "size": 914,
+      "mtimeMs": 1782697463865.6858,
+      "updatedAt": "2026-08-28T22:17:02.243Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/auth/auth_provider.dart": {
+      "description": "Riverpod provider",
+      "tokens": 343,
+      "hash": "2b556cdc12272191",
+      "size": 1200,
+      "mtimeMs": 1782697951724.61,
+      "updatedAt": "2026-08-28T22:17:02.244Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/auth/auth_provider.g.dart": {
+      "description": "AuthServiceProvider: debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash",
+      "tokens": 1605,
+      "hash": "88c1966af61db53e",
+      "size": 5615,
+      "mtimeMs": 1782708914192.5466,
+      "updatedAt": "2026-08-28T22:17:02.245Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/auth/auth_service.dart": {
+      "description": "Riverpod provider",
+      "tokens": 104,
+      "hash": "8f329cb18281ec24",
+      "size": 365,
+      "mtimeMs": 1782697423558.3037,
+      "updatedAt": "2026-08-28T22:17:02.245Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/auth/login_page.dart": {
+      "description": "Stateful widget",
+      "tokens": 1020,
+      "hash": "ccab95e35fffbf99",
+      "size": 3570,
+      "mtimeMs": 1782697454568.8425,
+      "updatedAt": "2026-08-28T22:17:02.246Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/dashboard/dashboard_page.dart": {
+      "description": "ignore: avoid_web_libraries_in_flutter, deprecated_member_use",
+      "tokens": 2789,
+      "hash": "95c9156398896071",
+      "size": 9765,
+      "mtimeMs": 1782808991570.866,
+      "updatedAt": "2026-08-28T22:17:02.246Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/items/bulk_import/bulk_import_page.dart": {
+      "description": "ignore: avoid_web_libraries_in_flutter",
+      "tokens": 4734,
+      "hash": "63cbe08d547cf476",
+      "size": 17099,
+      "mtimeMs": 1783234935709.899,
+      "updatedAt": "2026-08-28T22:17:02.248Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/items/bulk_import/bulk_import_result.dart": {
+      "description": "Declares BulkImportError",
+      "tokens": 237,
+      "hash": "83d93d503ec377d0",
+      "size": 831,
+      "mtimeMs": 1783186242573.3923,
+      "updatedAt": "2026-08-28T22:17:02.248Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/items/bulk_import/bulk_import_service.dart": {
+      "description": "Declares int",
+      "tokens": 3785,
+      "hash": "6d7164b7d743cf00",
+      "size": 13851,
+      "mtimeMs": 1783234542577.665,
+      "updatedAt": "2026-08-28T22:17:02.249Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/items/items_page.dart": {
+      "description": "Stateful widget: _FilterChip",
+      "tokens": 3551,
+      "hash": "55830bbdccd20d5a",
+      "size": 12436,
+      "mtimeMs": 1783186420998.5808,
+      "updatedAt": "2026-08-28T22:17:02.249Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/items/items_provider.dart": {
+      "description": "Items operations are handled by DraftNotifier in sections_provider.dart.",
+      "tokens": 60,
+      "hash": "11301e3111f0f79b",
+      "size": 208,
+      "mtimeMs": 1782708740993.8882,
+      "updatedAt": "2026-08-28T22:17:02.250Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/items/widgets/item_form.dart": {
+      "description": "Stateful widget: ItemFormDialog",
+      "tokens": 4142,
+      "hash": "a32ca4569fb7a906",
+      "size": 14502,
+      "mtimeMs": 1787055912894.2754,
+      "updatedAt": "2026-08-28T22:17:02.250Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/profile/profile_page.dart": {
+      "description": "ProfilePage: build",
+      "tokens": 1082,
+      "hash": "ae98d5e4187a6ee1",
+      "size": 3790,
+      "mtimeMs": 1782697953773.1194,
+      "updatedAt": "2026-08-28T22:17:02.251Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/sections/sections_page.dart": {
+      "description": "Stateful widget: _SectionTile",
+      "tokens": 2509,
+      "hash": "104a2b9715544168",
+      "size": 8781,
+      "mtimeMs": 1782809041565.1282,
+      "updatedAt": "2026-08-28T22:17:02.251Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/sections/sections_provider.dart": {
+      "description": "Riverpod provider",
+      "tokens": 2210,
+      "hash": "24c33e492433409c",
+      "size": 8250,
+      "mtimeMs": 1783234927789.57,
+      "updatedAt": "2026-08-28T22:17:02.251Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/sections/sections_provider.g.dart": {
+      "description": "DraftRepositoryProvider: debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash, create",
+      "tokens": 1323,
+      "hash": "6d4ab1fdbcc20a88",
+      "size": 4629,
+      "mtimeMs": 1787921475610.5498,
+      "updatedAt": "2026-08-28T22:17:02.252Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/sections/widgets/section_form.dart": {
+      "description": "Stateful widget: SectionFormDialog",
+      "tokens": 676,
+      "hash": "61be9b50d10dafd7",
+      "size": 2369,
+      "mtimeMs": 1782708430244.769,
+      "updatedAt": "2026-08-28T22:17:02.252Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/settings/settings_page.dart": {
+      "description": "Flutter widget",
+      "tokens": 4380,
+      "hash": "ed4533e02bd96b60",
+      "size": 15336,
+      "mtimeMs": 1787942273422.2996,
+      "updatedAt": "2026-08-28T22:17:02.252Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/settings/settings_provider.dart": {
+      "description": "Riverpod provider",
+      "tokens": 247,
+      "hash": "a7fdc3314d50b5d7",
+      "size": 864,
+      "mtimeMs": 1782710485180.233,
+      "updatedAt": "2026-08-28T22:17:02.253Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/admin/settings/settings_provider.g.dart": {
+      "description": "SettingsBusinessRepositoryProvider: debugGetCreateSourceHash, debugGetCreateSourceHash",
+      "tokens": 823,
+      "hash": "7e9c53c9f17c8713",
+      "size": 2880,
+      "mtimeMs": 1782710849314.4197,
+      "updatedAt": "2026-08-28T22:17:02.253Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/menu/data/menu_repository.dart": {
+      "description": "Declares MenuRepository",
+      "tokens": 178,
+      "hash": "9717dae9f1089491",
+      "size": 625,
+      "mtimeMs": 1782665979866.6318,
+      "updatedAt": "2026-08-28T22:17:02.253Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/menu/models/item_model.dart": {
+      "description": "ItemModel: matchesSearch",
+      "tokens": 1292,
+      "hash": "6ade737f68f79228",
+      "size": 4529,
+      "mtimeMs": 1787920763857.8174,
+      "updatedAt": "2026-08-28T22:17:02.254Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/menu/models/menu_snapshot_model.dart": {
+      "description": "Declares MenuSnapshotModel",
+      "tokens": 443,
+      "hash": "a59754272b86837a",
+      "size": 1549,
+      "mtimeMs": 1782808970462.5864,
+      "updatedAt": "2026-08-28T22:17:02.254Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/menu/models/section_model.dart": {
+      "description": "Declares SectionModel",
+      "tokens": 183,
+      "hash": "f6477cc58431f3ad",
+      "size": 640,
+      "mtimeMs": 1782811024077.5254,
+      "updatedAt": "2026-08-28T22:17:02.254Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/menu/presentation/menu_page.dart": {
+      "description": "Stateful widget: _CafeInfoStrip",
+      "tokens": 3411,
+      "hash": "d2a18c190af4c196",
+      "size": 11946,
+      "mtimeMs": 1787942294769.2405,
+      "updatedAt": "2026-08-28T22:17:02.255Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/menu/presentation/menu_provider.dart": {
+      "description": "Riverpod provider",
+      "tokens": 1081,
+      "hash": "5bb18ff6e05b221e",
+      "size": 3789,
+      "mtimeMs": 1787955224244.8735,
+      "updatedAt": "2026-08-28T22:17:02.255Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/menu/presentation/menu_provider.g.dart": {
+      "description": "MenuRepositoryProvider: debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash",
+      "tokens": 1754,
+      "hash": "869c6fe5da872962",
+      "size": 6138,
+      "mtimeMs": 1787950831705.1724,
+      "updatedAt": "2026-08-28T22:17:02.255Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/menu/presentation/widgets/item_card.dart": {
+      "description": "Stateless widget: _QuantityStepper",
+      "tokens": 3256,
+      "hash": "48a4b4b4447d0534",
+      "size": 11411,
+      "mtimeMs": 1787942321517.4614,
+      "updatedAt": "2026-08-28T22:17:02.256Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/menu/presentation/widgets/search_bar.dart": {
+      "description": "Stateless widget: MenuSearchBar",
+      "tokens": 374,
+      "hash": "4ce065c567e1ebad",
+      "size": 1311,
+      "mtimeMs": 1782666058746.7737,
+      "updatedAt": "2026-08-28T22:17:02.256Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/menu/presentation/widgets/section_chip.dart": {
+      "description": "Stateless widget: SectionChipBar",
+      "tokens": 517,
+      "hash": "77726e5e28563e49",
+      "size": 1809,
+      "mtimeMs": 1782811035494.9858,
+      "updatedAt": "2026-08-28T22:17:02.257Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/order/data/order_request_repository.dart": {
+      "description": "phase_plan/phase11_5.md (billing_cafe repo) — plain-http REST client",
+      "tokens": 2417,
+      "hash": "a27df4840669e074",
+      "size": 8483,
+      "mtimeMs": 1787920927356.9004,
+      "updatedAt": "2026-08-28T22:17:02.259Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/order/models/cart_line.dart": {
+      "description": "/ This project's own local cart-line shape (phase_plan/phase11_6.md,",
+      "tokens": 627,
+      "hash": "ef266d9d21712b0f",
+      "size": 2198,
+      "mtimeMs": 1787921197580.6663,
+      "updatedAt": "2026-08-28T22:17:02.260Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart": {
+      "description": "Stateful widget: _CartLineTile",
+      "tokens": 3233,
+      "hash": "dec2df6faa14ed80",
+      "size": 11335,
+      "mtimeMs": 1787942339978.3506,
+      "updatedAt": "2026-08-28T22:17:02.261Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart": {
+      "description": "Stateful widget: _StatusScaffold",
+      "tokens": 4551,
+      "hash": "67709c0c463eac39",
+      "size": 15973,
+      "mtimeMs": 1787955126973.5488,
+      "updatedAt": "2026-08-28T22:17:02.262Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/order/presentation/widgets/honeypot_field.dart": {
+      "description": "/ phase_plan/phase11_6.md — a hidden anti-bot field. Positioned off-",
+      "tokens": 400,
+      "hash": "c0d7ba9b0559e272",
+      "size": 1403,
+      "mtimeMs": 1787921231335.2144,
+      "updatedAt": "2026-08-28T22:17:02.262Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/order/providers/cart_provider.dart": {
+      "description": "Riverpod provider",
+      "tokens": 411,
+      "hash": "53cebb6e5eb1fbe0",
+      "size": 1440,
+      "mtimeMs": 1787921209255.7368,
+      "updatedAt": "2026-08-28T22:17:02.262Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/order/providers/cart_provider.g.dart": {
+      "description": "CartNotifierProvider: debugGetCreateSourceHash",
+      "tokens": 890,
+      "hash": "95f8839768aa5408",
+      "size": 3129,
+      "mtimeMs": 1787950831703.0464,
+      "updatedAt": "2026-08-28T22:17:02.263Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart": {
+      "description": "Riverpod provider",
+      "tokens": 254,
+      "hash": "d6f92242280a4da2",
+      "size": 894,
+      "mtimeMs": 1787950709108.0007,
+      "updatedAt": "2026-08-28T22:17:02.263Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/order/providers/order_request_provider.g.dart": {
+      "description": "OrderRequestRepositoryProvider: debugGetCreateSourceHash",
+      "tokens": 895,
+      "hash": "9cc41c7968501970",
+      "size": 3149,
+      "mtimeMs": 1787950831702.63,
+      "updatedAt": "2026-08-28T22:17:02.263Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/order/validation.dart": {
+      "description": "/ phase_plan/phase11_6.md — mirrors billing_cafe's own",
+      "tokens": 313,
+      "hash": "9dd6e90a826128de",
+      "size": 1098,
+      "mtimeMs": 1787921669195.5242,
+      "updatedAt": "2026-08-28T22:17:02.264Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/models/admin_model.dart": {
+      "description": "Declares AdminRole",
+      "tokens": 342,
+      "hash": "7d637949c7f6574f",
+      "size": 1194,
+      "mtimeMs": 1782697421324.634,
+      "updatedAt": "2026-08-28T22:17:02.264Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/models/business_model.dart": {
+      "description": "Class: BusinessModel",
+      "tokens": 1461,
+      "hash": "2bb3e49d8d886269",
+      "size": 5122,
+      "mtimeMs": 1787942246234.615,
+      "updatedAt": "2026-08-28T22:17:02.264Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/models/draft_data.dart": {
+      "description": "Declares DraftData",
+      "tokens": 712,
+      "hash": "c443cce8b76db337",
+      "size": 2489,
+      "mtimeMs": 1782708217562.4197,
+      "updatedAt": "2026-08-28T22:17:02.265Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/models/draft_item_model.dart": {
+      "description": "Class: DraftItemModel",
+      "tokens": 1300,
+      "hash": "9183ca882857e704",
+      "size": 4547,
+      "mtimeMs": 1787055894905.999,
+      "updatedAt": "2026-08-28T22:17:02.265Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/models/draft_section_model.dart": {
+      "description": "Declares DraftSectionModel",
+      "tokens": 565,
+      "hash": "60186b6953af8e47",
+      "size": 1975,
+      "mtimeMs": 1782708199591.247,
+      "updatedAt": "2026-08-28T22:17:02.265Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/permissions/permission_service.dart": {
+      "description": "Single source of truth for role-based permissions (per plan.md).",
+      "tokens": 242,
+      "hash": "1efaf16e70c0fdd7",
+      "size": 847,
+      "mtimeMs": 1782697429583.8906,
+      "updatedAt": "2026-08-28T22:17:02.266Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/repositories/admin_repository.dart": {
+      "description": "Declares AdminRepository",
+      "tokens": 146,
+      "hash": "49ca9a9b817d6cad",
+      "size": 508,
+      "mtimeMs": 1782697425587.8088,
+      "updatedAt": "2026-08-28T22:17:02.266Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/repositories/business_repository.dart": {
+      "description": "Declares BusinessRepository",
+      "tokens": 233,
+      "hash": "e8078254c0a443d6",
+      "size": 814,
+      "mtimeMs": 1782710482086.8599,
+      "updatedAt": "2026-08-28T22:17:02.266Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/repositories/draft_repository.dart": {
+      "description": "Class: DraftRepository",
+      "tokens": 1339,
+      "hash": "28e2af9c03497f91",
+      "size": 4684,
+      "mtimeMs": 1787055917329.6433,
+      "updatedAt": "2026-08-28T22:17:02.267Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/services/cloudinary_service.dart": {
+      "description": "Declares CloudinaryUploadResult",
+      "tokens": 406,
+      "hash": "433e79aaad599bf4",
+      "size": 1423,
+      "mtimeMs": 1782736450793.869,
+      "updatedAt": "2026-08-28T22:17:02.267Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/services/firestore_service.dart": {
+      "description": "",
+      "tokens": 0,
+      "hash": "e3b0c44298fc1c14",
+      "size": 0,
+      "mtimeMs": 1782658805163.9663,
+      "updatedAt": "2026-08-28T22:17:02.267Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/services/image_service.dart": {
+      "description": "Declares ImageService",
+      "tokens": 140,
+      "hash": "ba3bff26239b4d41",
+      "size": 494,
+      "mtimeMs": 1782736457240.068,
+      "updatedAt": "2026-08-28T22:17:02.267Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/widgets/loading_widget.dart": {
+      "description": "",
+      "tokens": 0,
+      "hash": "e3b0c44298fc1c14",
+      "size": 0,
+      "mtimeMs": 1782658805164.9224,
+      "updatedAt": "2026-08-28T22:17:02.267Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/features/shared/widgets/publish_banner.dart": {
+      "description": "PublishBanner: build",
+      "tokens": 646,
+      "hash": "a8686bab4bd2362f",
+      "size": 2260,
+      "mtimeMs": 1782709004560.8425,
+      "updatedAt": "2026-08-28T22:17:02.268Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/firebase_options.dart": {
+      "description": "File generated by FlutterFire CLI.",
+      "tokens": 662,
+      "hash": "9593ade172fda11e",
+      "size": 2316,
+      "mtimeMs": 1782658560356.3486,
+      "updatedAt": "2026-08-28T22:17:02.268Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/main.dart": {
+      "description": "CafeApp: main, build",
+      "tokens": 322,
+      "hash": "9aa09b71355ae9bb",
+      "size": 1129,
+      "mtimeMs": 1787901542887.0981,
+      "updatedAt": "2026-08-28T22:17:02.268Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/lib/router.dart": {
+      "description": "_GoRouterRefreshStream: dispose",
+      "tokens": 791,
+      "hash": "4b5240088bbdce8c",
+      "size": 2767,
+      "mtimeMs": 1787921442601.1956,
+      "updatedAt": "2026-08-28T22:17:02.268Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/phase_plan/customer_ux_psychology.md": {
+      "description": "Customer UX/Psychology Pass — Cafe Countryside Menu",
+      "tokens": 2061,
+      "hash": "596d1458556a7119",
+      "size": 8325,
+      "mtimeMs": 1787943279614.663,
+      "updatedAt": "2026-08-28T22:17:02.269Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/pubspec.yaml": {
+      "description": "Dart/Flutter package manifest",
+      "tokens": 1217,
+      "hash": "1163da94f6975498",
+      "size": 4259,
+      "mtimeMs": 1787901501151.892,
+      "updatedAt": "2026-08-28T22:17:02.269Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/README.md": {
+      "description": "Project documentation",
+      "tokens": 161,
+      "hash": "3254b5231d0956f4",
+      "size": 643,
+      "mtimeMs": 1782658485872.2917,
+      "updatedAt": "2026-08-28T22:17:02.269Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/test/cart_provider_test.dart": {
+      "description": "phase_plan/phase11_6.md — CartNotifier's pure state transitions,",
+      "tokens": 1022,
+      "hash": "9d88536159306fd5",
+      "size": 3581,
+      "mtimeMs": 1787921649273.2815,
+      "updatedAt": "2026-08-28T22:17:02.270Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/test/item_model_test.dart": {
+      "description": "phase_plan/phase11_5.md (billing_cafe repo) — this project's first",
+      "tokens": 545,
+      "hash": "8ad3326016575b0b",
+      "size": 1910,
+      "mtimeMs": 1787920777399.1606,
+      "updatedAt": "2026-08-28T22:17:02.271Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/test/menu_provider_test.dart": {
+      "description": "phase_plan/phase11_9.md (billing_cafe repo) Task 3 — the menu page's",
+      "tokens": 246,
+      "hash": "a8ca5fe0b2d02297",
+      "size": 860,
+      "mtimeMs": 1787955232230.8657,
+      "updatedAt": "2026-08-28T22:17:02.272Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/test/order_request_repository_test.dart": {
+      "description": "phase_plan/phase11_5.md — dedicated tests for the Firestore REST API",
+      "tokens": 1294,
+      "hash": "2ab6da2dc0db2198",
+      "size": 4532,
+      "mtimeMs": 1787920973934.1416,
+      "updatedAt": "2026-08-28T22:17:02.272Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/test/order_status_page_test.dart": {
+      "description": "phase_plan/phase11_9.md (billing_cafe repo) Task 1 — the self-order",
+      "tokens": 1045,
+      "hash": "d7f0a05fd8c1ad58",
+      "size": 3665,
+      "mtimeMs": 1787955205767.6877,
+      "updatedAt": "2026-08-28T22:17:02.273Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/test/order_validation_test.dart": {
+      "description": "Declares Duration",
+      "tokens": 639,
+      "hash": "3608ba1f94fa0a43",
+      "size": 2236,
+      "mtimeMs": 1787921748539.7288,
+      "updatedAt": "2026-08-28T22:17:02.273Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/test/widget_test.dart": {
+      "description": "Placeholder — app requires Firebase initialization which cannot run in widget tests.",
+      "tokens": 73,
+      "hash": "3022ad8da97cdc0e",
+      "size": 255,
+      "mtimeMs": 1782709232714.3735,
+      "updatedAt": "2026-08-28T22:17:02.273Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/web/index.html": {
+      "description": "Why Not? Cafe Countryside - Menu",
+      "tokens": 688,
+      "hash": "7d1cf9f93b6e0e42",
+      "size": 2579,
+      "mtimeMs": 1787223013593.5356,
+      "updatedAt": "2026-08-28T22:17:02.274Z",
+      "source": "scan"
+    },
+    "cafe_countryside_menu/web/manifest.json": {
+      "description": "",
+      "tokens": 274,
+      "hash": "dfa258c76abb06e5",
+      "size": 958,
+      "mtimeMs": 1787223019423.4119,
+      "updatedAt": "2026-08-28T22:17:02.274Z",
+      "source": "scan"
+    },
+    "CHANGELOG.md": {
+      "description": "Change log",
+      "tokens": 1244,
+      "hash": "b828303339004e7d",
+      "size": 4994,
+      "mtimeMs": 1782642623695.289,
+      "updatedAt": "2026-08-28T22:17:02.274Z",
+      "source": "scan"
+    },
+    "CLAUDE.md": {
+      "description": "OpenWolf",
+      "tokens": 57,
+      "hash": "b1ca356fa9d5f3a6",
+      "size": 225,
+      "mtimeMs": 1783186076156.0417,
+      "updatedAt": "2026-08-28T22:17:02.275Z",
+      "source": "scan"
+    },
+    "decisions.md": {
+      "description": "Architecture Decisions",
+      "tokens": 1907,
+      "hash": "a34b05723b036a56",
+      "size": 7650,
+      "mtimeMs": 1782642667677.191,
+      "updatedAt": "2026-08-28T22:17:02.275Z",
+      "source": "scan"
+    },
+    "how_it_works.md": {
+      "description": "Why Not Cafe — How The System Works",
+      "tokens": 4127,
+      "hash": "4cebeefe1a2324f8",
+      "size": 20951,
+      "mtimeMs": 1783235499335.076,
+      "updatedAt": "2026-08-28T22:17:02.276Z",
+      "source": "scan"
+    },
+    "implementation_order.md": {
+      "description": "Why Not Cafe — Implementation Checklist",
+      "tokens": 3728,
+      "hash": "e33849e03ffb0432",
+      "size": 15129,
+      "mtimeMs": 1782642591933.948,
+      "updatedAt": "2026-08-28T22:17:02.277Z",
+      "source": "scan"
+    },
+    "plan.md": {
+      "description": "Why Not Cafe - Menu Website & Admin",
+      "tokens": 12632,
+      "hash": "eae760a9bfbc503a",
+      "size": 51409,
+      "mtimeMs": 1783235495655.7568,
+      "updatedAt": "2026-08-28T22:17:02.278Z",
+      "source": "scan"
+    }
+  }
+}
