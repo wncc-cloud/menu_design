@@ -7,7 +7,7 @@
       "error_message": "Significant refactor of ",
       "file": "cafe_countryside_menu/web/index.html",
       "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 15\u219227 lines (3 removed)",
+      "fix": "Rewrote 15→27 lines (3 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -71,7 +71,7 @@
       "error_message": "Significant refactor of ",
       "file": "cafe_countryside_menu/phase_plan/customer_ux_psychology.md",
       "root_cause": "7 lines replaced/restructured",
-      "fix": "Rewrote 7\u219211 lines (7 removed) | Also: ## Open questions for you; 1. Priority order above is my read of impact-vs-ef",
+      "fix": "Rewrote 7→11 lines (7 removed) | Also: ## Open questions for you; 1. Priority order above is my read of impact-vs-ef",
       "tags": [
         "auto-detected",
         "refactor",
@@ -104,7 +104,7 @@
       "timestamp": "2026-08-29T00:00:00.000Z",
       "error_message": "Menu page's 5-minute background refresh timer has no upper bound on tab-open time (cross-repo efficiency audit finding, phase_plan/phase11_9.md Task 3 in sibling billing_cafe repo)",
       "file": "cafe_countryside_menu/lib/features/menu/presentation/menu_provider.dart",
-      "root_cause": "MenuController (@Riverpod(keepAlive: true)) started a Timer.periodic(Duration(minutes: 5)) that calls ref.invalidateSelf() for as long as the controller instance is alive \u2014 i.e. for as long as a customer's browser tab is open, uncapped. This is the public, highest-traffic page in the app, so cost scales with real customer visits. No app-lifecycle/visibility hook (dart:html visibilitychange, WidgetsBindingObserver, etc.) exists anywhere in this codebase to pause the timer on a hidden tab.",
+      "root_cause": "MenuController (@Riverpod(keepAlive: true)) started a Timer.periodic(Duration(minutes: 5)) that calls ref.invalidateSelf() for as long as the controller instance is alive — i.e. for as long as a customer's browser tab is open, uncapped. This is the public, highest-traffic page in the app, so cost scales with real customer visits. No app-lifecycle/visibility hook (dart:html visibilitychange, WidgetsBindingObserver, etc.) exists anywhere in this codebase to pause the timer on a hidden tab.",
       "fix": "Widened the interval from 5 to 20 minutes (renamed the constant from private _menuRefreshInterval to public menuRefreshInterval so it's directly assertable from test/menu_provider_test.dart). Chose the interval-widen mitigation over building a pause/resume-on-visibility mechanism since no lifecycle hook already existed in the codebase to build on top of, per the audit's own stated tradeoff.",
       "tags": [
         "efficiency",
@@ -134,6 +134,38 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-08-29T00:00:00.000Z"
+    },
+    {
+      "id": "bug-009",
+      "timestamp": "2026-09-01T13:05:35.060Z",
+      "error_message": "Null/undefined access in ",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: if (heroCaption != null) ...[; const SizedBox(height: 4),",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-09-01T13:05:49.424Z"
+    },
+    {
+      "id": "bug-010",
+      "timestamp": "2026-09-01T13:16:34.573Z",
+      "error_message": "Null/undefined access in ",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: heroCaption: _customerName?.trim().isNotEmpty == true ? _cus | Also: if (heroCaption != null) ...[; const SizedBox(height: 4),",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 4,
+      "last_seen": "2026-09-01T13:17:37.382Z"
     }
   ]
 }

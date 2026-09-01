@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-08-28T22:17:02.281Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-09-01T13:17:37.368Z
 > Files: 124 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -192,7 +192,7 @@
 ## cafe_countryside_menu/lib/features/order/presentation/
 
 - `checkout_page.dart` — Stateful widget: _CartLineTile (~3233 tok)
-- `order_status_page.dart` — Stateful widget: _StatusScaffold (~4551 tok)
+- `order_status_page.dart` — Stateful widget: _StatusScaffold (~5712 tok)
 
 ## cafe_countryside_menu/lib/features/order/presentation/widgets/
 

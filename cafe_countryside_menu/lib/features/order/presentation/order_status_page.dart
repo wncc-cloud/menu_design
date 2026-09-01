@@ -28,6 +28,7 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
   Timer? _pollTimer;
   Timer? _tickTimer;
   String? _shortCode;
+  String? _customerName;
   DateTime? _expiresAt;
   int? _linkedOrderNumber;
   bool _loadFailed = false;
@@ -71,6 +72,7 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
       final linkedOrderNumber = data['linkedOrderNumber'] as int?;
       setState(() {
         _shortCode = data['shortCode'] as String? ?? _shortCode;
+        _customerName = data['customerName'] as String? ?? _customerName;
         if (expiresAt != null) _expiresAt = expiresAt;
         _linkedOrderNumber = linkedOrderNumber;
       });
@@ -132,6 +134,7 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
         title: 'Order confirmed!',
         heroLabel: 'YOUR ORDER NUMBER',
         heroValue: '#$_linkedOrderNumber',
+        heroCaption: _customerName?.trim().isNotEmpty == true ? _customerName : null,
         instructionBanner: const _InstructionBanner(
           icon: Icons.camera_alt_outlined,
           text: 'Take a screenshot or remember this number — '
@@ -222,6 +225,7 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
       title: 'Go to the counter to place your order',
       heroLabel: 'YOUR ORDER CODE',
       heroValue: _shortCode ?? '····',
+      heroCaption: _customerName?.trim().isNotEmpty == true ? _customerName : null,
       instructionBanner: const _InstructionBanner(
         icon: Icons.info_outline,
         text: 'Tell the cashier this code and pay at the counter — '
@@ -247,6 +251,7 @@ class _StatusScaffold extends StatelessWidget {
   final String title;
   final String heroLabel;
   final String heroValue;
+  final String? heroCaption;
   final Widget instructionBanner;
   final String subtitle;
   final Widget? extra;
@@ -260,6 +265,7 @@ class _StatusScaffold extends StatelessWidget {
     required this.title,
     required this.heroLabel,
     required this.heroValue,
+    this.heroCaption,
     required this.instructionBanner,
     required this.subtitle,
     this.extra,
@@ -325,6 +331,18 @@ class _StatusScaffold extends StatelessWidget {
                     letterSpacing: 2,
                   ),
                 ),
+                if (heroCaption != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    heroCaption!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
