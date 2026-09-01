@@ -43,6 +43,12 @@ MenuRepository menuRepository(Ref ref) {
 const menuRefreshInterval = Duration(minutes: 20);
 
 // keepAlive so the refresh timer persists for the entire app session.
+// Also invalidates businessProvider on the same tick (see that
+// provider's own doc comment) — piggy-backing on this timer rather than
+// giving business its own, since a single small doc read on the same
+// cadence as the menu refresh is negligible extra cost, and it avoids
+// converting business into a second class-based provider (which would
+// mean renaming it at every call site) just to own a Timer.
 @Riverpod(keepAlive: true)
 class MenuController extends _$MenuController {
   Timer? _refreshTimer;
@@ -52,12 +58,23 @@ class MenuController extends _$MenuController {
     ref.onDispose(() => _refreshTimer?.cancel());
     _refreshTimer = Timer.periodic(menuRefreshInterval, (_) {
       ref.invalidateSelf();
+      ref.invalidate(businessProvider);
     });
     return ref.read(menuRepositoryProvider).fetchMenu();
   }
 }
 
-// keepAlive: read once per session, cached until app restart.
+// keepAlive: cached until invalidated. Was originally "read once per
+// session, cached until app restart" with no refresh at all — found
+// during an edge-case review (2026-09-01) that this silently broke the
+// selfOrderEnabled kill-switch's stated promise ("stop new orders right
+// away"): a customer already on the page when an admin flips it off
+// would keep the old cached value and could still complete checkout,
+// since nothing ever invalidated this provider. Now refreshed
+// alongside the menu (MenuController's timer above) and by the
+// AppBar's manual refresh button (menu_page.dart), so the kill-switch
+// reaches an already-open tab within one refresh cycle, not only on a
+// full page reload.
 @Riverpod(keepAlive: true)
 Future<BusinessModel?> business(Ref ref) async {
   return BusinessRepository(FirebaseFirestore.instance).fetchBusiness();

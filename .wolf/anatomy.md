@@ -1,7 +1,11 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-09-01T13:17:37.368Z
-> Files: 124 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-09-01T17:12:49.567Z
+> Files: 125 tracked | Anatomy hits: 0 | Misses: 0
+
+## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
+
+- `spa_server.py` — SPAHandler: do_GET (~135 tok)
 
 ## ./
 
@@ -167,13 +171,13 @@
 
 ## cafe_countryside_menu/lib/features/menu/presentation/
 
-- `menu_page.dart` — Stateful widget: _CafeInfoStrip (~3411 tok)
-- `menu_provider.dart` — Riverpod provider (~1081 tok)
+- `menu_page.dart` — Stateful widget: _CafeInfoStrip (~4417 tok)
+- `menu_provider.dart` — Class: MenuFilterState (~1303 tok)
 - `menu_provider.g.dart` — MenuRepositoryProvider: debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash (~1754 tok)
 
 ## cafe_countryside_menu/lib/features/menu/presentation/widgets/
 
-- `item_card.dart` — Stateless widget: _QuantityStepper (~3256 tok)
+- `item_card.dart` — Stateful widget: _QuantityStepper (~3396 tok)
 - `search_bar.dart` — Stateless widget: MenuSearchBar (~374 tok)
 - `section_chip.dart` — Stateless widget: SectionChipBar (~517 tok)
 
@@ -191,12 +195,12 @@
 
 ## cafe_countryside_menu/lib/features/order/presentation/
 
-- `checkout_page.dart` — Stateful widget: _CartLineTile (~3233 tok)
+- `checkout_page.dart` — Stateful widget: _CartLineTile (~3256 tok)
 - `order_status_page.dart` — Stateful widget: _StatusScaffold (~5712 tok)
 
 ## cafe_countryside_menu/lib/features/order/presentation/widgets/
 
-- `honeypot_field.dart` — / phase_plan/phase11_6.md — a hidden anti-bot field. Positioned off- (~400 tok)
+- `honeypot_field.dart` — / phase_plan/phase11_6.md — a hidden anti-bot field. Positioned off- (~512 tok)
 
 ## cafe_countryside_menu/lib/features/order/providers/
 
@@ -236,7 +240,7 @@
 
 ## cafe_countryside_menu/phase_plan/
 
-- `customer_ux_psychology.md` — Customer UX/Psychology Pass — Cafe Countryside Menu (~2061 tok)
+- `customer_ux_psychology.md` — Customer UX/Psychology Pass — Cafe Countryside Menu (~2769 tok)
 
 ## cafe_countryside_menu/test/
 

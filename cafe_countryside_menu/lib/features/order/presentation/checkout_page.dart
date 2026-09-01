@@ -169,10 +169,31 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
               ),
             )
           : cart.isEmpty
-          ? const Center(
+          ? Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Text('Your cart is empty.', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.shopping_cart_outlined, size: 48, color: Colors.grey[400]),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Your cart is empty.',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Add something tasty from the menu.',
+                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                    ),
+                    const SizedBox(height: 20),
+                    OutlinedButton.icon(
+                      onPressed: () => context.go('/'),
+                      icon: const Icon(Icons.restaurant_menu, size: 18),
+                      label: const Text('Browse the menu'),
+                    ),
+                  ],
+                ),
               ),
             )
           : SingleChildScrollView(

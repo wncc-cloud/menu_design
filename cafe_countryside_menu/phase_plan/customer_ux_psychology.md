@@ -40,15 +40,58 @@ right after this section (that ranking stands as the rationale) — this
 is the actual build order, batched by effort rather than pure impact,
 since #3 needs real restructuring while #1/#4/#9 don't:
 
-1. **Batch 1 (together):** #1 optimistic add-to-cart feedback, #4 empty
-   states, #9 haptics — bundled into one pass, cheapest possible wins,
-   pure widget-level changes, no restructuring.
-2. **Batch 2:** #2 skeleton loading — slightly more surface area since
-   it replaces the loading state across the whole menu.
-3. **Batch 3 (last):** #3 sticky category bar — the one item that
-   actually needs restructuring (the section chip row currently sits in
-   a plain scrolling `Column`; pinning it means moving to a
-   `CustomScrollView`/`SliverPersistentHeader`), so it goes last.
+1. **Batch 1 (together) — DONE, implemented 2026-09-01:** #1 optimistic
+   add-to-cart feedback, #4 empty states, #9 haptics.
+   - #1: `item_card.dart`'s `ItemCard` converted from `ConsumerWidget` to
+     `ConsumerStatefulWidget` — add-to-cart now triggers a brief scale
+     pulse (`TweenAnimationBuilder`, no `AnimationController` lifecycle
+     needed) plus a floating SnackBar ("Added {name} to cart").
+   - #4: `menu_page.dart` gained `_EmptyItemsState` (query-aware — "No
+     items here yet." vs "Nothing matches '{query}' — try a different
+     word?", covers search/section-filter/bestsellers since they all
+     funnel through the same `filteredItemsProvider`); `checkout_page.dart`'s
+     empty-cart state got an icon, friendlier copy, and a "Browse the
+     menu" button back to `/`.
+   - #9: `HapticFeedback.lightImpact()` added to the add-to-cart button
+     and both stepper +/- taps (web is a documented no-op, doesn't throw).
+   - Verified: `flutter analyze` clean, all 42 tests pass, full release
+     build succeeds. Not yet deployed to production hosting.
+2. **Batch 2 — DONE, implemented 2026-09-01:** #2 skeleton loading.
+   - `menu_page.dart` gained `_MenuSkeleton`/`_SkeletonCard` — 6 grey
+     placeholder rows shaped like `ItemCard` (same margin/padding/image
+     size, so the real list doesn't visibly jump in height once it
+     swaps in), with a looping fade (`AnimationController` +
+     `FadeTransition`, same established pattern as
+     `order_status_page.dart`'s `_StatusPill` pulse) instead of a static
+     grey block. Replaces the old centered `CircularProgressIndicator`.
+   - Only shows on the very first load or a manual retry after an error
+     — `skipLoadingOnRefresh: true` (already in place) means the
+     20-minute background refresh never re-shows it.
+   - Verified: `flutter analyze` clean, all 43 tests pass, full release
+     build succeeds. Not yet deployed to production hosting.
+3. **Batch 3 — CLOSED, no code change needed, checked 2026-09-01:** #3
+   sticky category bar. Re-read `menu_page.dart`'s current `_MenuContent`
+   before touching it (per this doc's own review-before-build habit) and
+   found the described problem no longer exists: `_CafeInfoStrip`,
+   `MenuSearchBar`, and `SectionChipBar` are already plain (non-`Expanded`)
+   children of the outer `Column`, sitting above the single `Expanded`
+   child that holds the actual scrollable `ListView` (`_ItemsList`). That
+   is a deterministic Flutter layout — only the `Expanded` child's
+   internal list scrolls; everything above it (search bar, cafe info
+   strip, and the section chips) is already pinned and never scrolls
+   away, exactly the behavior this item asked for.
+   - Unclear whether this was already true when this doc was written
+     (2026-08-28) or became true as a side effect of Batch 1/2's edits to
+     the same file — not worth archaeology, the current behavior is what
+     matters.
+   - Deliberately did NOT build a `SliverPersistentHeader`/
+     `CustomScrollView` restructuring, since that would add real
+     complexity to reproduce an effect the current, simpler structure
+     already delivers — would violate this doc's own "additive, not a
+     rebuild" and no-unnecessary-complexity principles for zero visual
+     gain.
+   - No file changed, so nothing new to build/test at the code level;
+     verify by scrolling the live page (see chat for the manual check).
 
 ## Proposed items, in suggested priority order
 

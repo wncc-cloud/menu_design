@@ -8,7 +8,14 @@ import 'package:flutter/material.dart';
 /// in the form despite being translated off-screen.
 ///
 /// If [controller]'s text is non-empty at submit time, the caller
-/// drops the request client-side, before any network call at all.
+/// drops the request client-side, before any network call at all —
+/// silently, with no error shown (a real bot shouldn't learn it was
+/// caught). That silence is exactly why `autofillHints: const []` below
+/// matters: without it, a browser's autofill could plausibly fill this
+/// field for a genuine customer (heuristically, near real name/phone
+/// fields) and their real order would then vanish with zero feedback,
+/// looking like a broken button. Explicitly opting out of autofill is
+/// cheap insurance against that false-positive case.
 class HoneypotField extends StatelessWidget {
   final TextEditingController controller;
 
@@ -33,6 +40,7 @@ class HoneypotField extends StatelessWidget {
             child: TextField(
               controller: controller,
               autofocus: false,
+              autofillHints: const [],
               decoration: const InputDecoration(labelText: 'Leave this field empty'),
             ),
           ),
