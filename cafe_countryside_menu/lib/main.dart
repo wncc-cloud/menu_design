@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,8 +13,11 @@ void main() async {
   usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Fire-and-forget: only /checkout's REST calls need this token (see
+  // PosAppCheckService.getToken()'s own null-safe fallback), so it must
+  // never delay first paint for the menu-browsing majority of visitors.
   // Never fatal — see PosAppCheckService.activate()'s own doc.
-  await PosAppCheckService.activate();
+  unawaited(PosAppCheckService.activate());
   runApp(const ProviderScope(child: CafeApp()));
 }
 

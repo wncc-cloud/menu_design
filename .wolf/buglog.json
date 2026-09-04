@@ -278,6 +278,41 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-09-04T14:52:05.691Z"
+    },
+    {
+      "id": "bug-018",
+      "timestamp": "2026-09-04T15:17:32.175Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/lib/main.dart",
+      "root_cause": "Had 'package:firebase_core/firebase_core.dart'",
+      "fix": "Changed to 'dart:async'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-04T15:17:32.175Z"
+    },
+    {
+      "id": "bug-019",
+      "timestamp": "2026-09-04T15:18:00.000Z",
+      "error_message": "User complaint: menu site slow to load, sometimes fails to load entirely, on Safari/iPhone",
+      "file": "cafe_countryside_menu/web/index.html, cafe_countryside_menu/lib/main.dart",
+      "root_cause": "Two compounding first-load delays on every visit: (1) web/index.html loaded https://cdn.jsdelivr.net/npm/pica/dist/pica.min.js as a blocking synchronous <script> in <head> with no async/defer — that library is only used by ImageService for admin photo uploads, but the same index.html serves every SPA route including the public menu, so every customer's browser blocked HTML parsing on that CDN fetch. (2) main.dart awaited PosAppCheckService.activate() before runApp(), so nothing rendered until it resolved — it's already timeout-guarded at 8s (per pos_app_check_service.dart's own doc) but that token is only needed later by the /checkout REST calls, not for browsing the menu, so worst case every visitor ate up to 8s of blank screen before the menu even started loading. Safari/iOS was likely hit hardest because ITP/tracking-prevention can slow third-party script + reCAPTCHA Enterprise loads further, and CanvasKit (the likely default renderer Safari falls back to, lacking WasmGC/skwasm support) is already a heavier download than other browsers get.",
+      "fix": "Added defer to the pica script tag in web/index.html. Changed main.dart to unawaited(PosAppCheckService.activate()) so it runs in the background after runApp() instead of blocking first paint; getToken()'s existing null-safe fallback already handles activation not being ready yet.",
+      "tags": [
+        "performance",
+        "safari",
+        "ios",
+        "first-load",
+        "blocking-script",
+        "app-check"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-04T15:18:00.000Z"
     }
   ]
 }

@@ -188,3 +188,11 @@
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
 | 15:12 | Committed banner-emphasis fix + preview tool, pushed to designv2_revamp, built flutter web release, deployed to Firebase Hosting (cafe-countryside-menu) | order_status_page.dart, tool/order_status_preview.dart | verified: build succeeded, deploy complete at cafe-countryside-menu.web.app | ~6000 |
+| 20:47 | Edited cafe_countryside_menu/web/index.html | 2→4 lines | ~84 |
+| 20:47 | Edited cafe_countryside_menu/lib/main.dart | 4→7 lines | ~122 |
+| 20:47 | Edited cafe_countryside_menu/lib/main.dart | added 1 import(s) | ~20 |
+| 15:18 | Diagnosed + fixed Safari/iPhone slow/failed-load complaint: deferred blocking jsdelivr pica.min.js script (was in <head> with no async/defer, blocked parsing on every route incl. public menu); made PosAppCheckService.activate() unawaited in main() (was blocking first paint up to 8s on every visit for a token only needed by /checkout) | web/index.html, lib/main.dart | verified: dart analyze + flutter analyze clean; not yet rebuilt/redeployed | ~9000 |
+| 20:48 | Session end: 3 writes across 2 files (index.html, main.dart) | 8 reads | ~4404 tok |
+| 20:59 | Session end: 3 writes across 2 files (index.html, main.dart) | 8 reads | ~4404 tok |
+| 15:22 | Built flutter web release + deployed Safari/iPhone slow-load fixes (deferred pica.min.js, unawaited App Check activation) to Firebase Hosting | build/web | success: deploy complete at cafe-countryside-menu.web.app | ~1500 |
+| 21:02 | Session end: 3 writes across 2 files (index.html, main.dart) | 8 reads | ~4404 tok |
