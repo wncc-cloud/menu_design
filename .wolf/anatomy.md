@@ -1,18 +1,22 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-08-20T10:50:19.498Z
-> Files: 365 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-09-04T15:17:32.159Z
+> Files: 126 tracked | Anatomy hits: 0 | Misses: 0
+
+## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
+
+- `spa_server.py` — SPAHandler: do_GET (~135 tok)
 
 ## ./
 
 - `.gitignore` — Git ignore rules (~126 tok)
-- `bulk_import_plan.md` — Bulk Import Plan — Cafe Countryside Menu (~4955 tok)
+- `bulk_import_plan.md` — Bulk Import Plan — Cafe Countryside Menu (~5741 tok)
 - `CHANGELOG.md` — Change log (~1244 tok)
 - `CLAUDE.md` — OpenWolf (~57 tok)
 - `decisions.md` — Architecture Decisions (~1907 tok)
-- `how_it_works.md` — Why Not Cafe — How The System Works (~4125 tok)
+- `how_it_works.md` — Why Not Cafe — How The System Works (~4127 tok)
 - `implementation_order.md` — Why Not Cafe — Implementation Checklist (~3728 tok)
-- `plan.md` — Why Not Cafe - Menu Website & Admin (~12630 tok)
+- `plan.md` — Why Not Cafe - Menu Website & Admin (~12632 tok)
 
 ## .claude/
 
@@ -25,7 +29,7 @@
 ## cafe_countryside_menu/
 
 - `.firebaserc` (~17 tok)
-- `.flutter-plugins-dependencies` (~2463 tok)
+- `.flutter-plugins-dependencies` (~2747 tok)
 - `.gitignore` — Git ignore rules (~188 tok)
 - `.metadata` — This file tracks properties of this Flutter project. (~258 tok)
 - `analysis_options.yaml` — This file configures the analyzer, which statically analyzes Dart code to (~406 tok)
@@ -33,467 +37,64 @@
 - `firebase.json` (~173 tok)
 - `firestore.indexes.json` (~13 tok)
 - `firestore.rules` — isSignedIn: isAdmin, isOwner (~306 tok)
-- `pubspec.yaml` — Dart/Flutter package manifest (~1204 tok)
+- `pubspec.yaml` — Dart/Flutter package manifest (~1217 tok)
 - `README.md` — Project documentation (~161 tok)
 
 ## cafe_countryside_menu/.dart_tool/
 
-- `package_config.json` (~7477 tok)
-- `package_graph.json` (~7581 tok)
+- `package_config.json` (~7913 tok)
+- `package_graph.json` (~8037 tok)
 - `version` (~2 tok)
 
 ## cafe_countryside_menu/.dart_tool/build_resolvers/
 
 - `sdk.sum.deps` (~59 tok)
 
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/
-
-- `Account Web Data` (~20754 tok)
-- `Account Web Data-journal` (~0 tok)
-- `Affiliation Database` (~14200 tok)
-- `Affiliation Database-journal` (~0 tok)
-- `BookmarkMergedSurfaceOrdering` (~2 tok)
-- `BrowsingTopicsSiteData` (~7646 tok)
-- `BrowsingTopicsSiteData-journal` (~0 tok)
-- `BrowsingTopicsState` (~108 tok)
-- `Cookies` — Declares INTEGER (~53371 tok)
-- `Cookies-journal` (~0 tok)
-- `DIPS` (~9829 tok)
-- `DIPS-wal` (~79062 tok)
-- `engine_allowlist.bf` (~95 tok)
-- `Favicons` — Declares INTEGER (~12952 tok)
-- `Favicons-journal` (~0 tok)
-- `heavy_ad_intervention_opt_out.db-journal` (~0 tok)
-- `History` (~96022 tok)
-- `History-journal` (~0 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-- `Login Data` (~10923 tok)
-- `Login Data For Account` (~10923 tok)
-- `Login Data For Account-journal` (~0 tok)
-- `Login Data-journal` (~0 tok)
-- `MediaDeviceSalts` (~6554 tok)
-- `MediaDeviceSalts-journal` (~0 tok)
-- `Network Action Predictor` (~28391 tok)
-- `Network Action Predictor-journal` (~0 tok)
-- `Network Persistent State` (~17234 tok)
-- `Preferences` (~8123 tok)
-- `PreferredApps` (~9 tok)
-- `README` (~48 tok)
-- `Reporting and NEL` (~21827 tok)
-- `Reporting and NEL-journal` (~0 tok)
-- `Safe Browsing Cookies` — Declares INTEGER (~5462 tok)
-- `Safe Browsing Cookies-journal` (~0 tok)
-- `Secure Preferences` (~3942 tok)
-- `ServerCertificate` (~5462 tok)
-- `ServerCertificate-journal` (~0 tok)
-- `SharedStorage` (~1093 tok)
-- `Shortcuts` — Declares INTEGER (~5460 tok)
-- `Shortcuts-journal` (~0 tok)
-- `Top Sites` (~5462 tok)
-- `Top Sites-journal` (~0 tok)
-- `Translate Ranker Model` (~661 tok)
-- `TransportSecurity` (~3528 tok)
-- `Trust Tokens` (~9831 tok)
-- `Trust Tokens-journal` (~0 tok)
-- `trusted_vault.pb` (~23 tok)
-- `Web Data` (~42042 tok)
-- `Web Data-journal` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Accounts/Avatar Images/
-
-- `110694038726595359825` (~915 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/AutofillStrikeDatabase/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/BudgetDatabase/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/ClientCertificates/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Download Service/EntryDB/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Extension Rules/
-
-- `000003.log` (~21 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~107 tok)
-- `MANIFEST-000001` (~11 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Extension Scripts/
-
-- `000003.log` (~21 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~108 tok)
-- `MANIFEST-000001` (~11 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Extension State/
-
-- `000003.log` (~61 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~119 tok)
-- `LOG.old` (~119 tok)
-- `MANIFEST-000001` (~11 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Feature Engagement Tracker/AvailabilityDB/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Feature Engagement Tracker/EventDB/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/GCM Store/
-
-- `000003.log` (~305 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~115 tok)
-- `LOG.old` (~115 tok)
-- `MANIFEST-000001` (~11 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/GCM Store/Encryption/
-
-- `000003.log` (~0 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~121 tok)
-- `LOG.old` (~121 tok)
-- `MANIFEST-000001` (~11 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/IndexedDB/http_localhost_51694.indexeddb.leveldb/
-
-- `000005.ldb` (~350 tok)
-- `000007.log` (~73 tok)
-- `000008.ldb` (~519 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~224 tok)
-- `LOG.old` (~213 tok)
-- `MANIFEST-000001` (~32 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/IndexedDB/http_localhost_54394.indexeddb.leveldb/
-
-- `000005.ldb` (~350 tok)
-- `000007.log` (~73 tok)
-- `000008.ldb` (~519 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~224 tok)
-- `LOG.old` (~213 tok)
-- `MANIFEST-000001` (~32 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/IndexedDB/http_localhost_55303.indexeddb.leveldb/
-
-- `000024.log` (~0 tok)
-- `000027.ldb` (~263 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~1941 tok)
-- `LOG.old` (~213 tok)
-- `MANIFEST-000001` (~462 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/IndexedDB/http_localhost_61632.indexeddb.leveldb/
-
-- `000005.ldb` (~337 tok)
-- `000014.ldb` (~1124 tok)
-- `000015.log` (~3607 tok)
-- `000017.ldb` (~1188 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~954 tok)
-- `LOG.old` (~213 tok)
-- `MANIFEST-000001` (~221 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/IndexedDB/http_localhost_62346.indexeddb.leveldb/
-
-- `000010.log` (~11130 tok)
-- `000012.ldb` (~961 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~594 tok)
-- `LOG.old` (~213 tok)
-- `MANIFEST-000001` (~138 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/IndexedDB/http_localhost_62901.indexeddb.leveldb/
-
-- `000021.log` (~20616 tok)
-- `000023.ldb` (~962 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~1467 tok)
-- `MANIFEST-000001` (~403 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/IndexedDB/https_www.google.com_0.indexeddb.leveldb/
-
-- `000003.log` (~268 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~126 tok)
-- `MANIFEST-000001` (~6 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Local Storage/leveldb/
-
-- `000003.log` (~13469 tok)
-- `000004.log` (~7689 tok)
-- `000005.ldb` (~9226 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~166 tok)
-- `LOG.old` (~122 tok)
-- `MANIFEST-000001` (~42 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/PersistentOriginTrials/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Search Logos/
-
-- `dark_logo` (~8296 tok)
-- `logo` (~8130 tok)
-- `metadata` (~544 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Segmentation Platform/SegmentInfoDB/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Segmentation Platform/SignalDB/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Segmentation Platform/SignalStorageConfigDB/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Service Worker/CacheStorage/28da9c56fde4021055a681112c092453f74d8dd8/
-
-- `index.txt` (~34 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Service Worker/CacheStorage/28da9c56fde4021055a681112c092453f74d8dd8/b2c0233c-8b60-4878-9f31-4efb78f624d3/
-
-- `9b314fa80b8aa544_0` — Declares btn (~1004 tok)
-- `index` (~7 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Service Worker/CacheStorage/28da9c56fde4021055a681112c092453f74d8dd8/b2c0233c-8b60-4878-9f31-4efb78f624d3/index-dir/
-
-- `the-real-index` (~19 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Service Worker/Database/
-
-- `000003.log` (~699 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~123 tok)
-- `LOG.old` (~123 tok)
-- `MANIFEST-000001` (~11 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Session Storage/
-
-- `000003.log` (~3643 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~119 tok)
-- `LOG.old` (~119 tok)
-- `MANIFEST-000001` (~11 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Sessions/
-
-- `Session_13427176151997791` (~32672 tok)
-- `Session_13427177064820891` (~1746 tok)
-- `Session_13427177075209761` (~1719 tok)
-- `Session_13427177079908365` (~1532 tok)
-- `Session_13427182995058498` (~69694 tok)
-- `Session_13427183399240903` (~8306 tok)
-- `Session_13427184576935969` (~29069 tok)
-- `Session_13427185592434775` (~29213 tok)
-- `Session_13427212153860110` (~3835 tok)
-- `Session_13427282697055458` (~1724 tok)
-- `Session_13427282699317366` (~1509 tok)
-- `Session_13427284273907399` (~14472 tok)
-- `Session_13427284289108598` (~17747 tok)
-- `Tabs_13427177064975368` (~549 tok)
-- `Tabs_13427177069662886` (~3355 tok)
-- `Tabs_13427177075314022` (~3355 tok)
-- `Tabs_13427177079977980` (~795 tok)
-- `Tabs_13427182995431342` (~8461 tok)
-- `Tabs_13427184577257423` (~12012 tok)
-- `Tabs_13427185592753662` (~17190 tok)
-- `Tabs_13427212154227971` (~12557 tok)
-- `Tabs_13427282697093272` (~17190 tok)
-- `Tabs_13427282699351893` (~12552 tok)
-- `Tabs_13427283372925623` (~23193 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Shared Dictionary/
-
-- `db` (~12013 tok)
-- `db-journal` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Shared Dictionary/cache/
-
-- `94908862e69c4c27_0` — e: r, v, x + 24 more (~69723 tok)
-- `ac1ca97f36d879a7_0` — u: y, ia, ja + 33 more (~17338 tok)
-- `index` (~7 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Shared Dictionary/cache/index-dir/
-
-- `the-real-index` (~26 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Site Characteristics Database/
-
-- `000003.log` (~190 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~126 tok)
-- `LOG.old` (~126 tok)
-- `MANIFEST-000001` (~11 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/Sync Data/LevelDB/
-
-- `000003.log` (~27 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~120 tok)
-- `LOG.old` (~120 tok)
-- `MANIFEST-000001` (~11 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/WebStorage/
-
-- `QuotaManager` (~10922 tok)
-- `QuotaManager-journal` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/chrome_cart_db/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/commerce_subscription_db/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/discount_infos_db/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/discounts_db/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/optimization_guide_hint_cache_store/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/parcel_tracking_db/
-
-- `LOCK` (~0 tok)
-- `LOG` (~0 tok)
-- `LOG.old` (~0 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/shared_proto_db/
-
-- `000003.log` (~109770 tok)
-- `000004.log` (~10802 tok)
-- `000005.ldb` (~32925 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~163 tok)
-- `LOG.old` (~119 tok)
-- `MANIFEST-000001` (~34 tok)
-
-## cafe_countryside_menu/.dart_tool/chrome-device/Default/shared_proto_db/metadata/
-
-- `000003.log` (~357 tok)
-- `CURRENT` (~5 tok)
-- `LOCK` (~0 tok)
-- `LOG` (~123 tok)
-- `LOG.old` (~123 tok)
-- `MANIFEST-000001` (~11 tok)
-
 ## cafe_countryside_menu/.dart_tool/dartpad/
 
-- `web_plugin_registrant.dart` — Flutter web plugin registrant file. (~299 tok)
+- `web_plugin_registrant.dart` — Flutter web plugin registrant file. (~353 tok)
 
-## cafe_countryside_menu/.dart_tool/extension_discovery/
+## cafe_countryside_menu/.dart_tool/flutter_build/
 
-- `README.md` — Project documentation (~263 tok)
-- `vs_code.json` (~28 tok)
+- `dart_plugin_registrant.dart` — This file is generated from template in file `flutter_tools/lib/src/flutter_plugins.dart`. (~2193 tok)
 
 ## cafe_countryside_menu/.dart_tool/flutter_build/48266a41c9bddb7a8b14de09535d7fae/
 
-- `.filecache` (~74303 tok)
-- `app.dill.deps` (~53249 tok)
+- `.filecache` (~86962 tok)
+- `app.dill.deps` (~61642 tok)
 - `dart_build_result.json` (~40 tok)
 - `dart_build.d` (~43 tok)
 - `dart_build.stamp` (~152 tok)
-- `dart2js.d` (~43236 tok)
-- `dart2js.stamp` (~44364 tok)
+- `dart2js.d` (~51031 tok)
+- `dart2js.stamp` (~52330 tok)
 - `dart2wasm.stamp` (~149 tok)
-- `flutter_assets.d` (~2790 tok)
+- `flutter_assets.d` (~2935 tok)
 - `gen_localizations.stamp` (~7 tok)
-- `main.dart` — @dart=3.12 (~210 tok)
-- `main.dart.js.deps` (~53236 tok)
-- `outputs.json` (~588 tok)
-- `service_worker.d` (~1159 tok)
+- `main.dart` — @dart=3.12 (~225 tok)
+- `main.dart.js.deps` (~61628 tok)
+- `outputs.json` (~618 tok)
+- `service_worker.d` (~1188 tok)
 - `web_entrypoint.stamp` (~74 tok)
-- `web_plugin_registrant.dart` — Flutter web plugin registrant file. (~272 tok)
-- `web_release_bundle.stamp` (~3372 tok)
-- `web_resources.d` (~358 tok)
-- `web_service_worker.stamp` (~1186 tok)
+- `web_plugin_registrant.dart` — Flutter web plugin registrant file. (~353 tok)
+- `web_release_bundle.stamp` (~3577 tok)
+- `web_resources.d` (~413 tok)
+- `web_service_worker.stamp` (~1214 tok)
 - `web_static_assets.stamp` (~872 tok)
 - `web_templated_files.stamp` (~164 tok)
 
 ## cafe_countryside_menu/.firebase/
 
-- `hosting.YnVpbGQvd2Vi.cache` (~1078 tok)
+- `hosting.YnVpbGQvd2Vi.cache` (~1104 tok)
 
 ## cafe_countryside_menu/lib/
 
-- `firebase_options.dart` — File generated by FlutterFire CLI. (~618 tok)
-- `main.dart` — CafeApp: main, build (~260 tok)
-- `router.dart` — _GoRouterRefreshStream: dispose (~591 tok)
+- `firebase_options.dart` — File generated by FlutterFire CLI. (~662 tok)
+- `main.dart` — Class: CafeApp (~366 tok)
+- `router.dart` — _GoRouterRefreshStream: dispose (~791 tok)
 
 ## cafe_countryside_menu/lib/core/constants/
 
-- `app_constants.dart` — Declares AppConstants (~201 tok)
+- `app_constants.dart` — Declares AppConstants (~216 tok)
 
 ## cafe_countryside_menu/lib/core/errors/
 
@@ -503,104 +104,159 @@
 
 - `string_extensions.dart` (~0 tok)
 
+## cafe_countryside_menu/lib/core/services/
+
+- `external_link_service_stub.dart` — / Non-web fallback for `external_link_service.dart`'s conditional import. (~162 tok)
+- `external_link_service_web.dart` — ignore: avoid_web_libraries_in_flutter (~227 tok)
+- `external_link_service.dart` — Conditional import: dart:html only exists on the web compile target, not (~214 tok)
+- `pos_app_check_service.dart` — Firebase App Check for the POS (billing_cafe) project's Firestore (~1731 tok)
+
 ## cafe_countryside_menu/lib/features/admin/auth/
 
-- `access_denied_page.dart` — AccessDeniedPage: build (~515 tok)
-- `admin_guard.dart` — / Wraps every protected admin page. (~244 tok)
-- `auth_provider.dart` — Riverpod provider (~320 tok)
-- `auth_provider.g.dart` — AuthServiceProvider: debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash (~1498 tok)
-- `auth_service.dart` — Riverpod provider (~97 tok)
-- `login_page.dart` — Stateful widget (~952 tok)
+- `access_denied_page.dart` — AccessDeniedPage: build (~552 tok)
+- `admin_guard.dart` — / Wraps every protected admin page. (~262 tok)
+- `auth_provider.dart` — Riverpod provider (~343 tok)
+- `auth_provider.g.dart` — AuthServiceProvider: debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash (~1605 tok)
+- `auth_service.dart` — Riverpod provider (~104 tok)
+- `login_page.dart` — Stateful widget (~1020 tok)
 
 ## cafe_countryside_menu/lib/features/admin/dashboard/
 
-- `dashboard_page.dart` — ignore: avoid_web_libraries_in_flutter, deprecated_member_use (~2603 tok)
+- `dashboard_page.dart` — ignore: avoid_web_libraries_in_flutter, deprecated_member_use (~2789 tok)
 
 ## cafe_countryside_menu/lib/features/admin/items/
 
-- `items_page.dart` — Stateful widget: _FilterChip (~3247 tok)
-- `items_provider.dart` — Items operations are handled by DraftNotifier in sections_provider.dart. (~56 tok)
+- `items_page.dart` — Stateful widget: _FilterChip (~3551 tok)
+- `items_provider.dart` — Items operations are handled by DraftNotifier in sections_provider.dart. (~60 tok)
+
+## cafe_countryside_menu/lib/features/admin/items/bulk_import/
+
+- `bulk_import_page.dart` — ignore: avoid_web_libraries_in_flutter (~4734 tok)
+- `bulk_import_result.dart` — Declares BulkImportError (~237 tok)
+- `bulk_import_service.dart` — Declares int (~3785 tok)
 
 ## cafe_countryside_menu/lib/features/admin/items/widgets/
 
-- `item_form.dart` — Stateful widget: ItemFormDialog (~3866 tok)
+- `item_form.dart` — Stateful widget: ItemFormDialog (~4142 tok)
 
 ## cafe_countryside_menu/lib/features/admin/profile/
 
-- `profile_page.dart` — ProfilePage: build (~1010 tok)
+- `profile_page.dart` — ProfilePage: build (~1082 tok)
 
 ## cafe_countryside_menu/lib/features/admin/sections/
 
-- `sections_page.dart` — Stateful widget: _SectionTile (~2342 tok)
-- `sections_provider.dart` — Riverpod provider (~1870 tok)
-- `sections_provider.g.dart` — DraftRepositoryProvider: debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash, create (~1235 tok)
+- `sections_page.dart` — Stateful widget: _SectionTile (~2509 tok)
+- `sections_provider.dart` — Riverpod provider (~2210 tok)
+- `sections_provider.g.dart` — DraftRepositoryProvider: debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash, create (~1323 tok)
 
 ## cafe_countryside_menu/lib/features/admin/sections/widgets/
 
-- `section_form.dart` — Stateful widget: SectionFormDialog (~631 tok)
+- `section_form.dart` — Stateful widget: SectionFormDialog (~676 tok)
 
 ## cafe_countryside_menu/lib/features/admin/settings/
 
-- `settings_page.dart` — Stateful widget: _LogoPreview (~3234 tok)
-- `settings_provider.dart` — Riverpod provider (~231 tok)
-- `settings_provider.g.dart` — SettingsBusinessRepositoryProvider: debugGetCreateSourceHash, debugGetCreateSourceHash (~768 tok)
+- `settings_page.dart` — Flutter widget (~4380 tok)
+- `settings_provider.dart` — Riverpod provider (~247 tok)
+- `settings_provider.g.dart` — SettingsBusinessRepositoryProvider: debugGetCreateSourceHash, debugGetCreateSourceHash (~823 tok)
 
 ## cafe_countryside_menu/lib/features/menu/data/
 
-- `menu_repository.dart` — Declares MenuRepository (~167 tok)
+- `menu_repository.dart` — Declares MenuRepository (~178 tok)
 
 ## cafe_countryside_menu/lib/features/menu/models/
 
-- `item_model.dart` — ItemModel: matchesSearch (~1002 tok)
-- `menu_snapshot_model.dart` — Declares MenuSnapshotModel (~414 tok)
-- `section_model.dart` — Declares SectionModel (~171 tok)
+- `item_model.dart` — ItemModel: matchesSearch (~1292 tok)
+- `menu_snapshot_model.dart` — Declares MenuSnapshotModel (~443 tok)
+- `section_model.dart` — Declares SectionModel (~183 tok)
 
 ## cafe_countryside_menu/lib/features/menu/presentation/
 
-- `menu_page.dart` — ignore: avoid_web_libraries_in_flutter (~2251 tok)
-- `menu_provider.dart` — Riverpod provider (~734 tok)
-- `menu_provider.g.dart` — MenuRepositoryProvider: debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash (~1637 tok)
+- `menu_page.dart` — Stateful widget: _CafeInfoStrip (~4417 tok)
+- `menu_provider.dart` — Class: MenuFilterState (~1303 tok)
+- `menu_provider.g.dart` — MenuRepositoryProvider: debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash, debugGetCreateSourceHash (~1754 tok)
 
 ## cafe_countryside_menu/lib/features/menu/presentation/widgets/
 
-- `item_card.dart` — Stateless widget: ItemCard (~1744 tok)
-- `search_bar.dart` — Stateless widget: MenuSearchBar (~350 tok)
-- `section_chip.dart` — Stateless widget: SectionChipBar (~483 tok)
+- `item_card.dart` — Stateful widget: _QuantityStepper (~3396 tok)
+- `search_bar.dart` — Stateless widget: MenuSearchBar (~374 tok)
+- `section_chip.dart` — Stateless widget: SectionChipBar (~517 tok)
+
+## cafe_countryside_menu/lib/features/order/
+
+- `validation.dart` — / phase_plan/phase11_6.md — mirrors billing_cafe's own (~313 tok)
+
+## cafe_countryside_menu/lib/features/order/data/
+
+- `order_request_repository.dart` — phase_plan/phase11_5.md (billing_cafe repo) — plain-http REST client (~2417 tok)
+
+## cafe_countryside_menu/lib/features/order/models/
+
+- `cart_line.dart` — / This project's own local cart-line shape (phase_plan/phase11_6.md, (~627 tok)
+
+## cafe_countryside_menu/lib/features/order/presentation/
+
+- `checkout_page.dart` — Stateful widget: _CartLineTile (~3256 tok)
+- `order_status_page.dart` — Stateful widget: _StatusScaffold (~5898 tok)
+
+## cafe_countryside_menu/lib/features/order/presentation/widgets/
+
+- `honeypot_field.dart` — / phase_plan/phase11_6.md — a hidden anti-bot field. Positioned off- (~512 tok)
+
+## cafe_countryside_menu/lib/features/order/providers/
+
+- `cart_provider.dart` — Riverpod provider (~411 tok)
+- `cart_provider.g.dart` — CartNotifierProvider: debugGetCreateSourceHash (~890 tok)
+- `order_request_provider.dart` — Riverpod provider (~254 tok)
+- `order_request_provider.g.dart` — OrderRequestRepositoryProvider: debugGetCreateSourceHash (~895 tok)
 
 ## cafe_countryside_menu/lib/features/shared/models/
 
-- `admin_model.dart` — Declares AdminRole (~319 tok)
-- `business_model.dart` — Declares BusinessModel (~754 tok)
-- `draft_data.dart` — Declares DraftData (~664 tok)
-- `draft_item_model.dart` — Class: DraftItemModel (~1213 tok)
-- `draft_section_model.dart` — Declares DraftSectionModel (~527 tok)
+- `admin_model.dart` — Declares AdminRole (~342 tok)
+- `business_model.dart` — Class: BusinessModel (~1461 tok)
+- `draft_data.dart` — Declares DraftData (~712 tok)
+- `draft_item_model.dart` — Class: DraftItemModel (~1300 tok)
+- `draft_section_model.dart` — Declares DraftSectionModel (~565 tok)
 
 ## cafe_countryside_menu/lib/features/shared/permissions/
 
-- `permission_service.dart` — Single source of truth for role-based permissions (per plan.md). (~226 tok)
+- `permission_service.dart` — Single source of truth for role-based permissions (per plan.md). (~242 tok)
 
 ## cafe_countryside_menu/lib/features/shared/repositories/
 
-- `admin_repository.dart` — Declares AdminRepository (~136 tok)
-- `business_repository.dart` — Declares BusinessRepository (~218 tok)
-- `draft_repository.dart` — Class: DraftRepository (~1250 tok)
+- `admin_repository.dart` — Declares AdminRepository (~146 tok)
+- `business_repository.dart` — Declares BusinessRepository (~233 tok)
+- `draft_repository.dart` — Class: DraftRepository (~1339 tok)
 
 ## cafe_countryside_menu/lib/features/shared/services/
 
-- `cloudinary_service.dart` — Declares CloudinaryUploadResult (~379 tok)
+- `cloudinary_service.dart` — Declares CloudinaryUploadResult (~406 tok)
 - `firestore_service.dart` (~0 tok)
-- `image_service.dart` — Declares ImageService (~130 tok)
+- `image_service.dart` — Declares ImageService (~140 tok)
 
 ## cafe_countryside_menu/lib/features/shared/widgets/
 
 - `loading_widget.dart` (~0 tok)
-- `publish_banner.dart` — PublishBanner: build (~603 tok)
+- `publish_banner.dart` — PublishBanner: build (~646 tok)
+
+## cafe_countryside_menu/phase_plan/
+
+- `customer_ux_psychology.md` — Customer UX/Psychology Pass — Cafe Countryside Menu (~2769 tok)
 
 ## cafe_countryside_menu/test/
 
-- `widget_test.dart` — Placeholder — app requires Firebase initialization which cannot run in widget tests. (~68 tok)
+- `cart_provider_test.dart` — phase_plan/phase11_6.md — CartNotifier's pure state transitions, (~1022 tok)
+- `item_model_test.dart` — phase_plan/phase11_5.md (billing_cafe repo) — this project's first (~545 tok)
+- `menu_provider_test.dart` — phase_plan/phase11_9.md (billing_cafe repo) Task 3 — the menu page's (~246 tok)
+- `order_request_repository_test.dart` — phase_plan/phase11_5.md — dedicated tests for the Firestore REST API (~1294 tok)
+- `order_status_page_test.dart` — phase_plan/phase11_9.md (billing_cafe repo) Task 1 — the self-order (~1045 tok)
+- `order_validation_test.dart` — Declares Duration (~639 tok)
+- `widget_test.dart` — Placeholder — app requires Firebase initialization which cannot run in widget tests. (~73 tok)
+
+## cafe_countryside_menu/tool/
+
+- `order_status_preview.dart` — Local-only visual preview of OrderStatusPage's confirmed state — lets (~451 tok)
 
 ## cafe_countryside_menu/web/
 
-- `index.html` — Why Not? Cafe Countryside - Menu (~688 tok)
+- `index.html` — Why Not? Cafe Countryside - Menu (~730 tok)
 - `manifest.json` (~274 tok)

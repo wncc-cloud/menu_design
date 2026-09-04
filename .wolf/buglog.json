@@ -16,6 +16,303 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-08-20T10:50:13.697Z"
+    },
+    {
+      "id": "bug-002",
+      "timestamp": "2026-08-28T18:38:02.103Z",
+      "error_message": "Null/undefined access in ",
+      "file": "cafe_countryside_menu/lib/features/menu/presentation/menu_page.dart",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: final selfOrderEnabled = ref.watch(businessProvider).asData?; if (!selfOrderEnabled) return const SizedBox.shrink();",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-08-28T18:38:14.874Z"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-08-28T18:38:23.541Z",
+      "error_message": "Missing import: ../menu_provider.dart",
+      "file": "cafe_countryside_menu/lib/features/menu/presentation/widgets/item_card.dart",
+      "root_cause": "Module(s) not imported: ../menu_provider.dart",
+      "fix": "Added import(s) for ../menu_provider.dart",
+      "tags": [
+        "auto-detected",
+        "missing-import",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-08-28T18:38:23.541Z"
+    },
+    {
+      "id": "bug-004",
+      "timestamp": "2026-08-28T18:38:31.829Z",
+      "error_message": "Null/undefined access in ",
+      "file": "cafe_countryside_menu/lib/features/menu/presentation/widgets/item_card.dart",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-08-28T18:38:31.829Z"
+    },
+    {
+      "id": "bug-005",
+      "timestamp": "2026-08-28T18:54:22.076Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/phase_plan/customer_ux_psychology.md",
+      "root_cause": "7 lines replaced/restructured",
+      "fix": "Rewrote 7→11 lines (7 removed) | Also: ## Open questions for you; 1. Priority order above is my read of impact-vs-ef",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-08-28T18:54:39.742Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-08-29T00:00:00.000Z",
+      "error_message": "Self-order status poll never stops after the request's expiresAt passes (cross-repo efficiency audit finding, phase_plan/phase11_9.md Task 1 in sibling billing_cafe repo)",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+      "root_cause": "_pollOnce() only cancelled _pollTimer when linkedOrderNumber was set. There was no check anywhere in the poll body against expiresAt, so an unclaimed request whose countdown reached zero kept firing a real Firestore REST GET (via OrderRequestRepository.getRequest, not a cheap SDK listener) on the poll interval forever, for as long as the browser tab stayed open (e.g. backgrounded on a phone, not closed). Separately, the Timer.periodic that starts the recurring poll was also created unconditionally on any response with expiresAt set, even one that was already in the past.",
+      "fix": "Added a guard at the top of _pollOnce(): if _expiresAt is set and DateTime.now() is after it, cancel _pollTimer and return before making the REST call. Also guarded the Timer.periodic creation itself (`_pollTimer == null && expiresAt != null && !DateTime.now().isAfter(expiresAt)`) so a poll that already comes back expired never schedules a recurring timer in the first place.",
+      "tags": [
+        "efficiency",
+        "firestore-quota",
+        "timer-leak",
+        "order-status",
+        "cross-repo-audit"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-08-29T00:00:00.000Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-08-29T00:00:00.000Z",
+      "error_message": "Menu page's 5-minute background refresh timer has no upper bound on tab-open time (cross-repo efficiency audit finding, phase_plan/phase11_9.md Task 3 in sibling billing_cafe repo)",
+      "file": "cafe_countryside_menu/lib/features/menu/presentation/menu_provider.dart",
+      "root_cause": "MenuController (@Riverpod(keepAlive: true)) started a Timer.periodic(Duration(minutes: 5)) that calls ref.invalidateSelf() for as long as the controller instance is alive — i.e. for as long as a customer's browser tab is open, uncapped. This is the public, highest-traffic page in the app, so cost scales with real customer visits. No app-lifecycle/visibility hook (dart:html visibilitychange, WidgetsBindingObserver, etc.) exists anywhere in this codebase to pause the timer on a hidden tab.",
+      "fix": "Widened the interval from 5 to 20 minutes (renamed the constant from private _menuRefreshInterval to public menuRefreshInterval so it's directly assertable from test/menu_provider_test.dart). Chose the interval-widen mitigation over building a pause/resume-on-visibility mechanism since no lifecycle hook already existed in the codebase to build on top of, per the audit's own stated tradeoff.",
+      "tags": [
+        "efficiency",
+        "firestore-quota",
+        "menu-provider",
+        "cross-repo-audit"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-08-29T00:00:00.000Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-08-29T00:00:00.000Z",
+      "error_message": "flutter test fails to compile test/order_status_page_test.dart: \"Dart library 'dart:html' is not available on this platform\"",
+      "file": "cafe_countryside_menu/lib/core/services/external_link_service.dart",
+      "root_cause": "external_link_service.dart unconditionally imported dart:html. flutter test's default reporter runs on the Dart VM (not the web compile target), which has no dart:html. No prior test file happened to transitively import this file (via order_status_page.dart or menu_page.dart's _CafeInfoStrip), so the gap was latent until test/order_status_page_test.dart (added for bug-006's fix) became the first to pull it in. Confirmed this is fixable without a browser: `flutter test --platform chrome` does compile and pass, but that's an extra flag nothing in this repo's tooling documents, so plain `flutter test` should just work.",
+      "fix": "Split external_link_service.dart into a conditional import: external_link_service_web.dart (the original dart:html implementation, used when dart.library.html is available) and external_link_service_stub.dart (a no-op fallback for the VM). external_link_service.dart itself now just dispatches via `import 'external_link_service_stub.dart' if (dart.library.html) 'external_link_service_web.dart' as impl;`. Production web behavior is unchanged.",
+      "tags": [
+        "dart:html",
+        "flutter-test",
+        "conditional-import",
+        "vm-platform"
+      ],
+      "related_bugs": [
+        "bug-006"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-08-29T00:00:00.000Z"
+    },
+    {
+      "id": "bug-009",
+      "timestamp": "2026-09-01T13:05:35.060Z",
+      "error_message": "Null/undefined access in ",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: if (heroCaption != null) ...[; const SizedBox(height: 4),",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-09-01T13:05:49.424Z"
+    },
+    {
+      "id": "bug-010",
+      "timestamp": "2026-09-01T13:16:34.573Z",
+      "error_message": "Null/undefined access in ",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: heroCaption: _customerName?.trim().isNotEmpty == true ? _cus | Also: if (heroCaption != null) ...[; const SizedBox(height: 4),",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 4,
+      "last_seen": "2026-09-01T13:17:37.382Z"
+    },
+    {
+      "id": "bug-011",
+      "timestamp": "2026-09-01T14:18:11.693Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/lib/features/menu/presentation/menu_page.dart",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 10→5 lines (5 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-01T14:18:11.693Z"
+    },
+    {
+      "id": "bug-012",
+      "timestamp": "2026-09-01T14:18:32.232Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 8→29 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-01T14:18:32.232Z"
+    },
+    {
+      "id": "bug-013",
+      "timestamp": "2026-09-01T14:18:56.469Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/lib/features/menu/presentation/widgets/item_card.dart",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 30→65 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-01T14:18:56.469Z"
+    },
+    {
+      "id": "bug-014",
+      "timestamp": "2026-09-01T14:23:12.678Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/phase_plan/customer_ux_psychology.md",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 16→29 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-01T14:23:12.678Z"
+    },
+    {
+      "id": "bug-015",
+      "timestamp": "2026-09-01T17:02:19.993Z",
+      "error_message": "Wrong reference: Center should be _MenuSkeleton",
+      "file": "cafe_countryside_menu/lib/features/menu/presentation/menu_page.dart",
+      "root_cause": "Used \"Center\" instead of \"_MenuSkeleton\"",
+      "fix": "Changed Center → _MenuSkeleton",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-01T17:02:19.993Z"
+    },
+    {
+      "id": "bug-016",
+      "timestamp": "2026-09-01T17:12:49.596Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/phase_plan/customer_ux_psychology.md",
+      "root_cause": "4 lines replaced/restructured",
+      "fix": "Rewrote 4→23 lines (4 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-01T17:12:49.596Z"
+    },
+    {
+      "id": "bug-017",
+      "timestamp": "2026-09-04T14:52:05.691Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+      "root_cause": "8 lines replaced/restructured",
+      "fix": "Rewrote 38→49 lines (8 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-04T14:52:05.691Z"
+    },
+    {
+      "id": "bug-018",
+      "timestamp": "2026-09-04T15:17:32.175Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/lib/main.dart",
+      "root_cause": "Had 'package:firebase_core/firebase_core.dart'",
+      "fix": "Changed to 'dart:async'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-04T15:17:32.175Z"
+    },
+    {
+      "id": "bug-019",
+      "timestamp": "2026-09-04T15:18:00.000Z",
+      "error_message": "User complaint: menu site slow to load, sometimes fails to load entirely, on Safari/iPhone",
+      "file": "cafe_countryside_menu/web/index.html, cafe_countryside_menu/lib/main.dart",
+      "root_cause": "Two compounding first-load delays on every visit: (1) web/index.html loaded https://cdn.jsdelivr.net/npm/pica/dist/pica.min.js as a blocking synchronous <script> in <head> with no async/defer — that library is only used by ImageService for admin photo uploads, but the same index.html serves every SPA route including the public menu, so every customer's browser blocked HTML parsing on that CDN fetch. (2) main.dart awaited PosAppCheckService.activate() before runApp(), so nothing rendered until it resolved — it's already timeout-guarded at 8s (per pos_app_check_service.dart's own doc) but that token is only needed later by the /checkout REST calls, not for browsing the menu, so worst case every visitor ate up to 8s of blank screen before the menu even started loading. Safari/iOS was likely hit hardest because ITP/tracking-prevention can slow third-party script + reCAPTCHA Enterprise loads further, and CanvasKit (the likely default renderer Safari falls back to, lacking WasmGC/skwasm support) is already a heavier download than other browsers get.",
+      "fix": "Added defer to the pica script tag in web/index.html. Changed main.dart to unawaited(PosAppCheckService.activate()) so it runs in the background after runApp() instead of blocking first paint; getToken()'s existing null-safe fallback already handles activation not being ready yet.",
+      "tags": [
+        "performance",
+        "safari",
+        "ios",
+        "first-load",
+        "blocking-script",
+        "app-check"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-04T15:18:00.000Z"
     }
   ]
 }

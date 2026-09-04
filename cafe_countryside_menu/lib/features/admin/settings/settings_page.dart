@@ -23,8 +23,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   late final TextEditingController _instagramCtrl;
   late final TextEditingController _mapsCtrl;
   late final TextEditingController _hoursCtrl;
+  late final TextEditingController _expiryCtrl;
 
   BusinessModel? _current;
+  bool _showBestsellersTab = true;
+  bool _selfOrderEnabled = false;
   bool _saving = false;
   bool _logoUploading = false;
   String? _saveError;
@@ -37,6 +40,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     _instagramCtrl = TextEditingController();
     _mapsCtrl = TextEditingController();
     _hoursCtrl = TextEditingController();
+    _expiryCtrl = TextEditingController();
   }
 
   @override
@@ -47,6 +51,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       _instagramCtrl,
       _mapsCtrl,
       _hoursCtrl,
+      _expiryCtrl,
     ]) {
       c.dispose();
     }
@@ -60,6 +65,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     _instagramCtrl.text = b.instagram;
     _mapsCtrl.text = b.mapsUrl;
     _hoursCtrl.text = b.openingHours;
+    _expiryCtrl.text = b.orderRequestExpiryMinutes.toString();
+    _showBestsellersTab = b.showBestsellersTab;
+    _selfOrderEnabled = b.selfOrderEnabled;
   }
 
   BusinessModel _buildFromControllers() {
@@ -70,6 +78,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       instagram: _instagramCtrl.text.trim(),
       mapsUrl: _mapsCtrl.text.trim(),
       openingHours: _hoursCtrl.text.trim(),
+      orderRequestExpiryMinutes: int.tryParse(_expiryCtrl.text.trim()) ?? base.orderRequestExpiryMinutes,
+      showBestsellersTab: _showBestsellersTab,
+      selfOrderEnabled: _selfOrderEnabled,
     );
   }
 
@@ -293,6 +304,59 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       hintText: 'Mon–Sun: 8:00 AM – 10:00 PM',
                     ),
                     maxLines: 2,
+                  ),
+                  const SizedBox(height: 32),
+
+                  _SectionLabel('Self-Order'),
+                  const SizedBox(height: 12),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Enable self-ordering'),
+                    subtitle: const Text(
+                      'Lets customers add items to a cart and place an order '
+                      'from their phone. Turning this off immediately hides '
+                      'the cart and checkout from the menu — use this if '
+                      'something goes wrong and you need to stop new orders '
+                      'right away. Orders already placed are not affected.',
+                    ),
+                    value: _selfOrderEnabled,
+                    onChanged: (v) => setState(() => _selfOrderEnabled = v),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _expiryCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Self-order request expiry (minutes)',
+                      hintText: '3',
+                      helperText:
+                          'How long a customer\'s self-order request stays open for a '
+                          'cashier to claim before it expires (1-25 minutes).',
+                      helperMaxLines: 2,
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (v) {
+                      final trimmed = v?.trim() ?? '';
+                      if (trimmed.isEmpty) return 'Required';
+                      final minutes = int.tryParse(trimmed);
+                      if (minutes == null) return 'Enter a whole number';
+                      if (minutes < 1 || minutes > 25) return 'Must be between 1 and 25';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 32),
+
+                  _SectionLabel('Menu Display'),
+                  const SizedBox(height: 12),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Show "Best Sellers" tab'),
+                    subtitle: const Text(
+                      'A filter chip right after "All" showing only items '
+                      'marked as bestsellers. Hiding it here does not '
+                      'change any item\'s bestseller flag.',
+                    ),
+                    value: _showBestsellersTab,
+                    onChanged: (v) => setState(() => _showBestsellersTab = v),
                   ),
 
                   if (_saveError != null) ...[

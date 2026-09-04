@@ -155,7 +155,7 @@ final class DraftNotifierProvider
   DraftNotifier create() => DraftNotifier();
 }
 
-String _$draftNotifierHash() => r'a32776d40154ce891865a8325a9612daae21bb4f';
+String _$draftNotifierHash() => r'f6908e73cc4ec4f5d9e6141dba0ada10bbf8c7ab';
 
 abstract class _$DraftNotifier extends $AsyncNotifier<void> {
   FutureOr<void> build();

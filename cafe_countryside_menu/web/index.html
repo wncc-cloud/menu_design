@@ -43,8 +43,10 @@
   <meta name="twitter:title" content="Why Not? Cafe Countryside - Menu">
   <meta name="twitter:description" content="Browse the menu for Why Not? Cafe Countryside.">
   <meta name="twitter:image" content="https://cafe-countryside-menu.web.app/social-preview.png">
-  <!-- Required by flutter_image_compress for web (uses pica for compression) -->
-  <script src="https://cdn.jsdelivr.net/npm/pica/dist/pica.min.js"></script>
+  <!-- Required by flutter_image_compress for web (uses pica for compression).
+       Only admin photo-upload flows need this — defer so it never blocks
+       first paint for menu-browsing customers on this shared index.html. -->
+  <script src="https://cdn.jsdelivr.net/npm/pica/dist/pica.min.js" defer></script>
 </head>
 <body>
   <!--
