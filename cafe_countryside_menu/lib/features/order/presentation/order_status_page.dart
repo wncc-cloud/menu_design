@@ -135,10 +135,15 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
         heroLabel: 'YOUR ORDER NUMBER',
         heroValue: '#$_linkedOrderNumber',
         heroCaption: _customerName?.trim().isNotEmpty == true ? _customerName : null,
+        // Café-owner ask (round 3): customers were missing this line at a
+        // glance — bumped size/weight/contrast relative to the shared
+        // _InstructionBanner default (the pending screen's cashier
+        // instruction stays at the original size via `emphasized: false`).
         instructionBanner: const _InstructionBanner(
           icon: Icons.camera_alt_outlined,
           text: 'Take a screenshot or remember this number — '
               'you may need to show it when your order is ready.',
+          emphasized: true,
         ),
         subtitle: 'Head to the counter — your order is on its way.',
         // Café-owner ask: two additions here specifically (not on the
@@ -558,32 +563,43 @@ class _CleanupNudge extends StatelessWidget {
 class _InstructionBanner extends StatelessWidget {
   final IconData icon;
   final String text;
+  // Bigger/bolder/higher-contrast variant — see the confirmed-screen call
+  // site's comment. Kept opt-in so the pending screen's cashier
+  // instruction is unaffected.
+  final bool emphasized;
 
-  const _InstructionBanner({required this.icon, required this.text});
+  const _InstructionBanner({
+    required this.icon,
+    required this.text,
+    this.emphasized = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       constraints: const BoxConstraints(maxWidth: 360),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+      padding: EdgeInsets.symmetric(vertical: emphasized ? 14 : 10, horizontal: 14),
       decoration: BoxDecoration(
         color: const Color(0xFFFFF8E1),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFFFE082)),
+        border: Border.all(
+          color: const Color(0xFFFFE082),
+          width: emphasized ? 2 : 1,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: const Color(0xFFF57F17)),
+          Icon(icon, size: emphasized ? 26 : 20, color: const Color(0xFFF57F17)),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
-                color: Color(0xFF6D4C00),
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
+              style: TextStyle(
+                color: const Color(0xFF6D4C00),
+                fontSize: emphasized ? 16 : 13,
+                fontWeight: emphasized ? FontWeight.w800 : FontWeight.w500,
                 height: 1.3,
               ),
             ),

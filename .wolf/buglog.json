@@ -262,6 +262,22 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-09-01T17:12:49.596Z"
+    },
+    {
+      "id": "bug-017",
+      "timestamp": "2026-09-04T14:52:05.691Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+      "root_cause": "8 lines replaced/restructured",
+      "fix": "Rewrote 38→49 lines (8 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-04T14:52:05.691Z"
     }
   ]
 }

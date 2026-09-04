@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-09-01T17:12:49.567Z
-> Files: 125 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-09-04T15:02:48.271Z
+> Files: 126 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
 
@@ -196,7 +196,7 @@
 ## cafe_countryside_menu/lib/features/order/presentation/
 
 - `checkout_page.dart` — Stateful widget: _CartLineTile (~3256 tok)
-- `order_status_page.dart` — Stateful widget: _StatusScaffold (~5712 tok)
+- `order_status_page.dart` — Stateful widget: _StatusScaffold (~5898 tok)
 
 ## cafe_countryside_menu/lib/features/order/presentation/widgets/
 
@@ -251,6 +251,10 @@
 - `order_status_page_test.dart` — phase_plan/phase11_9.md (billing_cafe repo) Task 1 — the self-order (~1045 tok)
 - `order_validation_test.dart` — Declares Duration (~639 tok)
 - `widget_test.dart` — Placeholder — app requires Firebase initialization which cannot run in widget tests. (~73 tok)
+
+## cafe_countryside_menu/tool/
+
+- `order_status_preview.dart` — Local-only visual preview of OrderStatusPage's confirmed state — lets (~451 tok)
 
 ## cafe_countryside_menu/web/
 
