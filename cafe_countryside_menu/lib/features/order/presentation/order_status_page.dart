@@ -32,6 +32,11 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
   DateTime? _expiresAt;
   int? _linkedOrderNumber;
   bool _loadFailed = false;
+  // phase_plan/notes_in_order.md Task 5 — read-only recap fields, only
+  // ever populated for the CONFIRMED display; no need to reuse
+  // OrderCartLine itself here.
+  List<Map<String, dynamic>>? _lines;
+  String? _orderNotes;
 
   @override
   void initState() {
@@ -70,11 +75,19 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
 
       final expiresAt = data['expiresAt'] as DateTime?;
       final linkedOrderNumber = data['linkedOrderNumber'] as int?;
+      final rawLines = data['lines'] as List<dynamic>?;
       setState(() {
         _shortCode = data['shortCode'] as String? ?? _shortCode;
         _customerName = data['customerName'] as String? ?? _customerName;
         if (expiresAt != null) _expiresAt = expiresAt;
         _linkedOrderNumber = linkedOrderNumber;
+        if (rawLines != null) {
+          _lines = rawLines.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        }
+        final orderNotes = data['orderNotes'] as String?;
+        if (orderNotes != null && orderNotes.trim().isNotEmpty) {
+          _orderNotes = orderNotes.trim();
+        }
       });
 
       if (linkedOrderNumber != null) {
@@ -151,6 +164,10 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
         // your order number", unchanged, these just ride along below it.
         extra: Column(
           children: [
+            if (_lines != null && _lines!.isNotEmpty) ...[
+              _OrderRecap(lines: _lines!, orderNotes: _orderNotes),
+              const SizedBox(height: 12),
+            ],
             const _CleanupNudge(),
             const SizedBox(height: 12),
             OutlinedButton.icon(
@@ -511,6 +528,73 @@ class _StepTracker extends StatelessWidget {
 /// boilerplate signage. Distinct styling from `_InstructionBanner`
 /// (amber/informational) — this one leans into the ask/bin framing
 /// rather than a plain instruction.
+/// phase_plan/notes_in_order.md Task 5 — a compact receipt-style recap
+/// of what was submitted, shown once CONFIRMED. Read-only — no
+/// controls; editing an already-submitted order/note is a materially
+/// bigger, separate feature, not in scope here.
+class _OrderRecap extends StatelessWidget {
+  final List<Map<String, dynamic>> lines;
+  final String? orderNotes;
+
+  const _OrderRecap({required this.lines, this.orderNotes});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      constraints: const BoxConstraints(maxWidth: 360),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Your order',
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey[800]),
+          ),
+          const SizedBox(height: 8),
+          for (final line in lines)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('${line['name']} × ${line['quantity']}'),
+                        if ((line['notes'] as String?)?.isNotEmpty ?? false)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              line['notes'] as String,
+                              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (orderNotes != null) ...[
+            const Divider(height: 16),
+            Text(
+              'Note for the kitchen: $orderNotes',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _CleanupNudge extends StatelessWidget {
   const _CleanupNudge();
 

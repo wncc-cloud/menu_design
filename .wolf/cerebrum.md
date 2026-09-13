@@ -2,11 +2,60 @@
 
 > OpenWolf's learning memory. Updated automatically as the AI learns from interactions.
 > Do not edit manually unless correcting an error.
-> Last updated: 2026-07-04
+> Last updated: 2026-09-07
 
 ## User Preferences
 
 <!-- How the user likes things done. Code style, tools, patterns, communication. -->
+
+- **[2026-09-05]** When blocked from testing a real user-facing flow
+  locally (here: checkout has no emulator mode, hardcoded to real
+  `why-not-cafe-prod`), asked which of 3 real tradeoffs to take (add a
+  small reversible local test mode / simulate via seeded data only /
+  deploy to real dev and test there) rather than guessing — café owner
+  chose adding the local test mode. Confirms: don't silently build new
+  test infrastructure into shipped code without asking first, even when
+  it seems like the obviously-right engineering call.
+
+- **[2026-09-07]** Real user feedback (café owner, after actually
+  clicking through checkout): the per-item note affordance
+  (`checkout_page.dart`'s `_CartLineTile`) was too subtle to be usable —
+  the "add note" icon (`Icons.note_add_outlined`) looked like a generic
+  file icon indistinguishable from other controls, and a SAVED note
+  rendered as tiny 12px grey text easy to miss entirely. Fixed by
+  switching to `Icons.chat_bubble_outline`/`Icons.chat_bubble` (filled +
+  green when a note exists, so the icon itself signals state) and
+  replacing the tiny pin text with a full-width, high-contrast green
+  chip (same `0xFFE8F5E9`/`0xFF2E7D32` palette as `_CleanupNudge`
+  elsewhere on this page, for visual consistency). **Lesson: a
+  functionally-correct save (state genuinely updates, verified via
+  automated test) is not the same as a discoverable one** — this bug
+  report was about visibility/affordance, not the underlying save logic
+  (which worked correctly the whole time, confirmed before touching
+  anything). When a user says "I can't see X" about something that
+  IS being saved, check contrast/size/icon-recognizability before
+  assuming a functional bug.
+
+## Key Learnings
+
+- **[2026-09-05] `OrderRequestRepository` (checkout's REST client) can be
+  given a `useLocalEmulator` flag that redirects its writes at the local
+  Firestore emulator without touching menu *browsing***
+  (`FirebaseFirestore.instance`, a separate connection to the real
+  `cafe-countryside-menu` project) — only the checkout-submission path
+  needed redirecting to safely test locally; menu browsing stayed
+  pointed at real prod, read-only, harmless. See `billing_cafe`'s own
+  `phase_plan/notes_in_order.md` STATUS.md entry (2026-09-05) for the
+  full implementation. **Gotcha found while using it**: claiming a
+  real-menu-submitted request on billing_cafe's Counter re-validates
+  each line's `menuItemId` against billing_cafe's OWN seeded test menu
+  (a different Firebase project, `why-not-cafe-menu-dev`) — since real
+  prod's actual item ids don't match `seed.js`'s simplified test ids
+  (`menu_pizza`, `menu_tea`, etc.), a claimed real-menu item legitimately
+  shows up "unavailable" and the cart pre-fills empty. Not a bug — just
+  expected test-data drift between the real menu and the local seed;
+  `orderNotes` itself is unaffected either way (it doesn't depend on any
+  item match).
 
 ## Key Learnings
 
@@ -20,11 +69,44 @@
 - **web/index.html is shared by every SPA route** (public menu + admin), so any blocking third-party `<script>` added there (e.g. jsdelivr's `pica.min.js` for `flutter_image_compress`, admin-only) delays first paint for menu customers too — always add `defer`/`async` unless the script must run before Flutter boots. Fixed 2026-09-04 after a Safari/iPhone slow-load complaint.
 - **`main()` in `lib/main.dart` should never `await` anything customers don't need for the page they're on before `runApp()`.** `PosAppCheckService.activate()` is only for `/checkout`'s REST calls (see `pos_app_check_service.dart`'s own 8s-timeout doc) but used to be awaited before `runApp()`, so every visitor — including menu-only browsers — could eat up to 8s of blank screen. Changed to `unawaited(...)` 2026-09-04; `getToken()` already has a null-safe fallback for "activation not ready yet." Apply the same "does this route need it?" check before adding any future blocking startup call.
 - **Flutter Web default renderer on Safari is likely CanvasKit** (Safari lacks WasmGC/skwasm support), a heavier WASM download than the HTML renderer — worth testing `--web-renderer html` (or the current-version equivalent dart-define, verify against installed Flutter version first) for this text/image-only menu page if Safari load times are still an issue after the 2026-09-04 fixes.
+- **[2026-09-07] `flutter run -d web-server` (debug mode, tried for a
+  live hot-reload dev session) is NOT reliable enough for handing a URL
+  to a real person to test — confirmed on BOTH ends, not just my own
+  automation.** First found via automated re-connects (a fresh
+  headless-Chromium browser against an already-running debug session
+  loads blank — HTTP 200, nothing paints). Then the café owner hit it
+  independently in their own real browser: `menu_design`'s page showed
+  nothing at all, and separately billing_cafe's SAME debug-mode session
+  threw `firebase_auth/api-key-not-valid` on sign-in even though the
+  emulator config was verifiably correct (confirmed via a fresh
+  automated reconnect against the exact same URL, using the exact same
+  emulator — no code or config bug, sign-in worked fine there). The CLI
+  own hint explains why ("The web-server device requires the Dart Debug
+  Chrome extension for debugging") — without that extension the debug
+  session's state gets inconsistent across reconnects/hot-restarts in
+  ways a plain release build never does. **Fix that actually resolved
+  both real reports**: kill the `flutter run -d web-server` process,
+  `flutter build web` a real release build, serve it with `python3 -m
+  http.server` instead — zero repeats of either symptom afterward, this
+  session or before it. **For any future "give me a URL to test" ask —
+  always use a static release build, never `flutter run -d web-server`**,
+  even though the latter is faster to update on a code change (worth the
+  rebuild time given how confusing these symptoms are to a real user who
+  has no way to know it's a dev-server artifact, not their setup or the
+  app itself being broken).
+- *(superseded detail, kept for context)* automated screenshot
+  verification specifically: use a real `flutter build web` release
+  build served statically instead (proven reliable across many
+  reconnects all session) — reserve `flutter run -d web-server`
+  for the human's own single real browser session, not repeated
+  automated reconnects.
 
 ## Do-Not-Repeat
 
 <!-- Mistakes made and corrected. Each entry prevents the same mistake recurring. -->
 <!-- Format: [YYYY-MM-DD] Description of what went wrong and what to do instead. -->
+
+- **[2026-09-05] `OrderCartLine.copyWith`'s `notes: notes ?? this.notes` can never express "clear this field to null" — only "leave it as-is" (pass nothing/null) or "set a new non-null value".** Caught while building `phase_plan/notes_in_order.md` Task 1's `CartNotifier.setNotes(menuItemId, String? notes)`: calling `line.copyWith(notes: normalizedOrNull)` to clear a note would have silently kept the old note instead, since `null ?? this.notes` always resolves to the existing value. Fixed by having `setNotes` construct a new `OrderCartLine(...)` directly instead of going through `copyWith` for this one case. **Any future method on this class that needs to explicitly null out `notes` (or any other nullable field `copyWith` treats the same way) must NOT use `copyWith` for that — either construct the object directly, or first add a real "clear" sentinel/flag to `copyWith` itself.** `setQuantity`'s existing use of `copyWith(quantity: ...)` is unaffected (it never touches `notes`).
 
 ## Decision Log
 

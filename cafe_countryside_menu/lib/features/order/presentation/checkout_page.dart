@@ -25,6 +25,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
   final _phoneController = TextEditingController();
   final _tableController = TextEditingController();
   final _honeypotController = TextEditingController();
+  final _orderNotesController = TextEditingController();
   bool _submitting = false;
   String? _errorMessage;
   bool _prefilledTable = false;
@@ -35,19 +36,21 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     _phoneController.dispose();
     _tableController.dispose();
     _honeypotController.dispose();
+    _orderNotesController.dispose();
     super.dispose();
   }
 
-  void _prefillTableOnce(BuildContext context) {
+  void _prefillTableOnce(BuildContext context, bool tableNumberEnabled) {
     if (_prefilledTable) return;
     _prefilledTable = true;
+    if (!tableNumberEnabled) return;
     final table = GoRouterState.of(context).uri.queryParameters['table'];
     if (table != null && table.isNotEmpty) {
       _tableController.text = table;
     }
   }
 
-  Future<void> _submit(List<OrderCartLine> cart, int expiryMinutes) async {
+  Future<void> _submit(List<OrderCartLine> cart, int expiryMinutes, bool tableNumberEnabled) async {
     if (_submitting) return;
     // phase_plan/phase11_6.md — dropped client-side, before any
     // network call at all, cheaper than even a rejected write and
@@ -67,8 +70,17 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
       'shortCode': _generateShortCode(),
       'customerName': _nameController.text.trim(),
       'customerPhone': _phoneController.text.trim(),
-      'tableNumber': _tableController.text.trim(),
+      // Admin setting — disabled means "never ask," so this is always
+      // blank regardless of whatever text the controller might still
+      // hold from before the setting was turned off.
+      'tableNumber': tableNumberEnabled ? _tableController.text.trim() : '',
       'lines': cart.map((l) => l.toWireMap()).toList(),
+      // phase_plan/notes_in_order.md Task 1 — always a trimmed string,
+      // never null, exactly matching tableNumber/customerName above:
+      // billing_cafe's rule requires this shape (a blank-to-null convention
+      // here would reject every no-note order under the rule's `is string`
+      // check).
+      'orderNotes': _orderNotesController.text.trim(),
       'status': 'PENDING',
       'createdAt': now,
       'expiresAt': expiresAt,
@@ -139,11 +151,11 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
 
   @override
   Widget build(BuildContext context) {
-    _prefillTableOnce(context);
-
     final cart = ref.watch(cartProvider);
     final business = ref.watch(businessProvider).asData?.value;
     final expiryMinutes = business?.orderRequestExpiryMinutes ?? 3;
+    final tableNumberEnabled = business?.tableNumberEnabled ?? true;
+    _prefillTableOnce(context, tableNumberEnabled);
     final subtotalPaise = cart.fold<int>(0, (sum, l) => sum + l.lineTotalPaise);
     // Admin kill-switch — closes the loophole of a bookmarked/typed
     // /checkout URL still working after ordering's been turned off,
@@ -210,6 +222,8 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                           onQuantityChanged: (q) =>
                               ref.read(cartProvider.notifier).setQuantity(line.menuItemId, q),
                           onRemove: () => ref.read(cartProvider.notifier).removeItem(line.menuItemId),
+                          onNotesChanged: (notes) =>
+                              ref.read(cartProvider.notifier).setNotes(line.menuItemId, notes),
                         )),
                     const Divider(height: 24),
                     Row(
@@ -245,10 +259,21 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                             : 'Enter exactly 10 digits, no spaces or +91';
                       },
                     ),
+                    if (tableNumberEnabled) ...[
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _tableController,
+                        decoration: const InputDecoration(labelText: 'Table number (optional)'),
+                      ),
+                    ],
                     const SizedBox(height: 12),
                     TextFormField(
-                      controller: _tableController,
-                      decoration: const InputDecoration(labelText: 'Table number (optional)'),
+                      controller: _orderNotesController,
+                      decoration: const InputDecoration(
+                        labelText: 'Notes for the kitchen (optional, applies to every item)',
+                      ),
+                      maxLength: 300,
+                      maxLines: 2,
                     ),
                     HoneypotField(controller: _honeypotController),
                     if (_errorMessage != null) ...[
@@ -259,7 +284,9 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton(
-                        onPressed: _submitting ? null : () => _submit(cart, expiryMinutes),
+                        onPressed: _submitting
+                            ? null
+                            : () => _submit(cart, expiryMinutes, tableNumberEnabled),
                         style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
                         child: _submitting
                             ? const SizedBox(
@@ -282,33 +309,118 @@ class _CartLineTile extends StatelessWidget {
   final OrderCartLine line;
   final ValueChanged<int> onQuantityChanged;
   final VoidCallback onRemove;
+  final ValueChanged<String?> onNotesChanged;
 
   const _CartLineTile({
     required this.line,
     required this.onQuantityChanged,
     required this.onRemove,
+    required this.onNotesChanged,
   });
+
+  Future<void> _editNote(BuildContext context) async {
+    final controller = TextEditingController(text: line.notes ?? '');
+    final note = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Note for ${line.name}'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 300,
+          decoration: const InputDecoration(
+            hintText: 'e.g. Extra spicy, no onion',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(controller.text),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    if (note != null) onNotesChanged(note);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final hasNote = line.notes != null && line.notes!.isNotEmpty;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(child: Text(line.name)),
-          IconButton(
-            icon: const Icon(Icons.remove_circle_outline, size: 20),
-            onPressed: () => onQuantityChanged(line.quantity - 1),
+          Row(
+            children: [
+              Expanded(child: Text(line.name)),
+              IconButton(
+                icon: Icon(
+                  hasNote ? Icons.chat_bubble : Icons.chat_bubble_outline,
+                  size: 20,
+                  color: hasNote ? const Color(0xFF2E7D32) : Colors.grey[700],
+                ),
+                tooltip: hasNote ? 'Edit note' : 'Add a note (e.g. extra spicy, no onion)',
+                onPressed: () => _editNote(context),
+              ),
+              IconButton(
+                icon: const Icon(Icons.remove_circle_outline, size: 20),
+                onPressed: () => onQuantityChanged(line.quantity - 1),
+              ),
+              Text('${line.quantity}'),
+              IconButton(
+                icon: const Icon(Icons.add_circle_outline, size: 20),
+                onPressed: () => onQuantityChanged(line.quantity + 1),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close, size: 18),
+                onPressed: onRemove,
+              ),
+            ],
           ),
-          Text('${line.quantity}'),
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline, size: 20),
-            onPressed: () => onQuantityChanged(line.quantity + 1),
-          ),
-          IconButton(
-            icon: const Icon(Icons.close, size: 18),
-            onPressed: onRemove,
-          ),
+          // Café-owner feedback (2026-09-07): the previous tiny grey pin
+          // text was too easy to miss — a real customer added a note and
+          // couldn't tell it had actually saved. Now a full-width,
+          // high-contrast chip, same green as the rest of this page's
+          // accent color, tappable to edit again.
+          if (hasNote)
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: InkWell(
+                onTap: () => _editNote(context),
+                borderRadius: BorderRadius.circular(6),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8F5E9),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: const Color(0xFFA5D6A7)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.chat_bubble, size: 14, color: Color(0xFF2E7D32)),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          line.notes!,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF1B5E20),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

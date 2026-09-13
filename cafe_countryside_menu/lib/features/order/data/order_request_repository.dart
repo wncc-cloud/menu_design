@@ -40,23 +40,44 @@ class OrderRequestRepository {
   final String posWebApiKey;
   final String businessId;
 
+  /// Local-testing-only escape hatch (`--dart-define=USE_FIREBASE_EMULATOR=true`,
+  /// same flag name billing_cafe's own `env.dart` already uses for this
+  /// exact purpose) — routes every REST call at the local Firestore
+  /// emulator (`firebase/dev-seed`'s `demo-why-not-cafe` project,
+  /// matching `seed.js`'s own project id) instead of [posProjectId], and
+  /// skips requiring a real App Check token (the emulator's REST
+  /// surface never verifies one). **Never true in a real build** — no
+  /// dart-define means this defaults to false and every real user still
+  /// goes through the exact same real-project path as before this flag
+  /// existed.
+  final bool useLocalEmulator;
+
   const OrderRequestRepository({
     required this.posProjectId,
     required this.posWebApiKey,
     required this.businessId,
+    this.useLocalEmulator = false,
   });
 
+  static const _emulatorBase =
+      'http://127.0.0.1:8080/v1/projects/demo-why-not-cafe/databases/(default)/documents';
+
   Uri get _collectionUri => Uri.parse(
-        'https://firestore.googleapis.com/v1/projects/$posProjectId/databases/(default)/'
-        'documents/businesses/$businessId/customerOrderRequests?key=$posWebApiKey',
+        useLocalEmulator
+            ? '$_emulatorBase/businesses/$businessId/customerOrderRequests'
+            : 'https://firestore.googleapis.com/v1/projects/$posProjectId/databases/(default)/'
+                'documents/businesses/$businessId/customerOrderRequests?key=$posWebApiKey',
       );
 
   Uri _documentUri(String requestId) => Uri.parse(
-        'https://firestore.googleapis.com/v1/projects/$posProjectId/databases/(default)/'
-        'documents/businesses/$businessId/customerOrderRequests/$requestId?key=$posWebApiKey',
+        useLocalEmulator
+            ? '$_emulatorBase/businesses/$businessId/customerOrderRequests/$requestId'
+            : 'https://firestore.googleapis.com/v1/projects/$posProjectId/databases/(default)/'
+                'documents/businesses/$businessId/customerOrderRequests/$requestId?key=$posWebApiKey',
       );
 
   Future<String> _requireToken() async {
+    if (useLocalEmulator) return 'local-emulator-test-token';
     final token = await PosAppCheckService.getToken();
     if (token == null) {
       throw const AppCheckTokenException(

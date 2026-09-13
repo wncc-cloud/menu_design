@@ -28,6 +28,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   BusinessModel? _current;
   bool _showBestsellersTab = true;
   bool _selfOrderEnabled = false;
+  bool _tableNumberEnabled = true;
   bool _saving = false;
   bool _logoUploading = false;
   String? _saveError;
@@ -68,6 +69,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     _expiryCtrl.text = b.orderRequestExpiryMinutes.toString();
     _showBestsellersTab = b.showBestsellersTab;
     _selfOrderEnabled = b.selfOrderEnabled;
+    _tableNumberEnabled = b.tableNumberEnabled;
   }
 
   BusinessModel _buildFromControllers() {
@@ -81,6 +83,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       orderRequestExpiryMinutes: int.tryParse(_expiryCtrl.text.trim()) ?? base.orderRequestExpiryMinutes,
       showBestsellersTab: _showBestsellersTab,
       selfOrderEnabled: _selfOrderEnabled,
+      tableNumberEnabled: _tableNumberEnabled,
     );
   }
 
@@ -342,6 +345,18 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       if (minutes < 1 || minutes > 25) return 'Must be between 1 and 25';
                       return null;
                     },
+                  ),
+                  const SizedBox(height: 16),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Ask for a table number at checkout'),
+                    subtitle: const Text(
+                      'Shows the "Table number" field on checkout. Turn this off '
+                      'if your café doesn\'t seat tables (pure takeaway/counter) — '
+                      'customers won\'t be asked for one at all.',
+                    ),
+                    value: _tableNumberEnabled,
+                    onChanged: (v) => setState(() => _tableNumberEnabled = v),
                   ),
                   const SizedBox(height: 32),
 

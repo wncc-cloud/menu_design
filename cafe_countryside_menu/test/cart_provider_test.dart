@@ -99,4 +99,48 @@ void main() {
     notifier.setQuantity('m1', 3);
     expect(container.read(cartProvider).single.lineTotalPaise, 90000);
   });
+
+  group('setNotes (phase_plan/notes_in_order.md Task 1)', () {
+    test('sets a note on the matching line', () {
+      final notifier = container.read(cartProvider.notifier);
+      notifier.addItem(pizza);
+      notifier.setNotes('m1', 'Extra spicy');
+      expect(container.read(cartProvider).single.notes, 'Extra spicy');
+    });
+
+    test('does not affect other lines', () {
+      final notifier = container.read(cartProvider.notifier);
+      notifier.addItem(pizza);
+      notifier.addItem(chai);
+      notifier.setNotes('m1', 'Extra spicy');
+      final cart = container.read(cartProvider);
+      expect(cart.firstWhere((l) => l.menuItemId == 'm1').notes, 'Extra spicy');
+      expect(cart.firstWhere((l) => l.menuItemId == 'm2').notes, isNull);
+    });
+
+    test('clearing with null round-trips to null, not empty string', () {
+      final notifier = container.read(cartProvider.notifier);
+      notifier.addItem(pizza);
+      notifier.setNotes('m1', 'Extra spicy');
+      notifier.setNotes('m1', null);
+      expect(container.read(cartProvider).single.notes, isNull);
+    });
+
+    test('clearing with an empty/whitespace-only string also round-trips to null', () {
+      final notifier = container.read(cartProvider.notifier);
+      notifier.addItem(pizza);
+      notifier.setNotes('m1', 'Extra spicy');
+      notifier.setNotes('m1', '   ');
+      expect(container.read(cartProvider).single.notes, isNull);
+    });
+
+    test('a note persists across a later quantity change on the same line', () {
+      final notifier = container.read(cartProvider.notifier);
+      notifier.addItem(pizza);
+      notifier.setNotes('m1', 'Extra spicy');
+      notifier.setQuantity('m1', 3);
+      expect(container.read(cartProvider).single.notes, 'Extra spicy');
+      expect(container.read(cartProvider).single.quantity, 3);
+    });
+  });
 }

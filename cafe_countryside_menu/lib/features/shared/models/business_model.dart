@@ -37,6 +37,15 @@ class BusinessModel {
   /// only stops new ones from starting.
   final bool selfOrderEnabled;
 
+  /// Admin toggle: whether the checkout screen shows the "Table number"
+  /// field at all. Defaults to `true` (today's existing behavior,
+  /// unchanged). Turning it off hides the field from customers entirely
+  /// — a submitted order simply carries a blank `tableNumber`, exactly
+  /// like a customer who left it blank today; no other code path
+  /// changes. Useful for a café that seats no tables (pure takeaway/
+  /// counter) and never wants to ask for one.
+  final bool tableNumberEnabled;
+
   final DateTime? updatedAt;
 
   const BusinessModel({
@@ -52,6 +61,7 @@ class BusinessModel {
     this.orderRequestExpiryMinutes = 3,
     this.showBestsellersTab = true,
     this.selfOrderEnabled = false,
+    this.tableNumberEnabled = true,
     this.updatedAt,
   });
 
@@ -80,6 +90,7 @@ class BusinessModel {
         orderRequestExpiryMinutes: (json['orderRequestExpiryMinutes'] as num?)?.toInt() ?? 3,
         showBestsellersTab: json['showBestsellersTab'] as bool? ?? true,
         selfOrderEnabled: json['selfOrderEnabled'] as bool? ?? false,
+        tableNumberEnabled: json['tableNumberEnabled'] as bool? ?? true,
         updatedAt: (json['updatedAt'] as Timestamp?)?.toDate(),
       );
 
@@ -96,6 +107,7 @@ class BusinessModel {
         'orderRequestExpiryMinutes': orderRequestExpiryMinutes,
         'showBestsellersTab': showBestsellersTab,
         'selfOrderEnabled': selfOrderEnabled,
+        'tableNumberEnabled': tableNumberEnabled,
         if (updatedAt != null) 'updatedAt': Timestamp.fromDate(updatedAt!),
       };
 
@@ -112,6 +124,7 @@ class BusinessModel {
     int? orderRequestExpiryMinutes,
     bool? showBestsellersTab,
     bool? selfOrderEnabled,
+    bool? tableNumberEnabled,
     DateTime? updatedAt,
   }) =>
       BusinessModel(
@@ -127,6 +140,7 @@ class BusinessModel {
         orderRequestExpiryMinutes: orderRequestExpiryMinutes ?? this.orderRequestExpiryMinutes,
         showBestsellersTab: showBestsellersTab ?? this.showBestsellersTab,
         selfOrderEnabled: selfOrderEnabled ?? this.selfOrderEnabled,
+        tableNumberEnabled: tableNumberEnabled ?? this.tableNumberEnabled,
         updatedAt: updatedAt ?? this.updatedAt,
       );
 }

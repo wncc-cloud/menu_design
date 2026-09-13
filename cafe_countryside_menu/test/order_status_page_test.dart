@@ -90,4 +90,112 @@ void main() {
     await tester.pump(const Duration(seconds: 40));
     expect(fake.callCount, 2);
   });
+
+  group('phase_plan/notes_in_order.md Task 5 — confirmed recap', () {
+    testWidgets('shows every submitted line with quantity, and each line\'s own note when present',
+        (tester) async {
+      final now = DateTime.now();
+      final fake = _FakeOrderRequestRepository([
+        {
+          'shortCode': '1234',
+          'expiresAt': now.add(const Duration(minutes: 3)),
+          'linkedOrderNumber': 42,
+          'lines': [
+            {'name': 'Pizza', 'quantity': 2, 'notes': 'Extra spicy, no onion'},
+            {'name': 'Cold Coffee', 'quantity': 1, 'notes': null},
+          ],
+          'orderNotes': null,
+        },
+      ]);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [orderRequestRepositoryProvider.overrideWithValue(fake)],
+          child: const MaterialApp(home: OrderStatusPage(requestId: 'req1')),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('Pizza × 2'), findsOneWidget);
+      expect(find.text('Extra spicy, no onion'), findsOneWidget);
+      expect(find.text('Cold Coffee × 1'), findsOneWidget);
+    });
+
+    testWidgets('renders the order-wide note once, only when non-empty', (tester) async {
+      final now = DateTime.now();
+      final fake = _FakeOrderRequestRepository([
+        {
+          'shortCode': '1234',
+          'expiresAt': now.add(const Duration(minutes: 3)),
+          'linkedOrderNumber': 42,
+          'lines': [
+            {'name': 'Pizza', 'quantity': 1, 'notes': null},
+          ],
+          'orderNotes': 'Please pack separately, birthday order',
+        },
+      ]);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [orderRequestRepositoryProvider.overrideWithValue(fake)],
+          child: const MaterialApp(home: OrderStatusPage(requestId: 'req1')),
+        ),
+      );
+      await tester.pump();
+
+      expect(
+        find.text('Note for the kitchen: Please pack separately, birthday order'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('no lines ever submitted with a note — renders no empty note-shaped placeholder',
+        (tester) async {
+      final now = DateTime.now();
+      final fake = _FakeOrderRequestRepository([
+        {
+          'shortCode': '1234',
+          'expiresAt': now.add(const Duration(minutes: 3)),
+          'linkedOrderNumber': 42,
+          'lines': [
+            {'name': 'Pizza', 'quantity': 1, 'notes': null},
+          ],
+          'orderNotes': '',
+        },
+      ]);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [orderRequestRepositoryProvider.overrideWithValue(fake)],
+          child: const MaterialApp(home: OrderStatusPage(requestId: 'req1')),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.textContaining('Note for the kitchen'), findsNothing);
+    });
+
+    testWidgets('a getRequest response missing lines entirely still shows the order number, no crash',
+        (tester) async {
+      final now = DateTime.now();
+      final fake = _FakeOrderRequestRepository([
+        {
+          'shortCode': '1234',
+          'expiresAt': now.add(const Duration(minutes: 3)),
+          'linkedOrderNumber': 42,
+        },
+      ]);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [orderRequestRepositoryProvider.overrideWithValue(fake)],
+          child: const MaterialApp(home: OrderStatusPage(requestId: 'req1')),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('#42'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  });
 }
