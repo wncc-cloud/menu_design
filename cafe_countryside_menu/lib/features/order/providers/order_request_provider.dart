@@ -24,11 +24,23 @@ part 'order_request_provider.g.dart';
 /// existed.
 const _useLocalEmulator = bool.fromEnvironment('USE_FIREBASE_EMULATOR');
 
+/// Local-testing-only escape hatch matching
+/// `pos_app_check_service.dart`'s own `_useDevPos` — points these REST
+/// calls at the real `why-not-cafe-dev` cloud project (its pre-2026-08-29
+/// values, recovered from git history commit 56a8aaa) instead of
+/// `why-not-cafe-prod`, so checkout can be exercised against dev's
+/// already-seeded data. Defaults to `false` — omitting the flag (every
+/// real build) is byte-for-byte the same behavior as before this
+/// existed.
+const _useDevPos = bool.fromEnvironment('USE_DEV_POS');
+
 @riverpod
 OrderRequestRepository orderRequestRepository(Ref ref) {
   return const OrderRequestRepository(
-    posProjectId: 'why-not-cafe-prod',
-    posWebApiKey: 'AIzaSyCi8WM2k2-HZBd_eS6gnI5ZjchA7DCztuE',
+    posProjectId: _useDevPos ? 'why-not-cafe-dev' : 'why-not-cafe-prod',
+    posWebApiKey: _useDevPos
+        ? 'AIzaSyDaSu24dx-KnSQ7GDtuCtKQVrhwiLSOya0'
+        : 'AIzaSyCi8WM2k2-HZBd_eS6gnI5ZjchA7DCztuE',
     businessId: 'why-not-cafe',
     useLocalEmulator: _useLocalEmulator,
   );

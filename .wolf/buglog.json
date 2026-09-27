@@ -313,6 +313,86 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-09-04T15:18:00.000Z"
+    },
+    {
+      "id": "bug-020",
+      "timestamp": "2026-09-27T10:31:01.314Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 11→23 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-27T10:31:01.314Z"
+    },
+    {
+      "id": "bug-021",
+      "timestamp": "2026-09-27T10:31:10.240Z",
+      "error_message": "Wrong reference: OrderRequestRepository should be const",
+      "file": "cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+      "root_cause": "Used \"OrderRequestRepository\" instead of \"const\"",
+      "fix": "Changed OrderRequestRepository → const",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-27T10:31:10.240Z"
+    },
+    {
+      "id": "bug-022",
+      "timestamp": "2026-09-27T10:45:25.892Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 9→19 lines (3 removed) | Also: /// 2-step tracker on the pending screen only — gi; /// explicit mental model (\"I'm on step 1 of 2\") i",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-09-27T10:50:18.129Z"
+    },
+    {
+      "id": "bug-023",
+      "timestamp": "2026-09-27T10:58:17.236Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 7→15 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-27T10:58:17.236Z"
+    },
+    {
+      "id": "bug-024",
+      "timestamp": "2026-09-27T10:58:41.591Z",
+      "error_message": "Null/undefined access in ",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-09-27T10:58:41.591Z"
     }
   ]
 }

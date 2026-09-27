@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-09-04T15:17:32.159Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-09-27T10:58:41.567Z
 > Files: 126 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
@@ -109,7 +109,7 @@
 - `external_link_service_stub.dart` — / Non-web fallback for `external_link_service.dart`'s conditional import. (~162 tok)
 - `external_link_service_web.dart` — ignore: avoid_web_libraries_in_flutter (~227 tok)
 - `external_link_service.dart` — Conditional import: dart:html only exists on the web compile target, not (~214 tok)
-- `pos_app_check_service.dart` — Firebase App Check for the POS (billing_cafe) project's Firestore (~1731 tok)
+- `pos_app_check_service.dart` — Firebase App Check for the POS (billing_cafe) project's Firestore (~2030 tok)
 
 ## cafe_countryside_menu/lib/features/admin/auth/
 
@@ -196,7 +196,7 @@
 ## cafe_countryside_menu/lib/features/order/presentation/
 
 - `checkout_page.dart` — Stateful widget: _CartLineTile (~3256 tok)
-- `order_status_page.dart` — Stateful widget: _StatusScaffold (~5898 tok)
+- `order_status_page.dart` — Flutter widget (~9864 tok)
 
 ## cafe_countryside_menu/lib/features/order/presentation/widgets/
 
@@ -206,7 +206,7 @@
 
 - `cart_provider.dart` — Riverpod provider (~411 tok)
 - `cart_provider.g.dart` — CartNotifierProvider: debugGetCreateSourceHash (~890 tok)
-- `order_request_provider.dart` — Riverpod provider (~254 tok)
+- `order_request_provider.dart` — Declares _useLocalEmulator (~590 tok)
 - `order_request_provider.g.dart` — OrderRequestRepositoryProvider: debugGetCreateSourceHash (~895 tok)
 
 ## cafe_countryside_menu/lib/features/shared/models/

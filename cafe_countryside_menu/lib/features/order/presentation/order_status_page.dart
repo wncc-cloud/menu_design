@@ -238,6 +238,11 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
         // your order number", unchanged, these just ride along below it.
         extra: Column(
           children: [
+            // Same 3-step tracker as the pending screen, now landed on
+            // step 3 — carries the "where am I" mental model through to
+            // confirmation instead of dropping it once payment happens.
+            const _StepTracker(activeStep: 3, accentColor: Color(0xFF2E7D32)),
+            const SizedBox(height: 16),
             if (_lines != null && _lines!.isNotEmpty) ...[
               _OrderRecap(lines: _lines!, orderNotes: _orderNotes),
               const SizedBox(height: 12),
@@ -374,10 +379,28 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
       heroLabel: 'YOUR ORDER CODE',
       heroValue: _shortCode ?? '····',
       heroCaption: _customerName?.trim().isNotEmpty == true ? _customerName : null,
-      instructionBanner: const _InstructionBanner(
-        icon: Icons.info_outline,
-        text: 'Tell the cashier this code and pay at the counter — '
-            'your order is placed only once they confirm it.',
+      // Café-owner ask (2026-09-27): customers were reaching this screen,
+      // missing the pay-at-counter instruction entirely, and asking
+      // whether they could pay inside the app instead — this app never
+      // takes payment at all, so that has to be said explicitly, not
+      // implied. Bumped to `emphasized` (same treatment as the confirmed
+      // screen's screenshot reminder) so it reads before the countdown
+      // does, and the wording now leads with "not in this app" instead
+      // of assuming that's understood.
+      // Café-owner ask (2026-09-27, round 2): even emphasized, the English
+      // card was still being skipped by customers more comfortable in
+      // Hindi. Auto-rotating the same message in both languages (rather
+      // than cramming both into one card) keeps each version readable at
+      // the same size/weight, with a manual swipe available for anyone
+      // who wants to jump straight to their language.
+      instructionBanner: const _BilingualInstructionBanner(
+        icon: Icons.point_of_sale_outlined,
+        textEn: 'Payment is NOT done in this app. Show this code and pay '
+            'the cashier at the counter — your order is placed only '
+            'once they confirm it.',
+        textHi: 'भुगतान इस ऐप में नहीं होता। यह कोड दिखाएँ और काउंटर पर '
+            'कैशियर को भुगतान करें — कैशियर की पुष्टि के बाद ही आपका '
+            'ऑर्डर दर्ज होगा।',
       ),
       subtitle: 'This code expires in $minutes:${seconds.toString().padLeft(2, '0')} '
           'if not confirmed.',
@@ -391,7 +414,7 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
             _OrderRecap(lines: _lines!, orderNotes: _orderNotes),
             const SizedBox(height: 12),
           ],
-          const _StepTracker(),
+          const _StepTracker(activeStep: 1),
         ],
       ),
     );
@@ -607,53 +630,70 @@ class _StatusPillState extends State<_StatusPill> with SingleTickerProviderState
   }
 }
 
-/// 2-step tracker on the pending screen only — gives the customer an
-/// explicit mental model ("I'm on step 1 of 2") instead of an open-ended
-/// "waiting" feeling, which is what let people assume step 1 (place the
-/// order) was already done.
+/// 3-step tracker shown on both the pending and confirmed screens — gives
+/// the customer an explicit mental model ("I'm on step N of 3") instead of
+/// an open-ended "waiting" feeling, which is what let people assume step 1
+/// (place the order) was already done. Steps before [activeStep] render as
+/// done (checkmark, filled), [activeStep] itself is highlighted, and later
+/// steps stay grey — [accentColor] lets each screen use its own state
+/// colour (orange while pending, green once confirmed) for the done/active
+/// steps.
 class _StepTracker extends StatelessWidget {
-  const _StepTracker();
+  final int activeStep;
+  final Color accentColor;
+
+  const _StepTracker({this.activeStep = 1, this.accentColor = const Color(0xFFE65100)});
+
+  static const _labels = ['Show code', 'Pay at counter', 'Order confirmed'];
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _step(number: '1', label: 'Show code', active: true),
-        Container(
+    final steps = <Widget>[];
+    for (var i = 0; i < _labels.length; i++) {
+      final stepNumber = i + 1;
+      if (i > 0) {
+        steps.add(Container(
           width: 28,
           height: 2,
           margin: const EdgeInsets.symmetric(horizontal: 6),
           color: const Color(0xFFE0E0E0),
-        ),
-        _step(number: '2', label: 'Pay & confirm', active: false),
-      ],
-    );
+        ));
+      }
+      steps.add(_step(
+        number: stepNumber,
+        label: _labels[i],
+        done: stepNumber < activeStep,
+        active: stepNumber == activeStep,
+      ));
+    }
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: steps);
   }
 
-  Widget _step({required String number, required String label, required bool active}) {
-    final accent = const Color(0xFFE65100);
+  Widget _step({required int number, required String label, required bool done, required bool active}) {
+    final highlighted = done || active;
     return Column(
       children: [
         CircleAvatar(
           radius: 12,
-          backgroundColor: active ? accent : const Color(0xFFEEEEEE),
-          child: Text(
-            number,
-            style: TextStyle(
-              color: active ? Colors.white : Colors.grey[600],
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          backgroundColor: highlighted ? accentColor : const Color(0xFFEEEEEE),
+          child: done
+              ? const Icon(Icons.check, size: 14, color: Colors.white)
+              : Text(
+                  '$number',
+                  style: TextStyle(
+                    color: active ? Colors.white : Colors.grey[600],
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
           style: TextStyle(
             fontSize: 11,
-            color: active ? accent : Colors.grey[500],
-            fontWeight: active ? FontWeight.bold : FontWeight.normal,
+            color: highlighted ? accentColor : Colors.grey[500],
+            fontWeight: highlighted ? FontWeight.bold : FontWeight.normal,
           ),
         ),
       ],
@@ -822,6 +862,129 @@ class _InstructionBanner extends StatelessWidget {
                 color: const Color(0xFF6D4C00),
                 fontSize: emphasized ? 16 : 13,
                 fontWeight: emphasized ? FontWeight.w800 : FontWeight.w500,
+                height: 1.3,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Same card look as `_InstructionBanner(emphasized: true)`, but rotates
+/// between an English and a Hindi rendering of the same message every few
+/// seconds — swipeable too, so a customer who reads Hindi doesn't have to
+/// wait out the English half of the cycle. A fixed height keeps the swap
+/// from jumping the rest of the page, since the two translations rarely
+/// wrap to the same number of lines.
+class _BilingualInstructionBanner extends StatefulWidget {
+  final IconData icon;
+  final String textEn;
+  final String textHi;
+
+  const _BilingualInstructionBanner({
+    required this.icon,
+    required this.textEn,
+    required this.textHi,
+  });
+
+  @override
+  State<_BilingualInstructionBanner> createState() => _BilingualInstructionBannerState();
+}
+
+class _BilingualInstructionBannerState extends State<_BilingualInstructionBanner> {
+  static const _height = 150.0;
+  static const _accent = Color(0xFFF57F17);
+
+  late final PageController _controller = PageController();
+  Timer? _timer;
+  int _page = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 5), (_) => _advance());
+  }
+
+  void _advance() {
+    if (!mounted || !_controller.hasClients) return;
+    _controller.animateToPage(
+      1 - _page,
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          height: _height,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 360),
+            child: PageView(
+              controller: _controller,
+              onPageChanged: (page) => setState(() => _page = page),
+              children: [
+                _card(widget.textEn),
+                _card(widget.textHi),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(2, (i) {
+            final active = i == _page;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              width: active ? 16 : 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: active ? _accent : const Color(0xFFFFE082),
+                borderRadius: BorderRadius.circular(3),
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _card(String text) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF8E1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFFFE082), width: 2),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(widget.icon, size: 26, color: _accent),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Color(0xFF6D4C00),
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
                 height: 1.3,
               ),
             ),

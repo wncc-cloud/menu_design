@@ -27,11 +27,20 @@ void main() {
   });
 
   group('calculatePollIntervalSeconds', () {
-    test('a 3-minute window (the default) polls close to every 10 seconds', () {
+    test('a 3-minute window (the default) polls at the 15-second floor', () {
       final now = DateTime(2026, 1, 1, 12, 0, 0);
       final expiresAt = now.add(const Duration(minutes: 3));
       final interval = calculatePollIntervalSeconds(expiresAt: expiresAt, now: now);
-      expect(interval, closeTo(10, 2));
+      expect(interval, 15);
+    });
+
+    test('a 6-minute window scales above the floor (remaining / 18)', () {
+      final now = DateTime(2026, 1, 1, 12, 0, 0);
+      final interval = calculatePollIntervalSeconds(
+        expiresAt: now.add(const Duration(minutes: 6)),
+        now: now,
+      );
+      expect(interval, 20);
     });
 
     test('a 15-minute window polls noticeably less often than a 3-minute one', () {
@@ -47,13 +56,22 @@ void main() {
       expect(longInterval, greaterThan(shortInterval));
     });
 
-    test('never goes below the 8-second floor even for a very short remaining window', () {
+    test('never goes below the 15-second floor even for a very short remaining window', () {
       final now = DateTime(2026, 1, 1, 12, 0, 0);
       final interval = calculatePollIntervalSeconds(
         expiresAt: now.add(const Duration(seconds: 20)),
         now: now,
       );
-      expect(interval, 8);
+      expect(interval, 15);
+    });
+
+    test('an already-expired window still returns the floor, never 0 or negative', () {
+      final now = DateTime(2026, 1, 1, 12, 0, 0);
+      final interval = calculatePollIntervalSeconds(
+        expiresAt: now.subtract(const Duration(minutes: 1)),
+        now: now,
+      );
+      expect(interval, 15);
     });
 
     test('never exceeds the 30-second ceiling even for a very long window', () {

@@ -2,14 +2,14 @@
   "version": 1,
   "created_at": "2026-07-04T17:27:56.152Z",
   "lifetime": {
-    "total_tokens_estimated": 660701,
-    "total_reads": 463,
-    "total_writes": 412,
-    "total_sessions": 21,
-    "anatomy_hits": 332,
-    "anatomy_misses": 104,
-    "repeated_reads_blocked": 98,
-    "estimated_savings_vs_bare_cli": 431761
+    "total_tokens_estimated": 789582,
+    "total_reads": 519,
+    "total_writes": 483,
+    "total_sessions": 22,
+    "anatomy_hits": 365,
+    "anatomy_misses": 127,
+    "repeated_reads_blocked": 188,
+    "estimated_savings_vs_bare_cli": 1082991
   },
   "sessions": [
     {
@@ -5540,6 +5540,850 @@
         "writes_count": 3,
         "repeated_reads_blocked": 1,
         "anatomy_lookups": 7
+      }
+    },
+    {
+      "id": "session-2026-09-27-1553",
+      "started": "2026-09-27T10:23:06.681Z",
+      "ended": "2026-09-27T10:32:27.443Z",
+      "reads": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 254,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 2002,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 1120,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 177,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 284,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 11,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 2256,
+        "output_tokens_estimated": 1592,
+        "reads_count": 2,
+        "writes_count": 4,
+        "repeated_reads_blocked": 3,
+        "anatomy_lookups": 2
+      }
+    },
+    {
+      "id": "session-2026-09-27-1553",
+      "started": "2026-09-27T10:23:06.681Z",
+      "ended": "2026-09-27T10:39:32.778Z",
+      "reads": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 254,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 2002,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/data/order_request_repository.dart",
+          "tokens_estimated": 2417,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/tmp/resp.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 1120,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 177,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 284,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 11,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 4673,
+        "output_tokens_estimated": 1592,
+        "reads_count": 4,
+        "writes_count": 4,
+        "repeated_reads_blocked": 3,
+        "anatomy_lookups": 3
+      }
+    },
+    {
+      "id": "session-2026-09-27-1553",
+      "started": "2026-09-27T10:23:06.681Z",
+      "ended": "2026-09-27T10:46:29.485Z",
+      "reads": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 254,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 2002,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/data/order_request_repository.dart",
+          "tokens_estimated": 2417,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/tmp/resp.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.13.25.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 8431,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 1120,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 177,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 284,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 11,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 305,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 20,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 13104,
+        "output_tokens_estimated": 1917,
+        "reads_count": 6,
+        "writes_count": 6,
+        "repeated_reads_blocked": 7,
+        "anatomy_lookups": 4
+      }
+    },
+    {
+      "id": "session-2026-09-27-1553",
+      "started": "2026-09-27T10:23:06.681Z",
+      "ended": "2026-09-27T10:46:46.147Z",
+      "reads": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 254,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 2002,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/data/order_request_repository.dart",
+          "tokens_estimated": 2417,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/tmp/resp.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.13.25.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 8431,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 1120,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 177,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 284,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 11,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 305,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 20,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 13104,
+        "output_tokens_estimated": 1917,
+        "reads_count": 6,
+        "writes_count": 6,
+        "repeated_reads_blocked": 7,
+        "anatomy_lookups": 4
+      }
+    },
+    {
+      "id": "session-2026-09-27-1553",
+      "started": "2026-09-27T10:23:06.681Z",
+      "ended": "2026-09-27T10:51:17.587Z",
+      "reads": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 254,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 2002,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/data/order_request_repository.dart",
+          "tokens_estimated": 2417,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/tmp/resp.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.13.25.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 8652,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.17.28.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 1120,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 177,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 284,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 11,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 305,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 20,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 694,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 73,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 172,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 13325,
+        "output_tokens_estimated": 2856,
+        "reads_count": 7,
+        "writes_count": 9,
+        "repeated_reads_blocked": 11,
+        "anatomy_lookups": 4
+      }
+    },
+    {
+      "id": "session-2026-09-27-1553",
+      "started": "2026-09-27T10:23:06.681Z",
+      "ended": "2026-09-27T10:51:48.941Z",
+      "reads": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 254,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 2002,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/data/order_request_repository.dart",
+          "tokens_estimated": 2417,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/tmp/resp.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.13.25.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 8652,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.17.28.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 1120,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 177,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 284,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 11,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 305,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 20,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 694,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 73,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 172,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 13325,
+        "output_tokens_estimated": 2856,
+        "reads_count": 7,
+        "writes_count": 9,
+        "repeated_reads_blocked": 11,
+        "anatomy_lookups": 4
+      }
+    },
+    {
+      "id": "session-2026-09-27-1553",
+      "started": "2026-09-27T10:23:06.681Z",
+      "ended": "2026-09-27T10:59:29.165Z",
+      "reads": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 254,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 2002,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/data/order_request_repository.dart",
+          "tokens_estimated": 2417,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/tmp/resp.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.13.25.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 9864,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.17.28.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.26.05.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 1120,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 177,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 284,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 11,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 305,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 20,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 694,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 73,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 172,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 255,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 1140,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 14537,
+        "output_tokens_estimated": 4251,
+        "reads_count": 8,
+        "writes_count": 11,
+        "repeated_reads_blocked": 16,
+        "anatomy_lookups": 4
+      }
+    },
+    {
+      "id": "session-2026-09-27-1553",
+      "started": "2026-09-27T10:23:06.681Z",
+      "ended": "2026-09-27T11:00:02.351Z",
+      "reads": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 254,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 2002,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/data/order_request_repository.dart",
+          "tokens_estimated": 2417,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/tmp/resp.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.13.25.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 9864,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.17.28.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.26.05.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 1120,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 177,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 284,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 11,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 305,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 20,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 694,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 73,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 172,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 255,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 1140,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 14537,
+        "output_tokens_estimated": 4251,
+        "reads_count": 8,
+        "writes_count": 11,
+        "repeated_reads_blocked": 16,
+        "anatomy_lookups": 4
+      }
+    },
+    {
+      "id": "session-2026-09-27-1553",
+      "started": "2026-09-27T10:23:06.681Z",
+      "ended": "2026-09-27T11:05:36.024Z",
+      "reads": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 254,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 2002,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/data/order_request_repository.dart",
+          "tokens_estimated": 2417,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/tmp/resp.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.13.25.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 9864,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.17.28.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/Screenshot 2026-09-27 at 16.26.05.png",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 1120,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+          "tokens_estimated": 177,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 284,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/providers/order_request_provider.dart",
+          "tokens_estimated": 11,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 305,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 20,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 694,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 73,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 172,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 255,
+          "action": "edit"
+        },
+        {
+          "file": "/Users/wncc/Documents/development/projects/menu_design/cafe_countryside_menu/lib/features/order/presentation/order_status_page.dart",
+          "tokens_estimated": 1140,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 14537,
+        "output_tokens_estimated": 4251,
+        "reads_count": 8,
+        "writes_count": 11,
+        "repeated_reads_blocked": 16,
+        "anatomy_lookups": 4
       }
     }
   ],
