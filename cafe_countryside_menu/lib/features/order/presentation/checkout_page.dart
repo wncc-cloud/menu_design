@@ -6,7 +6,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../menu/presentation/menu_provider.dart';
 import '../data/order_request_repository.dart';
+import '../cart_revalidation.dart';
 import '../models/cart_line.dart';
+import '../providers/cafe_status_provider.dart';
 import '../providers/cart_provider.dart';
 import '../providers/order_request_provider.dart';
 import '../validation.dart';
@@ -29,6 +31,16 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
   bool _submitting = false;
   String? _errorMessage;
   bool _prefilledTable = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // A "closed" answer cached from the menu page may be hours old — look
+    // again when the customer arrives at checkout.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.invalidate(cafeOpenProvider);
+    });
+  }
 
   @override
   void dispose() {
@@ -64,6 +76,62 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
       _errorMessage = null;
     });
 
+    // billing_cafe phase12.md §12.3-B — re-check right now, not just at page
+    // load: the café may have closed while the customer was typing. Unknown
+    // (null) is treated as OPEN — this read failing must never block ordering.
+    final repo = ref.read(orderRequestRepositoryProvider);
+    if (await repo.fetchCafeOpen() == false) {
+      ref.invalidate(cafeOpenProvider);
+      if (mounted) {
+        setState(() {
+          _submitting = false;
+          _errorMessage = "We're closed right now, so we can't take your order. "
+              'Please try again when we open.';
+        });
+      }
+      return;
+    }
+
+    // billing_cafe phase12.md §12.3-C — compare the cart with a FRESH menu
+    // (bypassing the 20-minute cache) so a repriced / switched-off item is
+    // confirmed with the customer now instead of surprising them at the
+    // counter. Any failure to fetch just skips this check (fail-open).
+    var effectiveCart = cart;
+    try {
+      final fresh = await ref.read(menuRepositoryProvider).fetchMenu();
+      if (fresh != null) {
+        final result = revalidateCart(cart, fresh.items);
+        if (result.hasChanges) {
+          if (!mounted) return;
+          final ok = await _confirmCartChanges(result);
+          if (!mounted) return;
+          if (ok != true) {
+            setState(() => _submitting = false);
+            return;
+          }
+          ref.read(cartProvider.notifier).replaceAll(result.lines);
+          if (result.lines.isEmpty) {
+            setState(() {
+              _submitting = false;
+              _errorMessage = 'None of the items in your cart are available right now.';
+            });
+            // The empty cart replaces this form with the "cart is empty"
+            // view, which would hide the message above — say it there too.
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('None of the items in your cart are available right now.'),
+              ),
+            );
+            return;
+          }
+          effectiveCart = result.lines;
+        }
+      }
+    } catch (_) {
+      // fail-open: submit the cart as it is
+    }
+    if (!mounted) return;
+
     final now = DateTime.now();
     final expiresAt = now.add(Duration(minutes: expiryMinutes));
     final payload = {
@@ -74,7 +142,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
       // blank regardless of whatever text the controller might still
       // hold from before the setting was turned off.
       'tableNumber': tableNumberEnabled ? _tableController.text.trim() : '',
-      'lines': cart.map((l) => l.toWireMap()).toList(),
+      'lines': effectiveCart.map((l) => l.toWireMap()).toList(),
       // phase_plan/notes_in_order.md Task 1 — always a trimmed string,
       // never null, exactly matching tableNumber/customerName above:
       // billing_cafe's rule requires this shape (a blank-to-null convention
@@ -91,7 +159,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     };
 
     try {
-      final requestId = await ref.read(orderRequestRepositoryProvider).createRequest(payload);
+      final requestId = await repo.createRequest(payload);
       if (!mounted) return;
       ref.read(cartProvider.notifier).clear();
       context.go('/order-status/$requestId');
@@ -121,6 +189,44 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
         });
       }
     }
+  }
+
+  Future<bool?> _confirmCartChanges(CartRevalidation result) {
+    String rupees(int paise) => '₹${(paise / 100).toStringAsFixed(paise % 100 == 0 ? 0 : 2)}';
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Your cart has changed'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('The menu was updated since you added these:'),
+            const SizedBox(height: 8),
+            for (final c in result.changes)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  c.removed
+                      ? '• ${c.name} is no longer available'
+                      : '• ${c.name}: ${rupees(c.oldPaise)} → ${rupees(c.newPaise!)}',
+                ),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Back to cart'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Update & place order'),
+          ),
+        ],
+      ),
+    );
   }
 
   // A plain 4-digit code (1,000-9,999) crosses 50% collision odds at
@@ -161,6 +267,8 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     // /checkout URL still working after ordering's been turned off,
     // even though the menu page already hides every entry point to it.
     final selfOrderEnabled = business?.selfOrderEnabled ?? false;
+    // phase12.md §12.3-B — only an explicit `false` counts as closed.
+    final cafeClosed = ref.watch(cafeOpenProvider).asData?.value == false;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F8E9),
@@ -215,6 +323,33 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (cafeClosed) ...[
+                      Container(
+                        key: const Key('cafe-closed-banner'),
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFEBEE),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFEF9A9A)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "We're closed right now, so we can't take orders. "
+                              'Please come back when we open.',
+                              style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFFB71C1C)),
+                            ),
+                            TextButton(
+                              onPressed: () => ref.invalidate(cafeOpenProvider),
+                              child: const Text('Check again'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                     Text('Your order', style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 8),
                     ...cart.map((line) => _CartLineTile(
@@ -236,7 +371,12 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Prices may change at the counter.',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                    ),
+                    const SizedBox(height: 20),
                     TextFormField(
                       controller: _nameController,
                       decoration: const InputDecoration(labelText: 'Your name'),
@@ -249,6 +389,12 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                       decoration: const InputDecoration(
                         labelText: 'Phone',
                         hintText: '10 digit number',
+                        // Café owner's instruction, 2026-09-25: no WhatsApp
+                        // mention anywhere on the customer-facing menu site.
+                        // A plain, message-channel-neutral reason for the
+                        // phone number, so the field still explains itself.
+                        helperText: "So we can reach you about your order if needed.",
+                        helperMaxLines: 2,
                       ),
                       keyboardType: TextInputType.phone,
                       validator: (v) {
@@ -284,7 +430,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton(
-                        onPressed: _submitting
+                        onPressed: (_submitting || cafeClosed)
                             ? null
                             : () => _submit(cart, expiryMinutes, tableNumberEnabled),
                         style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),

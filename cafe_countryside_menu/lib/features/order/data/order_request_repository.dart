@@ -120,6 +120,34 @@ class OrderRequestRepository {
     return name.split('/').last;
   }
 
+  Uri get _cafeStatusUri => Uri.parse(
+        useLocalEmulator
+            ? '$_emulatorBase/businesses/$businessId/public/cafeStatus'
+            : 'https://firestore.googleapis.com/v1/projects/$posProjectId/databases/(default)/'
+                'documents/businesses/$businessId/public/cafeStatus?key=$posWebApiKey',
+      );
+
+  /// billing_cafe phase12.md §12.3-B — reads `public/cafeStatus.open`.
+  /// Returns `null` (UNKNOWN — callers treat as open) for anything other
+  /// than a clear boolean: not published yet (404), no App Check token, a
+  /// timeout, a non-200 or a malformed body. Never throws.
+  Future<bool?> fetchCafeOpen({Duration timeout = const Duration(seconds: 6)}) async {
+    try {
+      final token = await _requireToken();
+      final response = await http
+          .get(_cafeStatusUri, headers: {'X-Firebase-AppCheck': token})
+          .timeout(timeout);
+      if (response.statusCode != 200) return null;
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final fields = json['fields'] as Map<String, dynamic>?;
+      final open = fields?['open'] as Map<String, dynamic>?;
+      final value = open?['booleanValue'];
+      return value is bool ? value : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Reads back a request's current fields — used by the order-status
   /// page's poll loop to watch for `linkedOrderNumber` appearing. Never
   /// throws for a not-found/inaccessible document (returns `null`

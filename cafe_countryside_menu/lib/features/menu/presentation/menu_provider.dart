@@ -8,6 +8,7 @@ import '../models/item_model.dart';
 import '../models/menu_snapshot_model.dart';
 import '../../shared/models/business_model.dart';
 import '../../shared/repositories/business_repository.dart';
+import '../../order/providers/cafe_status_provider.dart';
 
 part 'menu_provider.g.dart';
 
@@ -59,6 +60,9 @@ class MenuController extends _$MenuController {
     _refreshTimer = Timer.periodic(menuRefreshInterval, (_) {
       ref.invalidateSelf();
       ref.invalidate(businessProvider);
+      // phase12 §12.3-B — an open/closed answer must not stay stale for hours
+      // in a tab that was opened while the café was closed.
+      ref.invalidate(cafeOpenProvider);
     });
     return ref.read(menuRepositoryProvider).fetchMenu();
   }

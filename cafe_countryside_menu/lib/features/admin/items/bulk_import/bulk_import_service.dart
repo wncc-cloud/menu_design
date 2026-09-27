@@ -241,6 +241,13 @@ BulkImportResult parseAndValidate(Uint8List bytes, DraftData draft) {
       errors.add(BulkImportError(sheetRow, 'Price cannot be negative'));
       continue;
     }
+    // billing_cafe phase12.md §12.4-C — a ₹0 row used to import silently and
+    // then break every counter order containing it.
+    if (price == 0) {
+      errors.add(BulkImportError(
+          sheetRow, 'Price must be more than 0 (use a 100% discount at the counter to give an item free)'));
+      continue;
+    }
 
     // Rule 6
     if (vegStr != 'YES' && vegStr != 'NO') {

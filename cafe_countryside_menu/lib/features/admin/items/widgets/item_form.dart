@@ -48,7 +48,7 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
     final e = widget.existing;
     _nameCtrl = TextEditingController(text: e?.name ?? '');
     _priceCtrl = TextEditingController(
-        text: e != null ? e.price.toStringAsFixed(0) : '');
+        text: e != null ? formatPriceForEditing(e.price) : '');
     _descCtrl = TextEditingController(text: e?.description ?? '');
     _ingCtrl = TextEditingController(text: e?.ingredients ?? '');
     _fromCtrl = TextEditingController(text: e?.availableFrom ?? '');
@@ -228,8 +228,17 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
                   ],
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return 'Price is required';
-                    if (double.tryParse(v.trim()) == null) {
+                    final parsed = double.tryParse(v.trim());
+                    if (parsed == null) {
                       return 'Enter a valid number';
+                    }
+                    // billing_cafe phase12.md §12.4-C: a ₹0 item would show on
+                    // the menu but every order containing it is rejected at
+                    // the counter. To give something free, use a normal price
+                    // with a 100% discount so the comp leaves a paper trail.
+                    if (parsed <= 0) {
+                      return 'Price must be more than ₹0 (to give an item free, '
+                          'use a 100% discount at the counter)';
                     }
                     return null;
                   },
@@ -422,3 +431,8 @@ class _ToggleRow extends StatelessWidget {
     );
   }
 }
+
+/// phase12.md §12.4-C2 — the price field must round-trip exactly: ₹49.50 used
+/// to open as "50" (forced whole rupees) and saving silently rewrote the price.
+String formatPriceForEditing(double price) =>
+    price == price.truncateToDouble() ? price.toStringAsFixed(0) : price.toString();

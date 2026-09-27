@@ -198,4 +198,144 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+  // billing_cafe phase12.md §12.1-A / claim_bug_fix.md §7.5.
+  group('claimed-by-cashier state (phase12 §12.1-A)', () {
+    Future<void> pumpPage(WidgetTester tester, _FakeOrderRequestRepository fake) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [orderRequestRepositoryProvider.overrideWithValue(fake)],
+          child: const MaterialApp(home: OrderStatusPage(requestId: 'req1')),
+        ),
+      );
+      await tester.pump();
+    }
+
+    Map<String, dynamic> req({
+      required Duration expiresIn,
+      String status = 'PENDING',
+      int? linked,
+      bool withLines = true,
+    }) =>
+        {
+          'shortCode': 'K7QM',
+          'customerName': 'Rahul',
+          'status': status,
+          'expiresAt': DateTime.now().add(expiresIn),
+          'linkedOrderNumber': linked,
+          if (withLines)
+            'lines': [
+              {'name': 'Pizza', 'quantity': 2, 'notes': null},
+            ],
+        };
+
+    testWidgets('PENDING now shows what was ordered (no prices) so the cashier can key it from the phone',
+        (tester) async {
+      final fake = _FakeOrderRequestRepository([req(expiresIn: const Duration(minutes: 5))]);
+      await pumpPage(tester, fake);
+      expect(find.text('Go to the counter to place your order'), findsOneWidget);
+      expect(find.text('Pizza × 2'), findsOneWidget);
+      expect(find.textContaining('₹'), findsNothing);
+    });
+
+    testWidgets('CLAIMED shows its own state, never "expired"', (tester) async {
+      final fake = _FakeOrderRequestRepository([
+        req(expiresIn: const Duration(minutes: 5), status: 'CLAIMED'),
+      ]);
+      await pumpPage(tester, fake);
+      expect(find.text('Cashier has your order — finishing up'), findsOneWidget);
+      expect(find.text('CASHIER HAS YOUR ORDER'), findsOneWidget);
+      expect(find.text('Pizza × 2'), findsOneWidget);
+      expect(find.text('This order request has expired.'), findsNothing);
+      expect(find.text('PENDING — NOT PLACED YET'), findsNothing);
+    });
+
+    testWidgets('CLAIMED already past expiry (within grace) is still shown as claimed, not expired',
+        (tester) async {
+      final fake = _FakeOrderRequestRepository([
+        req(expiresIn: const Duration(minutes: -2), status: 'CLAIMED'),
+      ]);
+      await pumpPage(tester, fake);
+      expect(find.text('Cashier has your order — finishing up'), findsOneWidget);
+      expect(find.text('This order request has expired.'), findsNothing);
+    });
+
+    testWidgets('a claim that lands between the last poll and expiry is caught by the final check',
+        (tester) async {
+      final fake = _FakeOrderRequestRepository([
+        req(expiresIn: const Duration(seconds: 1)), // poll 1: still PENDING
+        req(expiresIn: const Duration(seconds: -1), status: 'CLAIMED'), // final check
+        req(expiresIn: const Duration(seconds: -1), status: 'CLAIMED', linked: 42),
+      ]);
+      await pumpPage(tester, fake);
+      expect(find.text('Go to the counter to place your order'), findsOneWidget);
+
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 1300)));
+      await tester.pump(const Duration(seconds: 1)); // tick fires the final check
+      await tester.pump();
+      expect(fake.callCount, 2);
+      expect(find.text('Cashier has your order — finishing up'), findsOneWidget);
+      expect(find.text('This order request has expired.'), findsNothing);
+
+      // grace polling continues (15 s) until the order is placed
+      await tester.pump(const Duration(seconds: 16));
+      await tester.pump();
+      expect(fake.callCount, 3);
+      expect(find.text('Order confirmed!'), findsOneWidget);
+      expect(find.text('#42'), findsOneWidget);
+    });
+
+    testWidgets('never claimed: final check finds PENDING, shows expired once, then stops polling',
+        (tester) async {
+      final fake = _FakeOrderRequestRepository([
+        req(expiresIn: const Duration(seconds: 1)),
+        req(expiresIn: const Duration(seconds: -1)),
+      ]);
+      await pumpPage(tester, fake);
+
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 1300)));
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump();
+      expect(find.text('This order request has expired.'), findsOneWidget);
+      expect(fake.callCount, 2);
+
+      await tester.pump(const Duration(seconds: 60));
+      expect(fake.callCount, 2, reason: 'no polling after a confirmed-unclaimed expiry');
+    });
+
+    testWidgets('claimed but the cashier never finished: after the grace window it asks the customer to check the counter',
+        (tester) async {
+      final fake = _FakeOrderRequestRepository([
+        req(expiresIn: const Duration(minutes: -20), status: 'CLAIMED'),
+      ]);
+      await pumpPage(tester, fake);
+      expect(find.text('This order request has expired.'), findsOneWidget);
+      expect(find.textContaining('tell the cashier'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 60));
+      expect(fake.callCount, 1);
+    });
+
+    testWidgets('the request is deleted after being claimed -> a clear "counter no longer has this" message',
+        (tester) async {
+      final fake = _FakeOrderRequestRepository([
+        req(expiresIn: const Duration(minutes: 3), status: 'CLAIMED'),
+        null,
+      ]);
+      await pumpPage(tester, fake);
+      expect(find.text('Cashier has your order — finishing up'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 11));
+      await tester.pump();
+      expect(find.text('The counter no longer has this request.'), findsOneWidget);
+    });
+
+    testWidgets('a request released back to PENDING shows the countdown again', (tester) async {
+      final fake = _FakeOrderRequestRepository([
+        req(expiresIn: const Duration(minutes: 3), status: 'CLAIMED'),
+        req(expiresIn: const Duration(minutes: 3)),
+      ]);
+      await pumpPage(tester, fake);
+      await tester.pump(const Duration(seconds: 11));
+      await tester.pump();
+      expect(find.text('Go to the counter to place your order'), findsOneWidget);
+    });
+  });
 }

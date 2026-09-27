@@ -81,7 +81,13 @@ class ItemModel {
 
   // Returns false if marked unavailable, or outside its time window.
   // An empty availableFrom/Till means "always available".
-  bool get isCurrentlyAvailable {
+  bool get isCurrentlyAvailable => isAvailableAt(DateTime.now());
+
+  /// phase12.md §12.3-E — time-of-day is the CAFÉ's (India, UTC+5:30), never
+  /// the customer's device clock: a phone on another timezone (or one with a
+  /// wrong clock) used to show breakfast items at dinner. The upper bound is
+  /// exclusive: `till` 11:00 means available up to, but not including, 11:00.
+  bool isAvailableAt(DateTime now) {
     if (!available) return false;
     if (availableFrom.isEmpty || availableTill.isEmpty) return true;
     final fromParts = availableFrom.split(':');
@@ -92,13 +98,14 @@ class ItemModel {
     final tillH = int.tryParse(tillParts[0]);
     final tillM = int.tryParse(tillParts[1]);
     if (fromH == null || fromM == null || tillH == null || tillM == null) return true;
-    final now = DateTime.now();
-    final nowMin = now.hour * 60 + now.minute;
+    // India has no DST, so a fixed offset is exact.
+    final ist = now.toUtc().add(const Duration(hours: 5, minutes: 30));
+    final nowMin = ist.hour * 60 + ist.minute;
     final fromMin = fromH * 60 + fromM;
     final tillMin = tillH * 60 + tillM;
     // Overnight window (e.g. 22:00–02:00) when fromMin > tillMin
-    if (fromMin > tillMin) return nowMin >= fromMin || nowMin <= tillMin;
-    return nowMin >= fromMin && nowMin <= tillMin;
+    if (fromMin > tillMin) return nowMin >= fromMin || nowMin < tillMin;
+    return nowMin >= fromMin && nowMin < tillMin;
   }
 
   String? get cloudinaryImageUrl {

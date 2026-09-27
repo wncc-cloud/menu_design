@@ -38,12 +38,43 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
   List<Map<String, dynamic>>? _lines;
   String? _orderNotes;
 
+  // billing_cafe phase12.md §12.1-A — the cashier claims a request while
+  // this page still says "PENDING", then may take minutes to finish it. The
+  // page must not call that "expired" (customers then re-ordered, creating a
+  // duplicate), so it tracks the request's status and keeps polling for a
+  // grace window while a cashier holds it.
+  String? _status;
+  bool _lastPollBeforeExpiry = false;
+  bool _finalCheckDone = false;
+  bool _finalCheckInFlight = false;
+  bool _graceTimerStarted = false;
+  static const _graceWindow = Duration(minutes: 15);
+  static const _graceIntervalSeconds = 15;
+
+  /// A cashier holds it and hasn't placed it yet — but only for the grace
+  /// window past expiry; after that the customer is told to ask the counter
+  /// rather than being left on a screen that may never change.
+  bool get _cashierHasIt =>
+      _status == 'CLAIMED' &&
+      _linkedOrderNumber == null &&
+      (_expiresAt == null || DateTime.now().isBefore(_expiresAt!.add(_graceWindow)));
+
   @override
   void initState() {
     super.initState();
     // Ticks the countdown display once a second; never itself polls.
     _tickTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
+      if (!mounted) return;
+      final expiresAt = _expiresAt;
+      // The moment the window closes, look once more: a claim may have landed
+      // since the last poll. `_pollOnce` decides whether that check is due.
+      if (expiresAt != null &&
+          _lastPollBeforeExpiry &&
+          !_finalCheckDone &&
+          DateTime.now().isAfter(expiresAt)) {
+        unawaited(_pollOnce());
+      }
+      setState(() {});
     });
     unawaited(_pollOnce());
   }
@@ -62,21 +93,42 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
   Future<void> _pollOnce() async {
     if (_linkedOrderNumber != null) return;
     // The window already closed — don't spend a Firestore read just to
-    // discover that. `_expiresAt` is only known after the first
-    // successful poll, so this is a no-op until then.
-    if (_expiresAt != null && DateTime.now().isAfter(_expiresAt!)) {
-      _pollTimer?.cancel();
-      return;
+    // discover that, EXCEPT (a) one final check if the last poll predates
+    // expiry (a claim may have landed in between), and (b) keep polling for a
+    // grace window while a cashier holds the request. `_expiresAt` is only
+    // known after the first successful poll, so this is a no-op until then.
+    final now = DateTime.now();
+    if (_expiresAt != null && now.isAfter(_expiresAt!)) {
+      final inGrace = _cashierHasIt && now.isBefore(_expiresAt!.add(_graceWindow));
+      final finalCheckDue = !inGrace && _lastPollBeforeExpiry && !_finalCheckDone;
+      if (!inGrace && !finalCheckDue) {
+        _pollTimer?.cancel();
+        return;
+      }
+      if (finalCheckDue) {
+        _finalCheckDone = true;
+        if (mounted) setState(() => _finalCheckInFlight = true);
+      }
     }
     try {
       final data = await ref.read(orderRequestRepositoryProvider).getRequest(widget.requestId);
       if (!mounted) return;
-      if (data == null) return;
+      if (data == null) {
+        // The request document is gone (dismissed / cleaned up). Only
+        // meaningful once we have seen it at least once.
+        if (_status != null && _status != 'GONE') setState(() => _status = 'GONE');
+        return;
+      }
 
       final expiresAt = data['expiresAt'] as DateTime?;
       final linkedOrderNumber = data['linkedOrderNumber'] as int?;
       final rawLines = data['lines'] as List<dynamic>?;
+      final status = data['status'] as String?;
+      final pollTime = DateTime.now();
       setState(() {
+        _status = status ?? _status;
+        _finalCheckInFlight = false;
+        _lastPollBeforeExpiry = expiresAt != null && !pollTime.isAfter(expiresAt);
         _shortCode = data['shortCode'] as String? ?? _shortCode;
         _customerName = data['customerName'] as String? ?? _customerName;
         if (expiresAt != null) _expiresAt = expiresAt;
@@ -95,6 +147,23 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
         return;
       }
 
+      // Past expiry with a cashier holding it: switch to a slower grace poll.
+      if (expiresAt != null && pollTime.isAfter(expiresAt)) {
+        if (_cashierHasIt && pollTime.isBefore(expiresAt.add(_graceWindow))) {
+          if (!_graceTimerStarted) {
+            _graceTimerStarted = true;
+            _pollTimer?.cancel();
+            _pollTimer = Timer.periodic(
+              const Duration(seconds: _graceIntervalSeconds),
+              (_) => _pollOnce(),
+            );
+          }
+        } else {
+          _pollTimer?.cancel();
+        }
+        return;
+      }
+
       // phase_plan/phase11_6.md — scales with the actual remaining
       // window (a close proxy for the configured
       // orderRequestExpiryMinutes, since the first poll happens right
@@ -105,7 +174,12 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
         _pollTimer = Timer.periodic(Duration(seconds: intervalSeconds), (_) => _pollOnce());
       }
     } catch (e) {
-      if (mounted) setState(() => _loadFailed = _expiresAt == null);
+      if (mounted) {
+        setState(() {
+          _loadFailed = _expiresAt == null;
+          _finalCheckInFlight = false;
+        });
+      }
     }
   }
 
@@ -205,13 +279,65 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
       return const CircularProgressIndicator();
     }
 
+    // A cashier already holds this request ("claimed") but has not placed the
+    // order yet. Its own colour (blue) — distinct from PENDING amber and
+    // CONFIRMED green — and never "expired", however long they take.
+    if (_cashierHasIt) {
+      return _StatusScaffold(
+        badge: const _StatusPill(
+          text: 'CASHIER HAS YOUR ORDER',
+          color: Color(0xFF1565C0),
+          textColor: Colors.white,
+          pulse: true,
+        ),
+        icon: Icons.hourglass_top,
+        iconColor: const Color(0xFF1565C0),
+        heroColor: const Color(0xFF1565C0),
+        title: 'Cashier has your order — finishing up',
+        heroLabel: 'YOUR ORDER CODE',
+        heroValue: _shortCode ?? '····',
+        heroCaption: _customerName?.trim().isNotEmpty == true ? _customerName : null,
+        instructionBanner: const _InstructionBanner(
+          icon: Icons.info_outline,
+          text: 'Stay at the counter — your order number appears here as soon as '
+              "it's placed. You don't need to order again.",
+        ),
+        subtitle: 'This page updates by itself.',
+        extra: (_lines != null && _lines!.isNotEmpty)
+            ? _OrderRecap(lines: _lines!, orderNotes: _orderNotes)
+            : null,
+      );
+    }
+
     final remaining = _expiresAt!.difference(DateTime.now());
+    if (_status == 'GONE') {
+      return _StatusCard(
+        icon: Icons.info_outline,
+        iconColor: Colors.grey,
+        title: 'The counter no longer has this request.',
+        subtitle: 'Please tell the cashier directly, or place your order again.',
+        button: FilledButton(
+          onPressed: _placeAnotherOrder,
+          style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
+          child: const Text('Place another order'),
+        ),
+      );
+    }
+    if (remaining.isNegative && _finalCheckInFlight) {
+      return const _StatusCard(
+        icon: Icons.hourglass_empty,
+        iconColor: Colors.grey,
+        title: 'Checking with the counter…',
+        subtitle: 'One moment.',
+      );
+    }
     if (remaining.isNegative) {
       return _StatusCard(
         icon: Icons.timer_off_outlined,
         iconColor: Colors.grey,
         title: 'This order request has expired.',
-        subtitle: 'Please place your order again, or tell the cashier directly at the counter.',
+        subtitle: 'If the cashier already has your order it will appear here shortly. '
+            'Otherwise please place your order again, or tell the cashier directly at the counter.',
         button: FilledButton(
           onPressed: _placeAnotherOrder,
           style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
@@ -255,7 +381,19 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
       ),
       subtitle: 'This code expires in $minutes:${seconds.toString().padLeft(2, '0')} '
           'if not confirmed.',
-      extra: const _StepTracker(),
+      // Café-owner decision (2026-09-26): show what was ordered even while
+      // PENDING, so the cashier can key the order in from the customer's own
+      // phone if anything goes wrong. `_OrderRecap` shows names/quantities
+      // and notes only — never prices — so nothing here can go stale.
+      extra: Column(
+        children: [
+          if (_lines != null && _lines!.isNotEmpty) ...[
+            _OrderRecap(lines: _lines!, orderNotes: _orderNotes),
+            const SizedBox(height: 12),
+          ],
+          const _StepTracker(),
+        ],
+      ),
     );
   }
 }

@@ -68,6 +68,12 @@ class CartNotifier extends _$CartNotifier {
     state = state.where((l) => l.menuItemId != menuItemId).toList();
   }
 
+  /// Replaces the whole cart — used after the customer confirms the changes
+  /// found by `revalidateCart` (repriced / no-longer-available items).
+  void replaceAll(List<OrderCartLine> lines) {
+    state = List.unmodifiable(lines);
+  }
+
   void clear() {
     state = [];
   }

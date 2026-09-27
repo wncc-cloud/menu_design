@@ -56,4 +56,61 @@ void main() {
       expect((item.price * 100).round(), 4550);
     });
   });
+
+  // phase12.md §12.3-E — availability windows are in café (IST) time and the
+  // upper bound is exclusive.
+  group('ItemModel.isAvailableAt — IST, exclusive upper bound (12.3-E)', () {
+    ItemModel windowed(String from, String till) => ItemModel(
+          id: 'w',
+          sectionId: 's',
+          name: 'Breakfast',
+          price: 100,
+          availableFrom: from,
+          availableTill: till,
+        );
+
+    // 05:00 UTC == 10:30 IST.
+    final tenThirtyIst = DateTime.utc(2026, 9, 26, 5, 0);
+
+    test('uses IST regardless of the device timezone / representation', () {
+      final item = windowed('10:00', '11:00');
+      expect(item.isAvailableAt(tenThirtyIst), isTrue);
+      // the same instant expressed as a local DateTime must agree
+      expect(item.isAvailableAt(tenThirtyIst.toLocal()), isTrue);
+    });
+
+    test('device clock in another timezone does not matter: 10:30 IST is outside a 22:00-23:00 window', () {
+      expect(windowed('22:00', '23:00').isAvailableAt(tenThirtyIst), isFalse);
+    });
+
+    test('upper bound is exclusive: 11:00 IST is NOT inside 10:00-11:00', () {
+      final item = windowed('10:00', '11:00');
+      expect(item.isAvailableAt(DateTime.utc(2026, 9, 26, 5, 29)), isTrue); // 10:59
+      expect(item.isAvailableAt(DateTime.utc(2026, 9, 26, 5, 30)), isFalse); // 11:00
+    });
+
+    test('lower bound is inclusive', () {
+      expect(windowed('10:00', '11:00').isAvailableAt(DateTime.utc(2026, 9, 26, 4, 30)), isTrue); // 10:00
+    });
+
+    test('overnight window 22:00-02:00', () {
+      final item = windowed('22:00', '02:00');
+      expect(item.isAvailableAt(DateTime.utc(2026, 9, 26, 17, 0)), isTrue); // 22:30
+      expect(item.isAvailableAt(DateTime.utc(2026, 9, 26, 20, 0)), isTrue); // 01:30 next day IST
+      expect(item.isAvailableAt(DateTime.utc(2026, 9, 26, 20, 30)), isFalse); // 02:00 exclusive
+      expect(item.isAvailableAt(DateTime.utc(2026, 9, 26, 5, 0)), isFalse); // 10:30
+    });
+
+    test('UTC evening that is already tomorrow morning in IST', () {
+      // 19:00 UTC == 00:30 IST (next day)
+      expect(windowed('00:00', '01:00').isAvailableAt(DateTime.utc(2026, 9, 26, 19, 0)), isTrue);
+    });
+
+    test('no window, malformed window, or unavailable flag keep their old meaning', () {
+      expect(windowed('', '').isAvailableAt(tenThirtyIst), isTrue);
+      expect(windowed('bad', '11:00').isAvailableAt(tenThirtyIst), isTrue);
+      const off = ItemModel(id: 'x', sectionId: 's', name: 'n', price: 1, available: false);
+      expect(off.isAvailableAt(tenThirtyIst), isFalse);
+    });
+  });
 }

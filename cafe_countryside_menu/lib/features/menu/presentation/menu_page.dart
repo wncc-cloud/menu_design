@@ -8,6 +8,7 @@ import '../models/menu_snapshot_model.dart';
 import '../models/section_model.dart';
 import '../../../core/services/external_link_service.dart';
 import '../../order/providers/cart_provider.dart';
+import '../../order/providers/cafe_status_provider.dart';
 import '../../shared/models/business_model.dart';
 import 'menu_provider.dart';
 import 'widgets/item_card.dart';
@@ -74,6 +75,7 @@ class _MenuPageState extends ConsumerState<MenuPage> {
             onPressed: () {
               ref.invalidate(menuControllerProvider);
               ref.invalidate(businessProvider);
+              ref.invalidate(cafeOpenProvider);
             },
           ),
           // phase_plan/phase11_6.md — the only way to actually reach
@@ -122,10 +124,17 @@ class _MenuPageState extends ConsumerState<MenuPage> {
                   ),
                 ),
               )
-            : _MenuContent(
-                menu: menu,
-                searchController: _searchController,
-                business: business,
+            : Column(
+                children: [
+                  const _CafeClosedStrip(),
+                  Expanded(
+                    child: _MenuContent(
+                      menu: menu,
+                      searchController: _searchController,
+                      business: business,
+                    ),
+                  ),
+                ],
               ),
       ),
       // Café-owner ask: a persistent bottom cart bar (Swiggy/Zomato
@@ -133,6 +142,28 @@ class _MenuPageState extends ConsumerState<MenuPage> {
       // without scrolling back up to the AppBar's cart icon. Renders
       // nothing (SizedBox.shrink) while the cart is empty.
       bottomNavigationBar: const _BottomCartBar(),
+    );
+  }
+}
+
+/// billing_cafe phase12.md §12.3-B — shown only when the counter says the
+/// café is closed. Unknown / not-published counts as open (fail-open).
+class _CafeClosedStrip extends ConsumerWidget {
+  const _CafeClosedStrip();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final closed = ref.watch(cafeOpenProvider).asData?.value == false;
+    if (!closed) return const SizedBox.shrink();
+    return Container(
+      key: const Key('menu-cafe-closed-strip'),
+      width: double.infinity,
+      color: const Color(0xFFFFEBEE),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: const Text(
+        "We're closed right now — you can browse the menu, but we can't take orders until we open.",
+        style: TextStyle(color: Color(0xFFB71C1C), fontWeight: FontWeight.w600, fontSize: 13),
+      ),
     );
   }
 }
