@@ -772,6 +772,15 @@ Priority = value to the café × how cheap it is. All use the browser-storage he
 
 **Also verified (regression):** Settings save is field-scoped: with the Settings page open, `firstLoadPopup` was changed behind its back and a Settings save left it untouched (the old whole-document `set()` would have overwritten it); staff can write `menuDraft`, `menu/current` and the snapshot but not `businesses`.
 
+**Extras added after the owner's pick (rev 11):**
+- **L3 Remember me** (checkout): tick-box saves name + phone in this phone's own storage after a successful order; "Not you?" clears it; unticked saves nothing and clears any old copy.
+- **L6 Confirmed alert:** when the status page — using the polls it ALREADY does — first sees the order confirmed, the tab title becomes "✔ Order #43 confirmed" and the phone buzzes once (where supported; not iPhone Safari). **No new reads of the counter's (KOT) project**; the counter reads orders exactly as before.
+- **L8 Reorder items:** with one section selected on the Items page, ▲▼ move an item inside that section (draft, needs Publish; the section is renumbered 0..n-1 so arrows always work).
+- **L10 Search help:** an empty search result offers section chips ("Or browse: Chef Special, Best Sellers, Tea…").
+- **Dropped / skipped by the owner:** L9 structured hours (dropped for now), L11 smaller photos / collapsible Settings (skipped).
+- **Leftovers found while auditing the plan and fixed:** image fade-in with a reserved grey box (D.3); square 270 px list thumbnails and a wider crop for the detail sheet (J.8); the old Settings "Best Sellers tab" switch replaced by a pointer to Sections → Special sections and to the Promotions page; Chef Special marker in the admin item row.
+- **Design check:** the customer app was compared with the wireframe at phone width (header, info strip, chips, card layout with ADD on the photo, badges, detail sheet, pop-ups, checkout bar); no material differences. One note: in a browser without emoji fonts, chip labels with emoji can look clipped (the same happened before Phase 1 on the live menu); real phones have the fonts.
+
 **Not verified (needs a real device / the real counter):** iOS Safari and Android Chrome Back; café-closed card on a real closed status (covered by logic + widget tests only); a real order through the POS (status page + order banner end to end); Cloudinary promo upload; App Check timing; production cache headers.
 
 ---
