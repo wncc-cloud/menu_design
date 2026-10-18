@@ -770,6 +770,8 @@ Priority = value to the café × how cheap it is. All use the browser-storage he
 
 **Verified in the browser (emulator build):** promo pop-up opens, auto-closes after 8 s with the shrinking bar; Chef Special section pop-up (no Chef badge inside, Best Sellers badge kept, unavailable item sunk with "Available 11 PM–11:30 PM"); More from us sheet; footer card; special chips with the admin's names; Back closes a pop-up; Dashboard "Today at a glance"; Promotions page (live frequency write, samples blocked from being enabled, Save bumps `promotionsRev`, a stale Save is refused, "Discard changes?" on leaving); Sections special block; publish writes the snapshot; the sold-out switch updates `menu/current`, the draft and the snapshot in one go and bumps `menuVersion`, without counting as a change; Discard restores a hidden item and keeps the sold-out state; Firestore rules (owner / manager write `businesses`, staff refused, staff write `menu/*`, snapshot not public).
 
+**Also verified (regression):** Settings save is field-scoped: with the Settings page open, `firstLoadPopup` was changed behind its back and a Settings save left it untouched (the old whole-document `set()` would have overwritten it); staff can write `menuDraft`, `menu/current` and the snapshot but not `businesses`.
+
 **Not verified (needs a real device / the real counter):** iOS Safari and Android Chrome Back; café-closed card on a real closed status (covered by logic + widget tests only); a real order through the POS (status page + order banner end to end); Cloudinary promo upload; App Check timing; production cache headers.
 
 ---
