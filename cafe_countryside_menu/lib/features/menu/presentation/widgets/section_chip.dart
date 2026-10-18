@@ -88,15 +88,28 @@ class _SectionChip extends StatelessWidget {
                 selected: selected,
                 label: label,
                 excludeSemantics: true,
-                child: Chip(
-                  label: Text(label),
-                  side: side,
-                  visualDensity: VisualDensity.compact,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  backgroundColor: selected ? cs.primary : null,
-                  labelStyle: TextStyle(
-                    color: selected ? cs.onPrimary : (outlined ? cs.primary : null),
-                    fontWeight: (selected || outlined) ? FontWeight.bold : FontWeight.normal,
+                // A plain pill instead of Material's Chip: the Chip measured its
+                // label with a different font width and faded the end of the
+                // text ("Best Selle…"). The pill is exactly as wide as its text.
+                child: Container(
+                  height: 32,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: selected ? cs.primary : null,
+                    borderRadius: BorderRadius.circular(16),
+                    border: side == null ? Border.all(color: const Color(0xFFCAC4D0)) : Border.fromBorderSide(side),
+                  ),
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.visible,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: selected ? cs.onPrimary : (outlined ? cs.primary : null),
+                      fontWeight: (selected || outlined) ? FontWeight.bold : FontWeight.normal,
+                    ),
                   ),
                 ),
               ),
