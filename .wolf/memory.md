@@ -445,3 +445,14 @@
 | 18:46 | Session end: 24 writes across 2 files (phase1.md, phase1_wireframe.html) | 2 reads | ~59886 tok |
 | 18:47 | Created plan/phase1_prompts.md | — | ~1889 |
 | 18:47 | Session end: 25 writes across 3 files (phase1.md, phase1_wireframe.html, phase1_prompts.md) | 2 reads | ~61910 tok |
+| 18:55 | Created cafe_countryside_menu/test/notes_controls_test.dart | — | ~2184 |
+| 18:58 | Created cafe_countryside_menu/lib/features/order/providers/last_order_provider.dart | — | ~1478 |
+| 18:58 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/step4.py | — | ~1546 |
+| 19:00 | Created cafe_countryside_menu/test/recovery_features_test.dart | — | ~1998 |
+| 19:01 | Created cafe_countryside_menu/lib/features/menu/data/menu_cache.dart | — | ~660 |
+| 19:01 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/step5.py | — | ~1584 |
+| 19:02 | Created cafe_countryside_menu/test/menu_cache_test.dart | — | ~817 |
+| 19:03 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/step6.py | — | ~1351 |
+| 19:07 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/spa_server.py | — | ~181 |
+
+| 19:09 | Phase 1 release 1a built: splash+headers, storage helper, field-scoped settings, note controls, 12h times, cart persistence, order banner, shimmer+menu cache, staff publish fix, dashboard glance | cafe_countryside_menu/** | 142 tests pass, analyze 2 infos, release build tested in Chrome | ~ |

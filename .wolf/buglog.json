@@ -680,6 +680,38 @@
       "related_bugs": [],
       "occurrences": 4,
       "last_seen": "2026-10-18T13:09:16.228Z"
+    },
+    {
+      "id": "bug-043",
+      "timestamp": "2026-10-18T19:09:12.133547",
+      "error_message": "11 checkout tests failed: Timer (20 min periodic) pending after test",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart",
+      "root_cause": "ref.watch(menuControllerProvider) in checkout started the keepAlive MenuController and its refresh timer in widget tests (and on a cold /checkout load)",
+      "fix": "use ref.exists(menuControllerProvider) before watching; submit-time stripping still covers the cold case",
+      "tags": [
+        "riverpod",
+        "tests",
+        "timer",
+        "checkout"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T19:09:12.133547"
+    },
+    {
+      "id": "bug-044",
+      "timestamp": "2026-10-18T19:09:12.133547",
+      "error_message": "The method 'listenSelf' isn't defined for the type 'Ref'",
+      "file": "cafe_countryside_menu/lib/features/order/providers/cart_provider.dart",
+      "root_cause": "In Riverpod 3 listenSelf is a Notifier method, not on ref",
+      "fix": "call listenSelf(...) directly inside build()",
+      "tags": [
+        "riverpod",
+        "cart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T19:09:12.133547"
     }
   ]
 }

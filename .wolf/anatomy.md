@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-18T13:17:02.861Z
-> Files: 19 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-18T13:37:23.266Z
+> Files: 28 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
 
@@ -11,6 +11,13 @@
 
 ## ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/812d24a3-7f0b-493b-a059-3282a5cd312f/scratchpad/
 
+
+## ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/
+
+- `spa_server.py` — H: do_GET, end_headers (~181 tok)
+- `step4.py` — _OrderReminderBanner: sub (~1546 tok)
+- `step5.py` — MenuController: sub (~1584 tok)
+- `step6.py` — DashboardPage: sub (~1351 tok)
 
 ## ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/dd31c90a-eeaf-40fb-bd8e-4eed5ac9263f/scratchpad/
 
@@ -107,6 +114,7 @@
 
 ## cafe_countryside_menu/lib/features/menu/data/
 
+- `menu_cache.dart` — / Phase 1 (D.4 Tier 1) — stale-while-revalidate cache of the PUBLISHED menu (~660 tok)
 
 ## cafe_countryside_menu/lib/features/menu/models/
 
@@ -134,6 +142,7 @@
 
 ## cafe_countryside_menu/lib/features/order/providers/
 
+- `last_order_provider.dart` — Class: LastOrder (~1478 tok)
 
 ## cafe_countryside_menu/lib/features/shared/models/
 
@@ -155,6 +164,9 @@
 
 ## cafe_countryside_menu/test/
 
+- `menu_cache_test.dart` — Phase 1 D.4 Tier 1 — stale-while-revalidate menu cache. (~817 tok)
+- `notes_controls_test.dart` — Phase 1 Part E — admin control over notes (per item + whole order). (~2184 tok)
+- `recovery_features_test.dart` — Phase 1 — L5 (12-hour times), L2 (cart survives a refresh), L1 (order link). (~1998 tok)
 
 ## cafe_countryside_menu/tool/
 
