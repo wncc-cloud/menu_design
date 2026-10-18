@@ -354,7 +354,15 @@ class _MenuContentState extends ConsumerState<_MenuContent> {
           ),
         Expanded(
           child: filteredItems.isEmpty
-              ? _EmptyItemsState(searchQuery: filter.searchQuery)
+              ? _EmptyItemsState(
+                  searchQuery: filter.searchQuery,
+                  suggestions: [...specialChips, ...menu.sections].take(5).toList(),
+                  onPick: (id) {
+                    widget.searchController.clear();
+                    ref.read(menuFilterProvider.notifier).setSearch('');
+                    if (filter.selectedSectionId != id) ref.read(menuFilterProvider.notifier).setSection(id);
+                  },
+                )
               : _ItemsList(
                   items: filteredItems,
                   controller: _scroll,
@@ -567,7 +575,11 @@ class _SkeletonCard extends StatelessWidget {
 // filteredItemsProvider, so this one widget covers all of them).
 class _EmptyItemsState extends StatelessWidget {
   final String searchQuery;
-  const _EmptyItemsState({required this.searchQuery});
+
+  /// Section names offered as quick taps when a search finds nothing.
+  final List<SectionModel> suggestions;
+  final ValueChanged<String> onPick;
+  const _EmptyItemsState({required this.searchQuery, this.suggestions = const [], required this.onPick});
 
   @override
   Widget build(BuildContext context) {
@@ -597,6 +609,23 @@ class _EmptyItemsState extends StatelessWidget {
                 'Try a different word?',
                 style: TextStyle(fontSize: 13, color: Colors.grey[500]),
               ),
+              if (suggestions.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Text('Or browse:', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                const SizedBox(height: 6),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    for (final s in suggestions)
+                      ActionChip(
+                        label: Text(s.icon.isNotEmpty ? '${s.icon} ${s.name}' : s.name),
+                        onPressed: () => onPick(s.id),
+                      ),
+                  ],
+                ),
+              ],
             ],
           ],
         ),

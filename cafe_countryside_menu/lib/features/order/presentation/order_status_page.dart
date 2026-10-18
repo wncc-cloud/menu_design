@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/services/external_link_service.dart';
+import '../../../core/services/page_alert.dart';
 import '../providers/last_order_provider.dart';
 import 'widgets/while_you_wait_card.dart';
 import '../providers/order_request_provider.dart';
@@ -83,6 +84,7 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
 
   @override
   void dispose() {
+    if (_alerted) setTabTitle(null);
     _pollTimer?.cancel();
     _tickTimer?.cancel();
     super.dispose();
@@ -191,7 +193,19 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
 
   /// L1: keep the menu's "your order" banner in step with what this page
   /// already learned (no extra read). Staleness by time is the banner's job.
+  bool _alerted = false;
+
+  /// L6: the moment THIS page sees the order confirmed (from the poll it was
+  /// already doing — no extra read), change the tab title and buzz once.
+  void _alertIfJustConfirmed() {
+    if (_linkedOrderNumber == null || _alerted) return;
+    _alerted = true;
+    setTabTitle('✔ Order #$_linkedOrderNumber confirmed');
+    vibrateOnce();
+  }
+
   void _rememberForMenuBanner() {
+    _alertIfJustConfirmed();
     final LastOrderState s;
     if (_linkedOrderNumber != null) {
       s = LastOrderState.confirmed;

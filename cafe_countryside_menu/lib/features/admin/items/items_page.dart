@@ -238,8 +238,18 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                                               updatedAt: DateTime.now(),
                                             ))
                                     .name;
+                                // Arrows only while ONE section is selected: that is
+                                // the list whose order they change.
+                                final canMove = canManage && _filterSectionId != null;
                                 return _ItemTile(
                                   item: item,
+                                  onMoveUp: canMove && index > 0
+                                      ? () => ref.read(draftProvider.notifier).moveItem(item.id, -1)
+                                      : null,
+                                  onMoveDown: canMove && index < visibleItems.length - 1
+                                      ? () => ref.read(draftProvider.notifier).moveItem(item.id, 1)
+                                      : null,
+                                  showMoveHint: canMove,
                                   sectionName: sectionName,
                                   canManage: canManage,
                                   onEdit: () =>
@@ -303,8 +313,14 @@ class _ItemTile extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onToggleAvailable;
   final VoidCallback onToggleActive;
+  final VoidCallback? onMoveUp;
+  final VoidCallback? onMoveDown;
+  final bool showMoveHint;
 
   const _ItemTile({
+    this.onMoveUp,
+    this.onMoveDown,
+    this.showMoveHint = false,
     required this.item,
     required this.sectionName,
     required this.canManage,
@@ -347,6 +363,7 @@ class _ItemTile extends StatelessWidget {
               ? 'Hidden from menu'
               : '₹${item.price.toStringAsFixed(0)}  ·  $sectionName'
                   '${item.isBestseller ? '  ·  ⭐' : ''}'
+                  '${item.isChefSpecial ? '  ·  🍳' : ''}'
                   '${item.noteAllowed ? '' : '  ·  no note'}',
           style: TextStyle(
             fontSize: 12,
@@ -356,6 +373,18 @@ class _ItemTile extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (showMoveHint) ...[
+              IconButton(
+                icon: const Icon(Icons.arrow_upward, size: 18),
+                tooltip: 'Move up',
+                onPressed: onMoveUp,
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_downward, size: 18),
+                tooltip: 'Move down',
+                onPressed: onMoveDown,
+              ),
+            ],
             if (item.active)
               Switch(
                 value: item.available,

@@ -13,7 +13,9 @@ import '../cart_revalidation.dart';
 import '../models/cart_line.dart';
 import '../providers/cafe_status_provider.dart';
 import '../providers/cart_provider.dart';
+import '../../../core/services/storage_providers.dart';
 import '../providers/last_order_provider.dart';
+import '../providers/saved_customer.dart';
 import '../providers/order_request_provider.dart';
 import '../validation.dart';
 import 'widgets/honeypot_field.dart';
@@ -35,10 +37,18 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
   bool _submitting = false;
   String? _errorMessage;
   bool _prefilledTable = false;
+  bool _remember = false;
 
   @override
   void initState() {
     super.initState();
+    // L3: name / phone remembered on THIS phone from an earlier order.
+    final saved = readSavedCustomer(ref.read(localStoreProvider));
+    if (saved != null) {
+      _nameController.text = saved.name;
+      _phoneController.text = saved.phone;
+      _remember = true;
+    }
     // A "closed" answer cached from the menu page may be hours old — look
     // again when the customer arrives at checkout.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -187,6 +197,12 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
       final requestId = await repo.createRequest(payload);
       if (!mounted) return;
       ref.read(cartProvider.notifier).clear();
+      final store = ref.read(localStoreProvider);
+      if (_remember) {
+        writeSavedCustomer(store, _nameController.text, _phoneController.text);
+      } else {
+        clearSavedCustomer(store);
+      }
       ref.read(lastOrderProvider.notifier).saveNew(
             requestId: requestId,
             code: payload['shortCode'] as String,
@@ -480,6 +496,35 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                             ? null
                             : 'Enter exactly 10 digits, no spaces or +91';
                       },
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CheckboxListTile(
+                            key: const Key('remember-me'),
+                            contentPadding: EdgeInsets.zero,
+                            controlAffinity: ListTileControlAffinity.leading,
+                            dense: true,
+                            value: _remember,
+                            onChanged: (v) => setState(() => _remember = v ?? false),
+                            title: const Text('Remember my name and phone on this phone',
+                                style: TextStyle(fontSize: 13)),
+                          ),
+                        ),
+                        if (_remember)
+                          TextButton(
+                            key: const Key('not-you'),
+                            onPressed: () {
+                              clearSavedCustomer(ref.read(localStoreProvider));
+                              setState(() {
+                                _remember = false;
+                                _nameController.clear();
+                                _phoneController.clear();
+                              });
+                            },
+                            child: const Text('Not you?'),
+                          ),
+                      ],
                     ),
                     if (tableNumberEnabled) ...[
                       const SizedBox(height: 12),

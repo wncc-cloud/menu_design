@@ -182,12 +182,22 @@ class _ItemCardState extends ConsumerState<ItemCard> {
               left: 8,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
+                child: Container(
+                  color: const Color(0xFFE0E0E0),
                   width: 80,
                   height: 80,
                   child: Image.network(
                     imageUrl,
                     fit: BoxFit.cover,
+                    // Grey box while loading, then a fade-in: the card never
+                    // jumps when the photo arrives.
+                    frameBuilder: (_, child, frame, sync) => sync
+                        ? child
+                        : AnimatedOpacity(
+                            opacity: frame == null ? 0 : 1,
+                            duration: const Duration(milliseconds: 220),
+                            child: child,
+                          ),
                     errorBuilder: (_, _, _) => const SizedBox.shrink(),
                   ),
                 ),

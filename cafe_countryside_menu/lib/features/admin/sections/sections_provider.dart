@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../shared/models/draft_data.dart';
 import '../../shared/models/draft_diff.dart';
+import '../../shared/models/item_order.dart';
 import '../../shared/models/draft_item_model.dart';
 import '../../shared/models/draft_section_model.dart';
 import '../../shared/repositories/draft_repository.dart';
@@ -249,6 +250,15 @@ class DraftNotifier extends _$DraftNotifier {
             : i)
         .toList();
     await _save(draft.copyWith(items: items));
+  }
+
+  /// L8: reorder inside a section (draft — needs Publish like any item edit).
+  Future<void> moveItem(String itemId, int delta) async {
+    final draft = _draft();
+    if (draft == null) return;
+    final next = moveItemInSection(draft.items, itemId, delta);
+    if (next == null) return;
+    await _save(draft.copyWith(items: next));
   }
 
   Future<void> toggleItemActive(String itemId) async {
