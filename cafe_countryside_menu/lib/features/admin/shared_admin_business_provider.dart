@@ -25,10 +25,13 @@ class AdminBusinessNotifier extends AsyncNotifier<BusinessModel> {
     try {
       state = AsyncData(await op(cur));
       return null;
-    } on StaleWriteException catch (e) {
-      await reload();
-      return e.toString();
     } catch (e) {
+      // The web SDK wraps exceptions thrown inside a transaction callback, so
+      // recognise the stale-write by its message too.
+      if (e is StaleWriteException || e.toString().contains(const StaleWriteException().toString())) {
+        await reload();
+        return const StaleWriteException().toString();
+      }
       return 'Could not save: $e';
     }
   }

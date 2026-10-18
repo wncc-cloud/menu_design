@@ -17,46 +17,70 @@ class WhileYouWaitCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final biz = ref.watch(businessProvider).asData?.value;
     if (biz == null) return const SizedBox.shrink();
-    final ventures = venturesForMoreFromUs(biz.promotions, istDateString(DateTime.now()));
+    final ventures = venturesForMoreFromUs(
+      biz.promotions,
+      istDateString(DateTime.now()),
+    );
     if (ventures.isEmpty) return const SizedBox.shrink();
     final v = ventures.first;
     final url = whatsappUrl(v) ?? promoPrimaryUrl(v, medium: 'order_status');
     final line = v.tagline.isNotEmpty ? v.tagline : v.text;
 
-    return Container(
+    // Material (not a decorated Container) so the tile's ink is visible.
+    return Padding(
       key: const Key('while-you-wait'),
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFA5D6A7)),
-      ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          initiallyExpanded: false,
-          tilePadding: const EdgeInsets.symmetric(horizontal: 14),
-          title: const Text('While you wait ✨', style: TextStyle(fontWeight: FontWeight.bold)),
-          childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
-          expandedCrossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(v.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
-            if (line.isNotEmpty) Text(line, style: const TextStyle(color: Color(0xFF455A64))),
-            if (v.madeByLine.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text('🪵 ${v.madeByLine}', style: const TextStyle(fontSize: 12, color: Color(0xFF5D4037))),
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: Color(0xFFA5D6A7)),
+        ),
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            initiallyExpanded: false,
+            tilePadding: const EdgeInsets.symmetric(horizontal: 14),
+            title: const Text(
+              'While you wait ✨',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+            expandedCrossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                v.displayName,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-            if (url != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(minimumSize: const Size(0, 44)),
-                  onPressed: () => openPromoUrl(url),
-                  child: Text(v.buttonLabel.isNotEmpty ? v.buttonLabel : 'Message us'),
+              if (line.isNotEmpty)
+                Text(line, style: const TextStyle(color: Color(0xFF455A64))),
+              if (v.madeByLine.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    '🪵 ${v.madeByLine}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF5D4037),
+                    ),
+                  ),
                 ),
-              ),
-          ],
+              if (url != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(0, 44),
+                    ),
+                    onPressed: () => openPromoUrl(url),
+                    child: Text(
+                      v.buttonLabel.isNotEmpty ? v.buttonLabel : 'Message us',
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

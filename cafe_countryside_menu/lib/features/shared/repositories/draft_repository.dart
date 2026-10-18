@@ -33,7 +33,8 @@ class DraftRepository {
       .doc(AppConstants.lastPublishedDraftDocId);
 
   Stream<DraftData?> watchPublishedSnapshot() => _snapshotRef.snapshots().map(
-        (snap) => snap.exists ? DraftData.fromJson(snap.data()!) : null,
+        // A document without an items array is not a real snapshot.
+        (snap) => (snap.exists && snap.data()!.containsKey('items')) ? DraftData.fromJson(snap.data()!) : null,
       );
 
   /// Draft := the last published snapshot. Deliberately NOT `initFromMenu`:
@@ -41,7 +42,7 @@ class DraftRepository {
   /// snapshot exists yet (nothing published since this feature shipped).
   Future<void> discardDraft(String adminUid) async {
     final snap = await _snapshotRef.get();
-    if (!snap.exists) {
+    if (!snap.exists || !snap.data()!.containsKey('items')) {
       throw StateError('Discard is available after the next Publish.');
     }
     final published = DraftData.fromJson(snap.data()!);
