@@ -192,6 +192,20 @@ class DraftNotifier extends _$DraftNotifier {
     await _save(draft.copyWith(items: items));
   }
 
+  /// Phase 1 (Part E): turn notes on/off for every item of one section at once.
+  /// Draft only — needs Publish like any other item edit.
+  Future<void> setNotesAllowedForSection(String sectionId, bool allowed) async {
+    final draft = _draft();
+    if (draft == null) return;
+    final now = DateTime.now();
+    final items = draft.items
+        .map((i) => i.sectionId == sectionId && i.noteAllowed != allowed
+            ? i.copyWith(noteAllowed: allowed, updatedAt: now)
+            : i)
+        .toList();
+    await _save(draft.copyWith(items: items));
+  }
+
   Future<void> toggleItemActive(String itemId) async {
     final draft = _draft();
     if (draft == null) return;

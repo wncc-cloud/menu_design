@@ -29,6 +29,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool _showBestsellersTab = true;
   bool _selfOrderEnabled = false;
   bool _tableNumberEnabled = true;
+  bool _orderNoteEnabled = true;
   bool _saving = false;
   bool _logoUploading = false;
   String? _saveError;
@@ -70,6 +71,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     _showBestsellersTab = b.showBestsellersTab;
     _selfOrderEnabled = b.selfOrderEnabled;
     _tableNumberEnabled = b.tableNumberEnabled;
+    _orderNoteEnabled = b.orderNoteEnabled;
   }
 
   BusinessModel _buildFromControllers() {
@@ -84,6 +86,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       showBestsellersTab: _showBestsellersTab,
       selfOrderEnabled: _selfOrderEnabled,
       tableNumberEnabled: _tableNumberEnabled,
+      orderNoteEnabled: _orderNoteEnabled,
     );
   }
 
@@ -357,6 +360,18 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ),
                     value: _tableNumberEnabled,
                     onChanged: (v) => setState(() => _tableNumberEnabled = v),
+                  ),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Allow a note for the whole order'),
+                    subtitle: const Text(
+                      'Shows the "Notes for the kitchen" box on checkout. '
+                      'Turn this off if you do not want customers writing '
+                      'order-wide notes. Notes on individual items are set '
+                      'per item (Items page).',
+                    ),
+                    value: _orderNoteEnabled,
+                    onChanged: (v) => setState(() => _orderNoteEnabled = v),
                   ),
                   const SizedBox(height: 32),
 

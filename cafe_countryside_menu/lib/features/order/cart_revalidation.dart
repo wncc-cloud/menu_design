@@ -21,7 +21,17 @@ class CartRevalidation {
   final List<OrderCartLine> lines;
   final List<CartChange> changes;
 
-  const CartRevalidation({required this.lines, required this.changes});
+  /// Phase 1 (Part E): a note was dropped because its item no longer allows
+  /// notes. Deliberately NOT part of [hasChanges] — a notes change must never
+  /// open the price/availability confirm dialog, only a gentle one-line
+  /// message.
+  final bool notesRemoved;
+
+  const CartRevalidation({
+    required this.lines,
+    required this.changes,
+    this.notesRemoved = false,
+  });
 
   bool get hasChanges => changes.isNotEmpty;
 }
@@ -41,6 +51,7 @@ CartRevalidation revalidateCart(
   final byId = {for (final i in liveItems) i.id: i};
   final lines = <OrderCartLine>[];
   final changes = <CartChange>[];
+  var notesRemoved = false;
 
   for (final line in cart) {
     final live = byId[line.menuItemId];
@@ -52,15 +63,20 @@ CartRevalidation revalidateCart(
     if (livePaise != line.unitPricePaise) {
       changes.add(CartChange(name: line.name, oldPaise: line.unitPricePaise, newPaise: livePaise));
     }
+    final hadNote = line.notes != null && line.notes!.isNotEmpty;
+    final stripNote = hadNote && !live.noteAllowed;
+    if (stripNote) notesRemoved = true;
     lines.add(OrderCartLine(
       menuItemId: line.menuItemId,
       name: live.name,
       unitPricePaise: livePaise,
       quantity: line.quantity,
-      notes: line.notes,
+      // Constructed directly (not copyWith): copyWith cannot clear a note.
+      notes: stripNote ? null : line.notes,
       requiresKitchen: live.requiresKitchen,
       readyNow: line.readyNow,
     ));
   }
-  return CartRevalidation(lines: lines, changes: changes);
+  return CartRevalidation(
+      lines: lines, changes: changes, notesRemoved: notesRemoved);
 }

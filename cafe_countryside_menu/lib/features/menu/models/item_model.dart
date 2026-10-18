@@ -26,6 +26,11 @@ class ItemModel {
   /// as it always has.
   final bool requiresKitchen;
 
+  /// Phase 1 (Part E): whether the customer may attach a note to this item.
+  /// Missing = `true` — today every item allows notes, so defaulting to false
+  /// would silently remove the feature from the whole existing menu.
+  final bool noteAllowed;
+
   const ItemModel({
     required this.id,
     required this.sectionId,
@@ -41,6 +46,7 @@ class ItemModel {
     this.cloudinaryPublicId = '',
     this.sortOrder = 0,
     this.requiresKitchen = true,
+    this.noteAllowed = true,
   });
 
   factory ItemModel.fromJson(Map<String, dynamic> json) {
@@ -59,6 +65,7 @@ class ItemModel {
       cloudinaryPublicId: json['cloudinaryPublicId'] as String? ?? '',
       sortOrder: json['sortOrder'] as int? ?? 0,
       requiresKitchen: json['requiresKitchen'] as bool? ?? true,
+      noteAllowed: json['noteAllowed'] as bool? ?? true,
     );
   }
 
@@ -77,6 +84,7 @@ class ItemModel {
         'cloudinaryPublicId': cloudinaryPublicId,
         'sortOrder': sortOrder,
         'requiresKitchen': requiresKitchen,
+        'noteAllowed': noteAllowed,
       };
 
   // Returns false if marked unavailable, or outside its time window.

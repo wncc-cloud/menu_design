@@ -36,6 +36,7 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
   late bool _isBestseller;
   late bool _available;
   late bool _requiresKitchen;
+  late bool _noteAllowed;
 
   late String _imageUrl;
   late String _cloudinaryPublicId;
@@ -58,6 +59,7 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
     _isBestseller = e?.isBestseller ?? false;
     _available = e?.available ?? true;
     _requiresKitchen = e?.requiresKitchen ?? true;
+    _noteAllowed = e?.noteAllowed ?? true;
     _imageUrl = e?.imageUrl ?? '';
     _cloudinaryPublicId = e?.cloudinaryPublicId ?? '';
   }
@@ -159,6 +161,7 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
       availableFrom: _fromCtrl.text.trim(),
       availableTill: _tillCtrl.text.trim(),
       requiresKitchen: _requiresKitchen,
+      noteAllowed: _noteAllowed,
       sortOrder: widget.existing?.sortOrder ?? 0,
       businessId: 'default',
       createdAt: widget.existing?.createdAt ?? now,
@@ -317,6 +320,12 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
                   label: 'Needs kitchen preparation?',
                   value: _requiresKitchen,
                   onChanged: (v) => setState(() => _requiresKitchen = v),
+                  activeColor: const Color(0xFF2E7D32),
+                ),
+                _ToggleRow(
+                  label: 'Allow a note on this item',
+                  value: _noteAllowed,
+                  onChanged: (v) => setState(() => _noteAllowed = v),
                   activeColor: const Color(0xFF2E7D32),
                 ),
               ],

@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../menu/models/item_model.dart';
+import '../../menu/presentation/fresh_business_provider.dart';
 import '../../menu/presentation/menu_provider.dart';
+import '../../shared/models/business_model.dart';
 import '../data/order_request_repository.dart';
 import '../cart_revalidation.dart';
 import '../models/cart_line.dart';
@@ -62,7 +65,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     }
   }
 
-  Future<void> _submit(List<OrderCartLine> cart, int expiryMinutes, bool tableNumberEnabled) async {
+  Future<void> _submit(List<OrderCartLine> cart, int expiryMinutes, bool tableNumberEnabled, bool orderNoteEnabled) async {
     if (_submitting) return;
     // phase_plan/phase11_6.md — dropped client-side, before any
     // network call at all, cheaper than even a rejected write and
@@ -96,6 +99,17 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     // (bypassing the 20-minute cache) so a repriced / switched-off item is
     // confirmed with the customer now instead of surprising them at the
     // counter. Any failure to fetch just skips this check (fail-open).
+    // Phase 1 (Part E): switches that decide what is SENT are read fresh,
+    // so a note switched off 10 minutes ago is not still sent. One document
+    // read, only on Place Order; any failure keeps the values we already have.
+    try {
+      final BusinessModel? freshBiz = await ref.read(freshBusinessFetchProvider)();
+      if (freshBiz != null) {
+        tableNumberEnabled = freshBiz.tableNumberEnabled;
+        orderNoteEnabled = freshBiz.orderNoteEnabled;
+      }
+    } catch (_) {}
+
     var effectiveCart = cart;
     try {
       final fresh = await ref.read(menuRepositoryProvider).fetchMenu();
@@ -125,6 +139,16 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             return;
           }
           effectiveCart = result.lines;
+        } else if (result.notesRemoved) {
+          // Notes only: no confirm dialog, just keep the cart in sync and
+          // tell the customer in one non-blocking line.
+          ref.read(cartProvider.notifier).replaceAll(result.lines);
+          effectiveCart = result.lines;
+        }
+        if (result.notesRemoved && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Notes aren't available for some items right now.")),
+          );
         }
       }
     } catch (_) {
@@ -148,7 +172,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
       // billing_cafe's rule requires this shape (a blank-to-null convention
       // here would reject every no-note order under the rule's `is string`
       // check).
-      'orderNotes': _orderNotesController.text.trim(),
+      'orderNotes': orderNoteEnabled ? _orderNotesController.text.trim() : '',
       'status': 'PENDING',
       'createdAt': now,
       'expiresAt': expiresAt,
@@ -261,6 +285,17 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     final business = ref.watch(businessProvider).asData?.value;
     final expiryMinutes = business?.orderRequestExpiryMinutes ?? 3;
     final tableNumberEnabled = business?.tableNumberEnabled ?? true;
+    final orderNoteEnabled = business?.orderNoteEnabled ?? true;
+    // Per-item notes: look the item up in the loaded menu instead of adding a
+    // field to OrderCartLine (its hand-copied constructors would silently reset
+    // it). Not found / menu still loading = allowed (fail-open).
+    // Only looked at when the menu is already loaded (it normally is: the
+    // customer came from it). A cold /checkout load must not start the menu
+    // fetch + 20-min timer just for this; submit-time stripping still applies.
+    final menuItems = ref.exists(menuControllerProvider)
+        ? (ref.watch(menuControllerProvider).asData?.value?.items ?? const <ItemModel>[])
+        : const <ItemModel>[];
+    final noteBlocked = {for (final i in menuItems) if (!i.noteAllowed) i.id};
     _prefillTableOnce(context, tableNumberEnabled);
     final subtotalPaise = cart.fold<int>(0, (sum, l) => sum + l.lineTotalPaise);
     // Admin kill-switch — closes the loophole of a bookmarked/typed
@@ -353,7 +388,9 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                     Text('Your order', style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 8),
                     ...cart.map((line) => _CartLineTile(
+                          key: ValueKey(line.menuItemId),
                           line: line,
+                          noteAllowed: !noteBlocked.contains(line.menuItemId),
                           onQuantityChanged: (q) =>
                               ref.read(cartProvider.notifier).setQuantity(line.menuItemId, q),
                           onRemove: () => ref.read(cartProvider.notifier).removeItem(line.menuItemId),
@@ -412,15 +449,17 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                         decoration: const InputDecoration(labelText: 'Table number (optional)'),
                       ),
                     ],
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: _orderNotesController,
-                      decoration: const InputDecoration(
-                        labelText: 'Notes for the kitchen (optional, applies to every item)',
+                    if (orderNoteEnabled) ...[
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _orderNotesController,
+                        decoration: const InputDecoration(
+                          labelText: 'Notes for the kitchen (optional, applies to every item)',
+                        ),
+                        maxLength: 300,
+                        maxLines: 2,
                       ),
-                      maxLength: 300,
-                      maxLines: 2,
-                    ),
+                    ],
                     HoneypotField(controller: _honeypotController),
                     if (_errorMessage != null) ...[
                       const SizedBox(height: 16),
@@ -432,7 +471,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                       child: FilledButton(
                         onPressed: (_submitting || cafeClosed)
                             ? null
-                            : () => _submit(cart, expiryMinutes, tableNumberEnabled),
+                            : () => _submit(cart, expiryMinutes, tableNumberEnabled, orderNoteEnabled),
                         style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
                         child: _submitting
                             ? const SizedBox(
@@ -451,51 +490,52 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
   }
 }
 
-class _CartLineTile extends StatelessWidget {
+class _CartLineTile extends StatefulWidget {
   final OrderCartLine line;
+
+  /// False when the admin switched notes off for this item: the note control
+  /// is not shown at all (Phase 1, Part E).
+  final bool noteAllowed;
   final ValueChanged<int> onQuantityChanged;
   final VoidCallback onRemove;
   final ValueChanged<String?> onNotesChanged;
 
   const _CartLineTile({
+    super.key,
     required this.line,
+    required this.noteAllowed,
     required this.onQuantityChanged,
     required this.onRemove,
     required this.onNotesChanged,
   });
 
-  Future<void> _editNote(BuildContext context) async {
-    final controller = TextEditingController(text: line.notes ?? '');
-    final note = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Note for ${line.name}'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLength: 300,
-          decoration: const InputDecoration(
-            hintText: 'e.g. Extra spicy, no onion',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(controller.text),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-    if (note != null) onNotesChanged(note);
+  @override
+  State<_CartLineTile> createState() => _CartLineTileState();
+}
+
+class _CartLineTileState extends State<_CartLineTile> {
+  // Inline expandable note (replaces the old dialog): one tap fewer, and the
+  // note stays visible under the line.
+  late final TextEditingController _controller;
+  bool _editing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.line.notes ?? '');
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final line = widget.line;
     final hasNote = line.notes != null && line.notes!.isNotEmpty;
+    final open = widget.noteAllowed && (_editing || hasNote);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
@@ -505,64 +545,56 @@ class _CartLineTile extends StatelessWidget {
             children: [
               Expanded(child: Text(line.name)),
               IconButton(
-                icon: Icon(
-                  hasNote ? Icons.chat_bubble : Icons.chat_bubble_outline,
-                  size: 20,
-                  color: hasNote ? const Color(0xFF2E7D32) : Colors.grey[700],
-                ),
-                tooltip: hasNote ? 'Edit note' : 'Add a note (e.g. extra spicy, no onion)',
-                onPressed: () => _editNote(context),
-              ),
-              IconButton(
                 icon: const Icon(Icons.remove_circle_outline, size: 20),
-                onPressed: () => onQuantityChanged(line.quantity - 1),
+                onPressed: () => widget.onQuantityChanged(line.quantity - 1),
               ),
               Text('${line.quantity}'),
               IconButton(
                 icon: const Icon(Icons.add_circle_outline, size: 20),
-                onPressed: () => onQuantityChanged(line.quantity + 1),
+                onPressed: () => widget.onQuantityChanged(line.quantity + 1),
               ),
               IconButton(
                 icon: const Icon(Icons.close, size: 18),
-                onPressed: onRemove,
+                onPressed: widget.onRemove,
               ),
             ],
           ),
-          // Café-owner feedback (2026-09-07): the previous tiny grey pin
-          // text was too easy to miss — a real customer added a note and
-          // couldn't tell it had actually saved. Now a full-width,
-          // high-contrast chip, same green as the rest of this page's
-          // accent color, tappable to edit again.
-          if (hasNote)
+          if (widget.noteAllowed && !open)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                key: const Key('add-note'),
+                onPressed: () => setState(() => _editing = true),
+                icon: const Icon(Icons.chat_bubble_outline, size: 16),
+                label: const Text('Add a note (e.g. extra spicy, no onion)'),
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF2E7D32),
+                  minimumSize: const Size(0, 36),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                ),
+              ),
+            ),
+          if (open)
             Padding(
               padding: const EdgeInsets.only(top: 2),
-              child: InkWell(
-                onTap: () => _editNote(context),
-                borderRadius: BorderRadius.circular(6),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8F5E9),
+              child: TextField(
+                key: const Key('note-field'),
+                controller: _controller,
+                autofocus: _editing && !hasNote,
+                maxLength: 300,
+                minLines: 1,
+                maxLines: 3,
+                onChanged: widget.onNotesChanged,
+                decoration: InputDecoration(
+                  isDense: true,
+                  hintText: 'e.g. Extra spicy, no onion',
+                  prefixIcon: const Icon(Icons.chat_bubble,
+                      size: 16, color: Color(0xFF2E7D32)),
+                  filled: true,
+                  fillColor: const Color(0xFFE8F5E9),
+                  border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: const Color(0xFFA5D6A7)),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(Icons.chat_bubble, size: 14, color: Color(0xFF2E7D32)),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          line.notes!,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF1B5E20),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
+                    borderSide: const BorderSide(color: Color(0xFFA5D6A7)),
                   ),
                 ),
               ),

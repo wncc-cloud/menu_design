@@ -152,6 +152,32 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                           ],
                         ),
                       ),
+                    if (_filterSectionId != null && canManage)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Wrap(
+                          spacing: 8,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            const Text('Notes for this section:',
+                                style: TextStyle(fontSize: 12)),
+                            TextButton(
+                              onPressed: () => ref
+                                  .read(draftProvider.notifier)
+                                  .setNotesAllowedForSection(
+                                      _filterSectionId!, true),
+                              child: const Text('Allow notes for all'),
+                            ),
+                            TextButton(
+                              onPressed: () => ref
+                                  .read(draftProvider.notifier)
+                                  .setNotesAllowedForSection(
+                                      _filterSectionId!, false),
+                              child: const Text('Turn notes off for all'),
+                            ),
+                          ],
+                        ),
+                      ),
                     Expanded(
                       child: visibleItems.isEmpty
                           ? Center(
@@ -298,7 +324,8 @@ class _ItemTile extends StatelessWidget {
           !item.active
               ? 'Hidden from menu'
               : '₹${item.price.toStringAsFixed(0)}  ·  $sectionName'
-                  '${item.isBestseller ? '  ·  ⭐' : ''}',
+                  '${item.isBestseller ? '  ·  ⭐' : ''}'
+                  '${item.noteAllowed ? '' : '  ·  no note'}',
           style: TextStyle(
             fontSize: 12,
             color: !item.active ? Colors.orange[700] : null,
