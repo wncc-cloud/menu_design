@@ -23,6 +23,11 @@ import 'router.dart';
 /// real build — no dart-define means this defaults to false.
 const _useLocalEmulator = bool.fromEnvironment('USE_FIREBASE_EMULATOR');
 
+// Ports default to the billing_cafe seed setup; override with
+// --dart-define=FIRESTORE_EMULATOR_PORT=... when those ports are taken.
+const _firestoreEmulatorPort = int.fromEnvironment('FIRESTORE_EMULATOR_PORT', defaultValue: 8081);
+const _authEmulatorPort = int.fromEnvironment('AUTH_EMULATOR_PORT', defaultValue: 9098);
+
 /// A Firestore emulator instance namespaces data by project id — just
 /// pointing `useFirestoreEmulator` at localhost:8081 while keeping the
 /// real `cafe-countryside-menu` project id still reads an empty
@@ -47,7 +52,7 @@ void main() async {
     options: _useLocalEmulator ? _emulatorOptions : DefaultFirebaseOptions.currentPlatform,
   );
   if (_useLocalEmulator) {
-    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8081);
+    FirebaseFirestore.instance.useFirestoreEmulator('localhost', _firestoreEmulatorPort);
     // A DEDICATED Auth emulator on :9098 for `why-not-cafe-menu-dev`
     // (`firebase/dev-seed/menu-emulator/firebase.json`), NOT billing_cafe's
     // shared :9099 instance — that one is started with `--project
@@ -61,7 +66,7 @@ void main() async {
     // Google-popup sign-in (`AuthService.signInWithGoogle`) hits the
     // REAL identitytoolkit API with the fake `demo-api-key` above and
     // is correctly rejected — the original "Sign in failed" symptom.
-    await FirebaseAuth.instance.useAuthEmulator('localhost', 9098);
+    await FirebaseAuth.instance.useAuthEmulator('localhost', _authEmulatorPort);
   }
   // Fire-and-forget: only /checkout's REST calls need this token (see
   // PosAppCheckService.getToken()'s own null-safe fallback), so it must

@@ -17,6 +17,7 @@ class DraftItemModel {
   final String availableTill;
   final bool requiresKitchen;
   final bool noteAllowed;
+  final bool isChefSpecial;
   final int sortOrder;
   final String businessId;
   final DateTime createdAt;
@@ -39,6 +40,7 @@ class DraftItemModel {
     required this.availableTill,
     this.requiresKitchen = true,
     this.noteAllowed = true,
+    this.isChefSpecial = false,
     required this.sortOrder,
     required this.businessId,
     required this.createdAt,
@@ -62,6 +64,7 @@ class DraftItemModel {
         availableTill: json['availableTill'] as String? ?? '',
         requiresKitchen: json['requiresKitchen'] as bool? ?? true,
         noteAllowed: json['noteAllowed'] as bool? ?? true,
+        isChefSpecial: json['isChefSpecial'] as bool? ?? false,
         sortOrder: json['sortOrder'] as int? ?? 0,
         businessId: json['businessId'] as String? ?? 'default',
         createdAt:
@@ -87,6 +90,7 @@ class DraftItemModel {
         'availableTill': availableTill,
         'requiresKitchen': requiresKitchen,
         'noteAllowed': noteAllowed,
+        'isChefSpecial': isChefSpecial,
         'sortOrder': sortOrder,
         'businessId': businessId,
         'createdAt': Timestamp.fromDate(createdAt),
@@ -110,6 +114,7 @@ class DraftItemModel {
     String? availableTill,
     bool? requiresKitchen,
     bool? noteAllowed,
+    bool? isChefSpecial,
     int? sortOrder,
     String? businessId,
     DateTime? createdAt,
@@ -132,6 +137,7 @@ class DraftItemModel {
         availableTill: availableTill ?? this.availableTill,
         requiresKitchen: requiresKitchen ?? this.requiresKitchen,
         noteAllowed: noteAllowed ?? this.noteAllowed,
+        isChefSpecial: isChefSpecial ?? this.isChefSpecial,
         sortOrder: sortOrder ?? this.sortOrder,
         businessId: businessId ?? this.businessId,
         createdAt: createdAt ?? this.createdAt,

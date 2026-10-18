@@ -70,6 +70,7 @@ class DraftRepository {
         availableFrom: item.availableFrom,
         availableTill: item.availableTill,
         noteAllowed: item.noteAllowed,
+        isChefSpecial: item.isChefSpecial,
         sortOrder: item.sortOrder,
         businessId: 'default',
         createdAt: now,
@@ -125,6 +126,7 @@ class DraftRepository {
                   'availableTill': item.availableTill,
                   'requiresKitchen': item.requiresKitchen,
                   'noteAllowed': item.noteAllowed,
+                  'isChefSpecial': item.isChefSpecial,
                   'sortOrder': item.sortOrder,
                 })
             .toList(),

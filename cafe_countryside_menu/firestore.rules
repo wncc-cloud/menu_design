@@ -17,6 +17,14 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'owner';
     }
 
+    // Phase 1: businesses/* carries promotions (customer-facing ad space), the
+    // first-load pop-up choice and system-section config, so only owner and
+    // manager may write it. Staff keep menu/* (the live sold-out switch).
+    function isOwnerOrManager() {
+      return isAdmin()
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role in ['owner', 'manager'];
+    }
+
     // Public: anyone can read the live menu and business info
     match /menu/{docId} {
       allow read: if true;
@@ -25,7 +33,7 @@ service cloud.firestore {
 
     match /businesses/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isOwnerOrManager();
     }
 
     // Admins only: draft is never public

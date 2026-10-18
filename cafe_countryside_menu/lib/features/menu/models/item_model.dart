@@ -31,6 +31,9 @@ class ItemModel {
   /// would silently remove the feature from the whole existing menu.
   final bool noteAllowed;
 
+  /// Phase 1 (Part A): flag behind the "Chef Special" system section.
+  final bool isChefSpecial;
+
   const ItemModel({
     required this.id,
     required this.sectionId,
@@ -47,6 +50,7 @@ class ItemModel {
     this.sortOrder = 0,
     this.requiresKitchen = true,
     this.noteAllowed = true,
+    this.isChefSpecial = false,
   });
 
   factory ItemModel.fromJson(Map<String, dynamic> json) {
@@ -66,6 +70,7 @@ class ItemModel {
       sortOrder: json['sortOrder'] as int? ?? 0,
       requiresKitchen: json['requiresKitchen'] as bool? ?? true,
       noteAllowed: json['noteAllowed'] as bool? ?? true,
+      isChefSpecial: json['isChefSpecial'] as bool? ?? false,
     );
   }
 
@@ -85,6 +90,7 @@ class ItemModel {
         'sortOrder': sortOrder,
         'requiresKitchen': requiresKitchen,
         'noteAllowed': noteAllowed,
+        'isChefSpecial': isChefSpecial,
       };
 
   // Returns false if marked unavailable, or outside its time window.

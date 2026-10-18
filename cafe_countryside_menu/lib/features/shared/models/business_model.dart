@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'promotion_models.dart';
+
 class BusinessModel {
   final String businessId;
   final String cafeName;
@@ -51,6 +53,25 @@ class BusinessModel {
   /// so deploying never silently removes the feature.
   final bool orderNoteEnabled;
 
+  /// Phase 1 (Part A): Chef Special / Best Sellers config — order = display
+  /// order, names and icons editable, each can be hidden. Written ONLY by the
+  /// Sections page (field-level), never by Settings.
+  final List<SystemSection> systemSections;
+
+  /// Phase 1 (Part C): up to 4 promotions. Written only by the Promotions page.
+  final List<Promotion> promotions;
+
+  /// Phase 1 (B.0): the ONE thing that opens when the menu loads + how often.
+  final FirstLoadPopup firstLoadPopup;
+
+  /// Café-closed info card (hours, Directions, Call, one venture).
+  final bool closedPopupEnabled;
+
+  /// Bumped on every write of the matching array; a save compares the value
+  /// it loaded so two admins cannot silently overwrite each other (J.15 #7).
+  final int systemSectionsRev;
+  final int promotionsRev;
+
   final DateTime? updatedAt;
 
   const BusinessModel({
@@ -68,8 +89,18 @@ class BusinessModel {
     this.selfOrderEnabled = false,
     this.tableNumberEnabled = true,
     this.orderNoteEnabled = true,
+    this.systemSections = const [],
+    this.promotions = const [],
+    this.firstLoadPopup = const FirstLoadPopup(),
+    this.closedPopupEnabled = true,
+    this.systemSectionsRev = 0,
+    this.promotionsRev = 0,
     this.updatedAt,
   });
+
+  /// Resolved Chef Special / Best Sellers config (defaults when absent).
+  List<SystemSection> get resolvedSystemSections =>
+      systemSections.isNotEmpty ? systemSections : resolveSystemSections(null, legacyShowBestsellers: showBestsellersTab);
 
   factory BusinessModel.empty() => const BusinessModel(
         businessId: 'default',
@@ -98,6 +129,14 @@ class BusinessModel {
         selfOrderEnabled: json['selfOrderEnabled'] as bool? ?? false,
         tableNumberEnabled: json['tableNumberEnabled'] as bool? ?? true,
         orderNoteEnabled: json['orderNoteEnabled'] as bool? ?? true,
+        systemSections: json['systemSections'] == null
+            ? const []
+            : resolveSystemSections(json['systemSections']),
+        promotions: resolvePromotions(json['promotions']),
+        firstLoadPopup: FirstLoadPopup.fromJson(json['firstLoadPopup']),
+        closedPopupEnabled: json['closedPopupEnabled'] as bool? ?? true,
+        systemSectionsRev: (json['systemSectionsRev'] as num?)?.toInt() ?? 0,
+        promotionsRev: (json['promotionsRev'] as num?)?.toInt() ?? 0,
         updatedAt: (json['updatedAt'] as Timestamp?)?.toDate(),
       );
 
@@ -116,6 +155,12 @@ class BusinessModel {
         'selfOrderEnabled': selfOrderEnabled,
         'tableNumberEnabled': tableNumberEnabled,
         'orderNoteEnabled': orderNoteEnabled,
+        'systemSections': systemSections.map((s) => s.toJson()).toList(),
+        'promotions': promotions.map((p) => p.toJson()).toList(),
+        'firstLoadPopup': firstLoadPopup.toJson(),
+        'closedPopupEnabled': closedPopupEnabled,
+        'systemSectionsRev': systemSectionsRev,
+        'promotionsRev': promotionsRev,
         if (updatedAt != null) 'updatedAt': Timestamp.fromDate(updatedAt!),
       };
 
@@ -134,6 +179,12 @@ class BusinessModel {
     bool? selfOrderEnabled,
     bool? tableNumberEnabled,
     bool? orderNoteEnabled,
+    List<SystemSection>? systemSections,
+    List<Promotion>? promotions,
+    FirstLoadPopup? firstLoadPopup,
+    bool? closedPopupEnabled,
+    int? systemSectionsRev,
+    int? promotionsRev,
     DateTime? updatedAt,
   }) =>
       BusinessModel(
@@ -151,6 +202,12 @@ class BusinessModel {
         selfOrderEnabled: selfOrderEnabled ?? this.selfOrderEnabled,
         tableNumberEnabled: tableNumberEnabled ?? this.tableNumberEnabled,
         orderNoteEnabled: orderNoteEnabled ?? this.orderNoteEnabled,
+        systemSections: systemSections ?? this.systemSections,
+        promotions: promotions ?? this.promotions,
+        firstLoadPopup: firstLoadPopup ?? this.firstLoadPopup,
+        closedPopupEnabled: closedPopupEnabled ?? this.closedPopupEnabled,
+        systemSectionsRev: systemSectionsRev ?? this.systemSectionsRev,
+        promotionsRev: promotionsRev ?? this.promotionsRev,
         updatedAt: updatedAt ?? this.updatedAt,
       );
 

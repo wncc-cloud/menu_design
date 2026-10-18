@@ -22,6 +22,7 @@ const int _colFrom = 9;
 const int _colTill = 10;
 const int _colActive = 11;
 const int _colAllowNote = 12; // optional (Phase 1): blank = YES
+const int _colChef = 13; // optional (Phase 1): blank = NO
 
 // ── Cell string helper ────────────────────────────────────────────────────────
 
@@ -84,13 +85,13 @@ void generateAndDownloadTemplate(DraftData draft) {
     fontColorHex: ExcelColor.black87,
   );
 
-  // Row 0: instruction banner across all 13 columns
+  // Row 0: instruction banner across all 14 columns
   const bannerText =
       'Fill from row 3. Max 100 items per upload. '
       'Type a NEW section name to create one. '
       'Section Icon is optional (emoji). '
       'Leave optional columns blank for defaults.';
-  for (int c = 0; c < 13; c++) {
+  for (int c = 0; c < 14; c++) {
     final cell =
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: c, rowIndex: 0));
     cell.value = c == 0 ? TextCellValue(bannerText) : TextCellValue('');
@@ -102,7 +103,7 @@ void generateAndDownloadTemplate(DraftData draft) {
     'Section', 'Section Icon', 'Item Name', 'Price (₹)',
     'Description', 'Ingredients', 'Veg', 'Bestseller',
     'Available', 'Available From', 'Available Till', 'Active (Visible)',
-    'Allow Note',
+    'Allow Note', 'Chef Special',
   ];
   for (int c = 0; c < headers.length; c++) {
     final cell =
@@ -128,9 +129,9 @@ void generateAndDownloadTemplate(DraftData draft) {
       : ['☕', '🍟', '☕'];
 
   final examples = [
-    [sectionExamples[0], iconExamples[0], 'Masala Chai', '30', 'Strong spiced tea', 'Tea, Milk, Spices', 'YES', 'YES', 'YES', '', '', 'YES', 'YES'],
-    [sectionExamples[1], iconExamples[1], 'Veg Sandwich', '80', 'Grilled sandwich', 'Bread, Veggies, Cheese', 'YES', 'NO', 'YES', '08:00', '22:00', 'YES', 'YES'],
-    [sectionExamples[2], iconExamples[2], 'Filter Coffee', '40', '', '', 'YES', 'NO', 'YES', '', '', 'YES', 'NO'],
+    [sectionExamples[0], iconExamples[0], 'Masala Chai', '30', 'Strong spiced tea', 'Tea, Milk, Spices', 'YES', 'YES', 'YES', '', '', 'YES', 'YES', 'NO'],
+    [sectionExamples[1], iconExamples[1], 'Veg Sandwich', '80', 'Grilled sandwich', 'Bread, Veggies, Cheese', 'YES', 'NO', 'YES', '08:00', '22:00', 'YES', 'YES', 'YES'],
+    [sectionExamples[2], iconExamples[2], 'Filter Coffee', '40', '', '', 'YES', 'NO', 'YES', '', '', 'YES', 'NO', 'NO'],
   ];
 
   for (int r = 0; r < examples.length; r++) {
@@ -214,6 +215,7 @@ BulkImportResult parseAndValidate(Uint8List bytes, DraftData draft) {
     final tillStr = _cellStr(row, _colTill);
     final activeStr = _cellStr(row, _colActive).toUpperCase();
     final noteStr = _cellStr(row, _colAllowNote).toUpperCase();
+    final chefStr = _cellStr(row, _colChef).toUpperCase();
 
     // Rule 2
     if (sectionRaw.isEmpty) {
@@ -260,6 +262,10 @@ BulkImportResult parseAndValidate(Uint8List bytes, DraftData draft) {
     // Rule 7
     if (!_isYesNo(bestStr)) {
       errors.add(BulkImportError(sheetRow, 'Bestseller must be YES, NO, or blank'));
+    }
+
+    if (!_isYesNo(chefStr)) {
+      errors.add(BulkImportError(sheetRow, 'Chef Special must be YES, NO, or blank'));
     }
 
     if (!_isYesNo(noteStr)) {
@@ -406,6 +412,7 @@ BulkImportResult parseAndValidate(Uint8List bytes, DraftData draft) {
       availableFrom: _cellStr(row, _colFrom),
       availableTill: _cellStr(row, _colTill),
       noteAllowed: _parseBool(_cellStr(row, _colAllowNote).toUpperCase(), defaultValue: true),
+      isChefSpecial: _parseBool(_cellStr(row, _colChef).toUpperCase(), defaultValue: false),
       sortOrder: base + 1 + idx,
       businessId: 'default',
       createdAt: now,
