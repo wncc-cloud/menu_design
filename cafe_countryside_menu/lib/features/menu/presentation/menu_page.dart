@@ -395,8 +395,19 @@ class _MenuSkeletonState extends State<_MenuSkeleton>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
-    )..repeat(reverse: true);
+      duration: const Duration(milliseconds: 1400),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reduced motion: a static grey skeleton, no sweep.
+    if (MediaQuery.of(context).disableAnimations) {
+      _controller.stop();
+    } else if (!_controller.isAnimating) {
+      _controller.repeat();
+    }
   }
 
   @override
@@ -407,13 +418,12 @@ class _MenuSkeletonState extends State<_MenuSkeleton>
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: Tween<double>(begin: 0.4, end: 1.0).animate(_controller),
-      child: ListView.builder(
-        padding: const EdgeInsets.only(top: 8, bottom: 32),
-        itemCount: 6,
-        itemBuilder: (_, _) => const _SkeletonCard(),
-      ),
+    // Phase 1 (D.2): a real shimmer sweep, same colours and geometry as the
+    // HTML splash in web/index.html so the hand-over looks continuous.
+    return ListView.builder(
+      padding: const EdgeInsets.only(top: 8, bottom: 32),
+      itemCount: 6,
+      itemBuilder: (_, _) => _SkeletonCard(animation: _controller),
     );
   }
 }
@@ -421,7 +431,8 @@ class _MenuSkeletonState extends State<_MenuSkeleton>
 // Mirrors ItemCard's own margin/padding/image-size exactly so the real
 // list doesn't visibly jump in height once this swaps out.
 class _SkeletonCard extends StatelessWidget {
-  const _SkeletonCard();
+  final Animation<double> animation;
+  const _SkeletonCard({required this.animation});
 
   @override
   Widget build(BuildContext context) {
@@ -445,28 +456,31 @@ class _SkeletonCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Container(
-              width: 90,
-              height: 90,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+            _bar(width: 90, height: 90, radius: 8),
           ],
         ),
       ),
     );
   }
 
-  Widget _bar({required double width, required double height}) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(4),
-      ),
+  Widget _bar({required double width, required double height, double radius = 4}) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, _) {
+        final t = animation.value;
+        return Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(radius),
+            gradient: LinearGradient(
+              begin: Alignment(-3 + 6 * t, 0),
+              end: Alignment(-1 + 6 * t, 0),
+              colors: const [Color(0xFFE0E0E0), Color(0xFFF5F5F5), Color(0xFFE0E0E0)],
+            ),
+          ),
+        );
+      },
     );
   }
 }

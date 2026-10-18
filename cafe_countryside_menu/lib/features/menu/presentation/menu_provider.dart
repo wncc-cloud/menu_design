@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/services/browser_storage.dart';
+import '../../../core/services/storage_providers.dart';
+import '../data/menu_cache.dart';
 import '../data/menu_repository.dart';
 import '../models/item_model.dart';
 import '../models/menu_snapshot_model.dart';
@@ -53,10 +56,19 @@ const menuRefreshInterval = Duration(minutes: 20);
 @Riverpod(keepAlive: true)
 class MenuController extends _$MenuController {
   Timer? _refreshTimer;
+  bool _disposed = false;
+
+  /// The saved menu is only used for the FIRST build of a page load. Every
+  /// later build (Retry, manual refresh, the 20-minute timer) goes straight
+  /// to the network, so "Refresh" always forces a fresh result.
+  static bool _cacheServed = false;
 
   @override
   Future<MenuSnapshotModel?> build() async {
-    ref.onDispose(() => _refreshTimer?.cancel());
+    ref.onDispose(() {
+      _disposed = true;
+      _refreshTimer?.cancel();
+    });
     _refreshTimer = Timer.periodic(menuRefreshInterval, (_) {
       ref.invalidateSelf();
       ref.invalidate(businessProvider);
@@ -64,7 +76,31 @@ class MenuController extends _$MenuController {
       // in a tab that was opened while the café was closed.
       ref.invalidate(cafeOpenProvider);
     });
-    return ref.read(menuRepositoryProvider).fetchMenu();
+    final repo = ref.read(menuRepositoryProvider);
+    final store = ref.read(localStoreProvider);
+    if (!_cacheServed) {
+      _cacheServed = true;
+      final cached = readMenuCache(store);
+      if (cached != null) {
+        // Returning visitor: show the saved menu right away and replace it
+        // when the network answer arrives (cart is re-checked at submit).
+        unawaited(_revalidate(repo, store));
+        return cached;
+      }
+    }
+    final fresh = await repo.fetchMenu();
+    writeMenuCache(store, fresh);
+    return fresh;
+  }
+
+  Future<void> _revalidate(MenuRepository repo, KeyValueStore store) async {
+    try {
+      final fresh = await repo.fetchMenu();
+      writeMenuCache(store, fresh);
+      if (!_disposed) state = AsyncData(fresh);
+    } catch (_) {
+      // Keep showing the saved menu; the next refresh tries again.
+    }
   }
 }
 
