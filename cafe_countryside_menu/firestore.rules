@@ -27,7 +27,9 @@ service cloud.firestore {
 
     // Public: anyone can read the live menu and business info
     match /menu/{docId} {
-      allow read: if true;
+      // lastPublishedDraft is the draft exactly as last published (it keeps
+      // hidden items and prices) — admins only, never public.
+      allow read: if docId != 'lastPublishedDraft' || isAdmin();
       allow write: if isAdmin();
     }
 

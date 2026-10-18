@@ -8,6 +8,7 @@ class AppConstants {
   // Firestore document IDs
   static const String businessDocId = 'default';
   static const String menuCurrentDocId = 'current';
+  static const String lastPublishedDraftDocId = 'lastPublishedDraft';
   static const String menuDraftDocId = 'data';
 
   // Cloudinary

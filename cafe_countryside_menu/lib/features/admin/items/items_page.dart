@@ -48,7 +48,26 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
       builder: (_) => ItemFormDialog(sections: sections, existing: item),
     );
     if (result == null || !mounted) return;
-    await ref.read(draftProvider.notifier).updateItem(result);
+    // "Available now" is LIVE (not part of the draft): keep the draft's old
+    // value in this write and flip the three documents together afterwards.
+    final availabilityChanged = result.available != item.available;
+    await ref.read(draftProvider.notifier).updateItem(
+          availabilityChanged ? result.copyWith(available: item.available) : result,
+        );
+    if (availabilityChanged) {
+      await ref.read(draftProvider.notifier).setItemAvailableLive(item.id, result.available);
+      if (mounted) _liveToast(result.name, result.available);
+    }
+  }
+
+  void _liveToast(String name, bool available) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(available
+            ? 'Live now: $name is available again. Customers see it on their next refresh (≤ 20 min) and at checkout.'
+            : 'Live now: $name is sold out. Customers see it on their next refresh (≤ 20 min) and at checkout.'),
+      ));
   }
 
   Future<void> _confirmDelete(DraftItemModel item) async {
@@ -226,9 +245,12 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                                   onEdit: () =>
                                       _showEditDialog(item, sections),
                                   onDelete: () => _confirmDelete(item),
-                                  onToggleAvailable: () => ref
-                                      .read(draftProvider.notifier)
-                                      .toggleItemAvailable(item.id),
+                                  onToggleAvailable: () async {
+                                    final now = await ref
+                                        .read(draftProvider.notifier)
+                                        .toggleItemAvailable(item.id);
+                                    if (now != null && mounted) _liveToast(item.name, now);
+                                  },
                                   onToggleActive: () => ref
                                       .read(draftProvider.notifier)
                                       .toggleItemActive(item.id),

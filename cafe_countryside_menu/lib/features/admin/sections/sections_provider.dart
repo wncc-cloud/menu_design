@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' show Provider, StreamProvider;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../shared/models/draft_data.dart';
+import '../../shared/models/draft_diff.dart';
 import '../../shared/models/draft_item_model.dart';
 import '../../shared/models/draft_section_model.dart';
 import '../../shared/repositories/draft_repository.dart';
@@ -18,11 +20,39 @@ DraftRepository draftRepository(Ref ref) =>
 Stream<DraftData?> draftStream(Ref ref) =>
     ref.watch(draftRepositoryProvider).watchDraft();
 
-@riverpod
-bool hasUnpublishedChanges(Ref ref) {
-  final draft = ref.watch(draftStreamProvider).asData?.value;
-  return draft?.hasUnpublishedChanges ?? false;
+/// What was last published (the draft exactly as published), or null before
+/// the first Publish since the snapshot existed.
+final publishedSnapshotProvider = StreamProvider.autoDispose<DraftData?>(
+  (ref) => ref.watch(draftRepositoryProvider).watchPublishedSnapshot(),
+);
+
+/// Phase 1 (L4): unpublished-change status for the Publish banner.
+class PendingChanges {
+  final bool any;
+
+  /// Exact count, or null when it cannot be computed (no snapshot yet).
+  final int? count;
+
+  /// Discard needs the snapshot.
+  final bool canDiscard;
+  const PendingChanges({required this.any, this.count, required this.canDiscard});
 }
+
+final pendingChangesProvider = Provider.autoDispose<PendingChanges>((ref) {
+  final draft = ref.watch(draftStreamProvider).asData?.value;
+  if (draft == null) return const PendingChanges(any: false, canDiscard: false);
+  final snap = ref.watch(publishedSnapshotProvider).asData?.value;
+  if (snap == null) {
+    // Never published since the snapshot was introduced: fall back to the
+    // old timestamp rule, no count, Discard unavailable.
+    return PendingChanges(any: draft.hasUnpublishedChanges, canDiscard: false);
+  }
+  final n = countDraftChanges(draft, snap);
+  return PendingChanges(any: n > 0, count: n, canDiscard: true);
+});
+
+@riverpod
+bool hasUnpublishedChanges(Ref ref) => ref.watch(pendingChangesProvider).any;
 
 @riverpod
 class DraftNotifier extends _$DraftNotifier {
@@ -180,16 +210,31 @@ class DraftNotifier extends _$DraftNotifier {
     });
   }
 
-  Future<void> toggleItemAvailable(String itemId) async {
+  /// L2b: the sold-out switch is LIVE for every role — it writes the published
+  /// menu, the draft and the last-published snapshot in one transaction and is
+  /// not an unpublished change. Returns the new value (null if item unknown).
+  Future<bool?> toggleItemAvailable(String itemId) async {
     final draft = _draft();
-    if (draft == null) return;
-    final now = DateTime.now();
-    final items = draft.items
-        .map((i) => i.id == itemId
-            ? i.copyWith(available: !i.available, updatedAt: now)
-            : i)
-        .toList();
-    await _save(draft.copyWith(items: items));
+    if (draft == null) return null;
+    final item = draft.items.where((i) => i.id == itemId).firstOrNull;
+    if (item == null) return null;
+    final next = !item.available;
+    await _repo.setAvailabilityLive(itemId, next);
+    return next;
+  }
+
+  /// Sets availability live (used by the item form's "Available now" switch).
+  Future<void> setItemAvailableLive(String itemId, bool available) =>
+      _repo.setAvailabilityLive(itemId, available);
+
+  /// L4: draft := what customers see now (from the publish-time snapshot).
+  Future<String?> discardDraft() async {
+    try {
+      await _repo.discardDraft(_adminUid);
+      return null;
+    } catch (e) {
+      return e.toString().replaceFirst('Bad state: ', '');
+    }
   }
 
   /// Phase 1 (Part E): turn notes on/off for every item of one section at once.
