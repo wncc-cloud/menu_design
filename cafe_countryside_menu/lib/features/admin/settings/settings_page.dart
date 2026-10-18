@@ -377,16 +377,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
                   _SectionLabel('Menu Display'),
                   const SizedBox(height: 12),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('Show "Best Sellers" tab'),
-                    subtitle: const Text(
-                      'A filter chip right after "All" showing only items '
-                      'marked as bestsellers. Hiding it here does not '
-                      'change any item\'s bestseller flag.',
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE3F2FD),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    value: _showBestsellersTab,
-                    onChanged: (v) => setState(() => _showBestsellersTab = v),
+                    child: const Text(
+                      'Best Sellers and Chef Special (names, icons, show / hide, '
+                      'order) are now managed in Sections → Special sections. '
+                      'What opens when the menu loads is chosen on the '
+                      'Promotions & pop-up page.',
+                      style: TextStyle(color: Color(0xFF0D47A1), fontSize: 13),
+                    ),
                   ),
 
                   if (_saveError != null) ...[

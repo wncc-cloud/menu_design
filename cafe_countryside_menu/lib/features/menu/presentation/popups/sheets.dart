@@ -242,7 +242,7 @@ class _ItemDetailSheetState extends ConsumerState<ItemDetailSheet> {
     final lines = ref.watch(cartProvider).where((l) => l.menuItemId == item.id);
     final qty = lines.isEmpty ? 0 : lines.first.quantity;
     final available = item.isCurrentlyAvailable;
-    final img = item.cloudinaryImageUrl;
+    final img = item.cloudinaryDetailUrl;
     final hasWindow = item.availableFrom.isNotEmpty && item.availableTill.isNotEmpty;
 
     Widget? bar;

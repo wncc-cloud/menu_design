@@ -125,7 +125,15 @@ class ItemModel {
   String? get cloudinaryImageUrl {
     if (cloudinaryPublicId.isEmpty) return null;
     return 'https://res.cloudinary.com/${AppConstants.cloudinaryCloudName}'
-        '/image/upload/c_fill,h_300,w_400,q_auto,f_auto/$cloudinaryPublicId';
+        '/image/upload/c_fill,g_auto,w_270,h_270,q_auto,f_auto/$cloudinaryPublicId';
+  }
+
+  /// Wider crop for the item detail sheet (the 270 px list thumbnail would be
+  /// blurry across a full-width banner).
+  String? get cloudinaryDetailUrl {
+    if (cloudinaryPublicId.isEmpty) return null;
+    return 'https://res.cloudinary.com/${AppConstants.cloudinaryCloudName}'
+        '/image/upload/c_fill,g_auto,w_800,h_400,q_auto,f_auto/$cloudinaryPublicId';
   }
 
   String get formattedPrice {
