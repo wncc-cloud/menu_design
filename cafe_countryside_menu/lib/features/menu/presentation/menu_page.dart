@@ -15,6 +15,10 @@ import 'menu_provider.dart';
 import 'widgets/item_card.dart';
 import 'widgets/search_bar.dart';
 import 'widgets/section_chip.dart';
+import 'popup_launcher.dart';
+import 'popup_logic.dart';
+import 'popups/sheets.dart';
+import '../../shared/models/promotion_models.dart';
 
 class MenuPage extends ConsumerStatefulWidget {
   const MenuPage({super.key});
@@ -141,6 +145,7 @@ class _MenuPageState extends ConsumerState<MenuPage> {
               )
             : Column(
                 children: [
+                  const PopupLauncher(),
                   const _CafeClosedStrip(),
                   const _OrderReminderBanner(),
                   Expanded(
@@ -233,7 +238,7 @@ class _CafeClosedStrip extends ConsumerWidget {
   }
 }
 
-class _MenuContent extends ConsumerWidget {
+class _MenuContent extends ConsumerStatefulWidget {
   final MenuSnapshotModel menu;
   final TextEditingController searchController;
   final BusinessModel? business;
@@ -245,39 +250,119 @@ class _MenuContent extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_MenuContent> createState() => _MenuContentState();
+}
+
+class _MenuContentState extends ConsumerState<_MenuContent> {
+  final _scroll = ScrollController();
+  bool _compact = false; // search bar tucked away while scrolling down
+  double _last = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  // Hide the search bar while scrolling down, bring it back on scroll up, with
+  // hysteresis so it does not flicker (about one more card visible).
+  void _onScroll() {
+    if (!_scroll.hasClients) return;
+    final y = _scroll.offset;
+    final d = y - _last;
+    final searching = widget.searchController.text.isNotEmpty;
+    if (!_compact && !searching && d > 8 && y > 140) {
+      setState(() => _compact = true);
+      _last = y;
+    } else if (_compact && (d < -24 || y < 40 || searching)) {
+      setState(() => _compact = false);
+      _last = y;
+    } else if (d.abs() > 40) {
+      _last = y;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final menu = widget.menu;
+    final business = widget.business;
     final filter = ref.watch(menuFilterProvider);
     final filteredItems = ref.watch(filteredItemsProvider);
     final screenWidth = MediaQuery.of(context).size.width;
     final isWide = screenWidth >= 720;
 
+    // Chips: [All] + visible special sections that have items (admin order)
+    // + real sections. Hiding an empty special chip is deliberate (Part A).
+    final sys = business?.resolvedSystemSections ??
+        resolveSystemSections(null, legacyShowBestsellers: true);
+    final specialChips = <SectionModel>[
+      for (final s in sys)
+        if (s.visible &&
+            itemsForChip(menu.items, s.key == chefSpecialKey ? chefSpecialChipId : bestsellersChipId).isNotEmpty)
+          SectionModel(
+            id: s.key == chefSpecialKey ? chefSpecialChipId : bestsellersChipId,
+            name: s.displayName,
+            icon: s.displayIcon,
+          ),
+    ];
+    final chipIds = {...specialChips.map((c) => c.id), ...menu.sections.map((s) => s.id)};
+    final ventures = venturesForMoreFromUs(business?.promotions ?? const [], istDateString(DateTime.now()));
+
+    // A selected chip that vanished (hidden / emptied by a refresh) falls back
+    // to All, with a one-line message instead of a silent empty list.
+    final selected = filter.selectedSectionId;
+    if (selected != null && !chipIds.contains(selected)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ref.read(menuFilterProvider.notifier).setSection(selected); // toggles off
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("That section isn't available right now — showing everything.")),
+        );
+      });
+    }
+
+    final showChipBar = specialChips.isNotEmpty || menu.sections.isNotEmpty || ventures.isNotEmpty;
+
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _CafeInfoStrip(business: business),
-        MenuSearchBar(
-          controller: searchController,
-          onChanged: (q) => ref.read(menuFilterProvider.notifier).setSearch(q),
+        ClipRect(
+          child: AnimatedAlign(
+            alignment: Alignment.topCenter,
+            heightFactor: _compact ? 0 : 1,
+            duration: const Duration(milliseconds: 180),
+            child: MenuSearchBar(
+              controller: widget.searchController,
+              onChanged: (q) => ref.read(menuFilterProvider.notifier).setSearch(q),
+            ),
+          ),
         ),
-        if (menu.sections.isNotEmpty)
+        if (showChipBar)
           SectionChipBar(
-            sections: [
-              if (business?.showBestsellersTab ?? true)
-                const SectionModel(
-                  id: bestsellersSectionId,
-                  name: 'Best Sellers',
-                  icon: '⭐',
-                ),
-              ...menu.sections,
-            ],
-            selectedId: filter.selectedSectionId,
-            onSelected: (id) =>
-                ref.read(menuFilterProvider.notifier).setSection(id),
+            sections: [...specialChips, ...menu.sections],
+            specialIds: specialChips.map((c) => c.id).toSet(),
+            selectedId: selected,
+            onSelected: (id) => ref.read(menuFilterProvider.notifier).setSection(id),
+            onMore: ventures.isEmpty ? null : () => openMoreFromUs(context, ventures),
           ),
         Expanded(
           child: filteredItems.isEmpty
               ? _EmptyItemsState(searchQuery: filter.searchQuery)
-              : _ItemsList(items: filteredItems),
+              : _ItemsList(
+                  items: filteredItems,
+                  controller: _scroll,
+                  footer: VentureFooterCard(
+                    ventures: ventures,
+                    onMore: () => openMoreFromUs(context, ventures),
+                  ),
+                ),
         ),
       ],
     );
@@ -295,6 +380,8 @@ class _MenuContent extends ConsumerWidget {
   }
 }
 
+/// One line (hours, Call, Instagram, Directions) that scrolls sideways when the
+/// owner's text is long, instead of wrapping into a tall block.
 class _CafeInfoStrip extends StatelessWidget {
   final BusinessModel? business;
 
@@ -306,26 +393,15 @@ class _CafeInfoStrip extends StatelessWidget {
     if (b == null) return const SizedBox.shrink();
 
     final items = <_StripItem>[
-      if (b.openingHours.isNotEmpty)
-        _StripItem(icon: Icons.access_time_rounded, label: b.openingHours),
-      if (b.phone.isNotEmpty)
-        _StripItem(
-          icon: Icons.phone_outlined,
-          label: b.phone,
-          url: 'tel:${b.phone}',
-        ),
+      if (b.openingHours.isNotEmpty) _StripItem(icon: Icons.access_time_rounded, label: b.openingHours),
+      if (b.phone.isNotEmpty) _StripItem(icon: Icons.phone_outlined, label: b.phone, url: 'tel:${b.phone}'),
       if (b.instagram.isNotEmpty)
         _StripItem(
           icon: Icons.camera_alt_outlined,
           label: '@${b.instagram}',
           url: 'https://instagram.com/${b.instagram}',
         ),
-      if (b.mapsUrl.isNotEmpty)
-        _StripItem(
-          icon: Icons.location_on_outlined,
-          label: 'Directions',
-          url: b.mapsUrl,
-        ),
+      if (b.mapsUrl.isNotEmpty) _StripItem(icon: Icons.location_on_outlined, label: 'Directions', url: b.mapsUrl),
     ];
 
     if (items.isEmpty) return const SizedBox.shrink();
@@ -333,38 +409,38 @@ class _CafeInfoStrip extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: const Color(0xFFE8F5E9),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Wrap(
-        spacing: 16,
-        runSpacing: 6,
-        children: items
-            .map(
-              (item) => GestureDetector(
-                onTap: item.url != null
-                    ? () => openExternalLink(item.url!)
-                    : null,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(item.icon, size: 14, color: const Color(0xFF388E3C)),
-                    const SizedBox(width: 4),
-                    Text(
-                      item.label,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: item.url != null
-                            ? const Color(0xFF1B5E20)
-                            : Colors.grey[700],
-                        decoration: item.url != null
-                            ? TextDecoration.underline
-                            : null,
-                      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            for (final item in items)
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: InkWell(
+                  onTap: item.url != null ? () => openExternalLink(item.url!) : null,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 40),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(item.icon, size: 14, color: const Color(0xFF388E3C)),
+                        const SizedBox(width: 4),
+                        Text(
+                          item.label,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: item.url != null ? const Color(0xFF1B5E20) : Colors.grey[700],
+                            decoration: item.url != null ? TextDecoration.underline : null,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            )
-            .toList(),
+          ],
+        ),
       ),
     );
   }
@@ -641,14 +717,17 @@ class _CartButton extends StatelessWidget {
 
 class _ItemsList extends StatelessWidget {
   final List<ItemModel> items;
-  const _ItemsList({required this.items});
+  final ScrollController controller;
+  final Widget footer;
+  const _ItemsList({required this.items, required this.controller, required this.footer});
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: const EdgeInsets.only(bottom: 32),
-      itemCount: items.length,
-      itemBuilder: (_, i) => ItemCard(item: items[i]),
+      controller: controller,
+      padding: const EdgeInsets.only(bottom: 16),
+      itemCount: items.length + 1,
+      itemBuilder: (_, i) => i < items.length ? ItemCard(item: items[i]) : footer,
     );
   }
 }

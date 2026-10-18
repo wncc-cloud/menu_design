@@ -13,7 +13,7 @@ class MenuSearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: const EdgeInsets.fromLTRB(12, 6, 12, 4),
       child: TextField(
         controller: controller,
         onChanged: onChanged,

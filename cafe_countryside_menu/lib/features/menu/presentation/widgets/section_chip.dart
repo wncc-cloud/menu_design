@@ -2,25 +2,32 @@ import 'package:flutter/material.dart';
 
 import '../../models/section_model.dart';
 
+/// Chip row: All, special sections (amber outline), real sections, and an
+/// optional "✨ More from us" chip that opens a sheet instead of filtering.
+/// Chips LOOK 32 px tall but each sits in a 44 px tap row.
 class SectionChipBar extends StatelessWidget {
   final List<SectionModel> sections;
+  final Set<String> specialIds;
   final String? selectedId;
   final ValueChanged<String?> onSelected;
+  final VoidCallback? onMore;
 
   const SectionChipBar({
     super.key,
     required this.sections,
     required this.selectedId,
     required this.onSelected,
+    this.specialIds = const {},
+    this.onMore,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 52,
+      height: 48,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         children: [
           _SectionChip(
             label: 'All',
@@ -31,9 +38,11 @@ class SectionChipBar extends StatelessWidget {
             (s) => _SectionChip(
               label: s.icon.isNotEmpty ? '${s.icon} ${s.name}' : s.name,
               selected: selectedId == s.id,
+              special: specialIds.contains(s.id),
               onTap: () => onSelected(s.id),
             ),
           ),
+          if (onMore != null) _SectionChip(label: '✨ More from us', outlined: true, onTap: onMore!),
         ],
       ),
     );
@@ -43,27 +52,55 @@ class SectionChipBar extends StatelessWidget {
 class _SectionChip extends StatelessWidget {
   final String label;
   final bool selected;
+  final bool special;
+  final bool outlined;
   final VoidCallback onTap;
 
   const _SectionChip({
     required this.label,
-    required this.selected,
     required this.onTap,
+    this.selected = false,
+    this.special = false,
+    this.outlined = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final side = selected
+        ? BorderSide(color: cs.primary)
+        : special
+            ? const BorderSide(color: Color(0xFFFFB300))
+            : outlined
+                ? BorderSide(color: cs.primary, width: 1.5)
+                : null;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Chip(
-          label: Text(label),
-          backgroundColor: selected ? cs.primary : null,
-          labelStyle: TextStyle(
-            color: selected ? cs.onPrimary : null,
-            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+      child: Center(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 44),
+            child: Center(
+              child: Semantics(
+                button: true,
+                selected: selected,
+                label: label,
+                excludeSemantics: true,
+                child: Chip(
+                  label: Text(label),
+                  side: side,
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  backgroundColor: selected ? cs.primary : null,
+                  labelStyle: TextStyle(
+                    color: selected ? cs.onPrimary : (outlined ? cs.primary : null),
+                    fontWeight: (selected || outlined) ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ),

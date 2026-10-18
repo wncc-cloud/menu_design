@@ -7,6 +7,7 @@ import '../../../core/services/browser_storage.dart';
 import '../../../core/services/storage_providers.dart';
 import '../data/menu_cache.dart';
 import '../data/menu_repository.dart';
+import 'popup_logic.dart';
 import '../models/item_model.dart';
 import '../models/menu_snapshot_model.dart';
 import '../../shared/models/business_model.dart';
@@ -161,15 +162,13 @@ List<ItemModel> filteredItems(Ref ref) {
     data: (menu) {
       if (menu == null) return [];
       var items = menu.items;
-      if (filter.selectedSectionId == bestsellersSectionId) {
-        items = items.where((i) => i.isBestseller).toList();
-      } else if (filter.selectedSectionId != null) {
-        items = items.where((i) => i.sectionId == filter.selectedSectionId).toList();
+      if (filter.selectedSectionId != null) {
+        items = itemsForChip(items, filter.selectedSectionId!);
       }
       if (filter.searchQuery.isNotEmpty) {
         items = items.where((i) => i.matchesSearch(filter.searchQuery)).toList();
       }
-      return items;
+      return sortAvailableFirst(items);
     },
     loading: () => [],
     error: (_, _) => [],
