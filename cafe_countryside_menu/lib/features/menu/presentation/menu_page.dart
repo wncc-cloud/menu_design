@@ -9,6 +9,7 @@ import '../models/section_model.dart';
 import '../../../core/services/external_link_service.dart';
 import '../../order/providers/cart_provider.dart';
 import '../../order/providers/cafe_status_provider.dart';
+import '../../order/providers/last_order_provider.dart';
 import '../../shared/models/business_model.dart';
 import 'menu_provider.dart';
 import 'widgets/item_card.dart';
@@ -24,6 +25,20 @@ class MenuPage extends ConsumerStatefulWidget {
 
 class _MenuPageState extends ConsumerState<MenuPage> {
   final _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // L2: tell the customer once that a saved cart was restored.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (cartRestoredNotice && mounted) {
+        cartRestoredNotice = false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('We kept your cart from earlier.')),
+        );
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -127,6 +142,7 @@ class _MenuPageState extends ConsumerState<MenuPage> {
             : Column(
                 children: [
                   const _CafeClosedStrip(),
+                  const _OrderReminderBanner(),
                   Expanded(
                     child: _MenuContent(
                       menu: menu,
@@ -142,6 +158,55 @@ class _MenuPageState extends ConsumerState<MenuPage> {
       // without scrolling back up to the AppBar's cart icon. Renders
       // nothing (SizedBox.shrink) while the cart is empty.
       bottomNavigationBar: const _BottomCartBar(),
+    );
+  }
+}
+
+/// Phase 1 (L1): a slim "your order" link so a customer who left the status
+/// page can get back to their code. Not a pop-up; never shown on other routes.
+class _OrderReminderBanner extends ConsumerWidget {
+  const _OrderReminderBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final order = ref.watch(lastOrderProvider);
+    if (order == null || !order.isVisibleAt(DateTime.now())) {
+      return const SizedBox.shrink();
+    }
+    return Material(
+      color: const Color(0xFFFFF8E1),
+      child: InkWell(
+        key: const Key('order-reminder'),
+        onTap: () => context.go('/order-status/${order.requestId}'),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 40),
+          child: Row(
+            children: [
+              const SizedBox(width: 12),
+              const Text('🧾 '),
+              Expanded(
+                child: Text(
+                  order.bannerText,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Color(0xFF6D4C00), fontSize: 13),
+                ),
+              ),
+              const Text('Show code ›',
+                  style: TextStyle(
+                      color: Color(0xFF6D4C00),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13)),
+              IconButton(
+                key: const Key('order-reminder-dismiss'),
+                tooltip: 'Hide this reminder',
+                icon: const Icon(Icons.close, size: 18, color: Color(0xFF6D4C00)),
+                onPressed: () => ref.read(lastOrderProvider.notifier).dismiss(),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

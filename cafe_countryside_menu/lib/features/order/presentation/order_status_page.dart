@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/services/external_link_service.dart';
+import '../providers/last_order_provider.dart';
 import '../providers/order_request_provider.dart';
 import '../validation.dart';
 
@@ -116,7 +117,10 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
       if (data == null) {
         // The request document is gone (dismissed / cleaned up). Only
         // meaningful once we have seen it at least once.
-        if (_status != null && _status != 'GONE') setState(() => _status = 'GONE');
+        if (_status != null && _status != 'GONE') {
+          setState(() => _status = 'GONE');
+          ref.read(lastOrderProvider.notifier).update(widget.requestId, state: LastOrderState.gone);
+        }
         return;
       }
 
@@ -133,6 +137,7 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
         _customerName = data['customerName'] as String? ?? _customerName;
         if (expiresAt != null) _expiresAt = expiresAt;
         _linkedOrderNumber = linkedOrderNumber;
+        _rememberForMenuBanner();
         if (rawLines != null) {
           _lines = rawLines.map((e) => Map<String, dynamic>.from(e as Map)).toList();
         }
@@ -181,6 +186,26 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
         });
       }
     }
+  }
+
+  /// L1: keep the menu's "your order" banner in step with what this page
+  /// already learned (no extra read). Staleness by time is the banner's job.
+  void _rememberForMenuBanner() {
+    final LastOrderState s;
+    if (_linkedOrderNumber != null) {
+      s = LastOrderState.confirmed;
+    } else if (_status == 'CLAIMED') {
+      s = LastOrderState.claimed;
+    } else {
+      s = LastOrderState.pending;
+    }
+    ref.read(lastOrderProvider.notifier).update(
+          widget.requestId,
+          code: _shortCode,
+          number: _linkedOrderNumber,
+          state: s,
+          expiresAt: _expiresAt,
+        );
   }
 
   void _placeAnotherOrder() {

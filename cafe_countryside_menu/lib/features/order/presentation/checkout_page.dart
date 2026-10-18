@@ -13,6 +13,7 @@ import '../cart_revalidation.dart';
 import '../models/cart_line.dart';
 import '../providers/cafe_status_provider.dart';
 import '../providers/cart_provider.dart';
+import '../providers/last_order_provider.dart';
 import '../providers/order_request_provider.dart';
 import '../validation.dart';
 import 'widgets/honeypot_field.dart';
@@ -186,6 +187,12 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
       final requestId = await repo.createRequest(payload);
       if (!mounted) return;
       ref.read(cartProvider.notifier).clear();
+      ref.read(lastOrderProvider.notifier).saveNew(
+            requestId: requestId,
+            code: payload['shortCode'] as String,
+            placedAt: now,
+            expiresAt: expiresAt,
+          );
       context.go('/order-status/$requestId');
     } on AppCheckTokenException catch (e) {
       // phase_plan/phase11_6.md — a distinct, non-retry message; no

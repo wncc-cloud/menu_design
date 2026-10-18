@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/time_format.dart';
 import '../../../order/providers/cart_provider.dart';
 import '../../models/item_model.dart';
 import '../menu_provider.dart';
@@ -356,7 +357,7 @@ class _UnavailableBadge extends StatelessWidget {
         border: Border.all(color: Colors.grey.shade400),
       ),
       child: Text(
-        showWindow ? 'Available $from–$till' : 'Unavailable',
+        showWindow ? 'Available ${format12h(from)}–${format12h(till)}' : 'Unavailable',
         style: TextStyle(
           fontSize: 11,
           color: Colors.grey[600],

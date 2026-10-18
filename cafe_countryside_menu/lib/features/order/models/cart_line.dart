@@ -55,6 +55,27 @@ class OrderCartLine {
         readyNow: readyNow,
       );
 
+  /// Restores a line saved by [toWireMap] (cart persistence, L2). Returns null
+  /// for anything malformed so a corrupt saved cart is ignored, not crashed on.
+  static OrderCartLine? tryFromStorageMap(Object? raw) {
+    if (raw is! Map) return null;
+    final id = raw['menuItemId'];
+    final name = raw['name'];
+    final price = raw['unitPricePaise'];
+    final qty = raw['quantity'];
+    if (id is! String || id.isEmpty || name is! String) return null;
+    if (price is! int || price <= 0 || qty is! int || qty <= 0) return null;
+    final notes = raw['notes'];
+    return OrderCartLine(
+      menuItemId: id,
+      name: name,
+      unitPricePaise: price,
+      quantity: qty,
+      notes: notes is String && notes.isNotEmpty ? notes : null,
+      requiresKitchen: raw['requiresKitchen'] is bool ? raw['requiresKitchen'] as bool : true,
+    );
+  }
+
   Map<String, dynamic> toWireMap() => {
         'menuItemId': menuItemId,
         'name': name,
