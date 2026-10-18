@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/models/draft_section_model.dart';
 import '../../shared/widgets/publish_banner.dart';
 import '../auth/auth_provider.dart';
+import 'widgets/special_sections_block.dart';
 import 'sections_provider.dart';
 import 'widgets/section_form.dart';
 
@@ -121,7 +122,9 @@ class _SectionsPageState extends ConsumerState<SectionsPage> {
                 }
                 final sections = draft.sortedSections;
                 if (sections.isEmpty) {
-                  return Center(
+                  return ListView(children: [
+                    const SpecialSectionsBlock(),
+                    Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -140,10 +143,12 @@ class _SectionsPageState extends ConsumerState<SectionsPage> {
                         ],
                       ],
                     ),
-                  );
+                  ),
+                  ]);
                 }
                 if (canManage) {
                   return ReorderableListView.builder(
+                    header: const SpecialSectionsBlock(),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: sections.length,
                     onReorderItem: (oldIndex, newIndex) {
@@ -171,9 +176,10 @@ class _SectionsPageState extends ConsumerState<SectionsPage> {
                 }
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: sections.length,
+                  itemCount: sections.length + 1,
                   itemBuilder: (context, index) {
-                    final s = sections[index];
+                    if (index == 0) return const SpecialSectionsBlock();
+                    final s = sections[index - 1];
                     return _SectionTile(
                       key: ValueKey(s.id),
                       section: s,

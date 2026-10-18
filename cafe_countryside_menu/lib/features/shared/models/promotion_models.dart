@@ -36,7 +36,7 @@ class SystemSection {
 
   static String defaultName(String key) =>
       key == chefSpecialKey ? 'Chef Special' : 'Best Sellers';
-  static String defaultIcon(String key) => key == chefSpecialKey ? '👨‍🍳' : '⭐';
+  static String defaultIcon(String key) => key == chefSpecialKey ? '🍳' : '⭐';
 
   /// Name as shown: trimmed, whitespace collapsed, capped; empty = default.
   String get displayName {

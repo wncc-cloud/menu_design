@@ -8,6 +8,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../menu/models/menu_snapshot_model.dart';
 import '../../menu/presentation/menu_provider.dart';
+import '../../menu/presentation/popup_logic.dart';
+import '../../shared/models/business_model.dart';
 import '../../order/providers/cafe_status_provider.dart';
 import '../sections/sections_provider.dart';
 import '../auth/auth_provider.dart';
@@ -22,6 +24,15 @@ String _formatDateTime(DateTime dt) {
   final ampm = dt.hour >= 12 ? 'PM' : 'AM';
   final min = dt.minute.toString().padLeft(2, '0');
   return '${months[dt.month - 1]} ${dt.day}, ${dt.year}  $hour:$min $ampm';
+}
+
+String _dashChoiceLabel(BusinessModel b, MenuSnapshotModel menu) {
+  final c = b.firstLoadPopup;
+  if (c.choice == 'rotate') return 'rotating promotions';
+  if (c.promoId != null) {
+    return b.promotions.where((p) => p.id == c.promoId).firstOrNull?.displayName ?? 'a promotion';
+  }
+  return sectionChoiceLabel(b, menu, c.choice);
 }
 
 /// Phase 1 (L7): "what will customers see today?" in one place.
@@ -44,6 +55,16 @@ class _TodayAtAGlance extends ConsumerWidget {
       loading: () => 'Checking…',
       error: (_, _) => 'Unknown',
     );
+
+    final menu = ref.watch(menuControllerProvider).asData?.value;
+    final biz = business.asData?.value;
+    String popupLine = 'Checking…';
+    if (biz != null && menu != null) {
+      final d = decidePopup(business: biz, menu: menu, cafeOpen: cafe.asData?.value, now: DateTime.now());
+      popupLine = biz.firstLoadPopup.isNone
+          ? 'Nothing opens on load'
+          : (d.opens ? 'Live: ${_dashChoiceLabel(biz, menu)}' : 'Not opening: ${d.blockedReason ?? 'see Promotions'}');
+    }
 
     Widget row(String label, String value) => Padding(
           padding: const EdgeInsets.symmetric(vertical: 3),
@@ -72,6 +93,7 @@ class _TodayAtAGlance extends ConsumerWidget {
           const SizedBox(height: 6),
           row('Self-ordering', ordering),
           row('Café status (from the counter)', cafeText),
+          row('First-load pop-up', popupLine),
           row('Menu changes', changes ? 'Unpublished changes waiting' : 'All published'),
         ],
       ),
@@ -229,6 +251,13 @@ class DashboardPage extends ConsumerWidget {
                     title: 'Items',
                     subtitle: 'Add and edit menu items with pricing',
                     onTap: () => context.push('/admin/items'),
+                  ),
+                  const SizedBox(height: 8),
+                  _NavCard(
+                    icon: Icons.campaign_outlined,
+                    title: 'Promotions & pop-up',
+                    subtitle: 'What opens on load, closed card, other businesses',
+                    onTap: () => context.push('/admin/promotions'),
                   ),
                   const SizedBox(height: 8),
                   _NavCard(
