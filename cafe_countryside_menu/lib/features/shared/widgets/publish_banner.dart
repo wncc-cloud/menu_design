@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../admin/auth/auth_provider.dart';
 import '../../admin/sections/sections_provider.dart';
 
 class PublishBanner extends ConsumerWidget {
@@ -10,6 +11,8 @@ class PublishBanner extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final hasChanges = ref.watch(hasUnpublishedChangesProvider);
     final notifier = ref.watch(draftProvider);
+    // K.7 #2: the role check existed (canPublish) but the banner ignored it.
+    final canPublish = ref.watch(permissionServiceProvider)?.canPublish ?? false;
 
     if (!hasChanges) return const SizedBox.shrink();
 
@@ -23,10 +26,12 @@ class PublishBanner extends ConsumerWidget {
             children: [
               const Icon(Icons.circle, size: 10, color: Colors.white),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Unsaved changes — Publish to go live',
-                  style: TextStyle(
+                  canPublish
+                      ? 'Unsaved changes — Publish to go live'
+                      : 'Unpublished changes — a manager or owner must Publish',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
@@ -34,7 +39,9 @@ class PublishBanner extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              if (notifier.isLoading)
+              if (!canPublish)
+                const SizedBox.shrink()
+              else if (notifier.isLoading)
                 const SizedBox(
                   width: 20,
                   height: 20,

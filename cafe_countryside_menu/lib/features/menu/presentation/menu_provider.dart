@@ -78,7 +78,11 @@ class MenuController extends _$MenuController {
     });
     final repo = ref.read(menuRepositoryProvider);
     final store = ref.read(localStoreProvider);
-    if (!_cacheServed) {
+    // Only the customer menu route may use the saved copy; admin pages share
+    // this controller and must always see the live menu.
+    final path = Uri.base.path;
+    final customerMenuRoute = path.isEmpty || path == '/';
+    if (!_cacheServed && customerMenuRoute) {
       _cacheServed = true;
       final cached = readMenuCache(store);
       if (cached != null) {

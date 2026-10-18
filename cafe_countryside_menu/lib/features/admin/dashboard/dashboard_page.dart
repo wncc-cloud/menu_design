@@ -8,6 +8,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../menu/models/menu_snapshot_model.dart';
 import '../../menu/presentation/menu_provider.dart';
+import '../../order/providers/cafe_status_provider.dart';
+import '../sections/sections_provider.dart';
 import '../auth/auth_provider.dart';
 import '../../shared/widgets/publish_banner.dart';
 
@@ -20,6 +22,61 @@ String _formatDateTime(DateTime dt) {
   final ampm = dt.hour >= 12 ? 'PM' : 'AM';
   final min = dt.minute.toString().padLeft(2, '0');
   return '${months[dt.month - 1]} ${dt.day}, ${dt.year}  $hour:$min $ampm';
+}
+
+/// Phase 1 (L7): "what will customers see today?" in one place.
+class _TodayAtAGlance extends ConsumerWidget {
+  const _TodayAtAGlance();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final business = ref.watch(businessProvider);
+    final cafe = ref.watch(cafeOpenProvider);
+    final changes = ref.watch(hasUnpublishedChangesProvider);
+
+    final ordering = business.when(
+      data: (b) => (b?.selfOrderEnabled ?? false) ? 'On' : 'Off',
+      loading: () => 'Checking…',
+      error: (_, _) => 'Unknown',
+    );
+    final cafeText = cafe.when(
+      data: (open) => open == null ? 'Unknown' : (open ? 'Open' : 'Closed'),
+      loading: () => 'Checking…',
+      error: (_, _) => 'Unknown',
+    );
+
+    Widget row(String label, String value) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 3),
+          child: Row(
+            children: [
+              Expanded(child: Text(label, style: TextStyle(color: Colors.grey[700]))),
+              Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+        );
+
+    return Container(
+      key: const Key('today-at-a-glance'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFA5D6A7)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Today at a glance',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+          const SizedBox(height: 6),
+          row('Self-ordering', ordering),
+          row('Café status (from the counter)', cafeText),
+          row('Menu changes', changes ? 'Unpublished changes waiting' : 'All published'),
+        ],
+      ),
+    );
+  }
 }
 
 class DashboardPage extends ConsumerWidget {
@@ -105,6 +162,8 @@ class DashboardPage extends ConsumerWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 20),
+                    const _TodayAtAGlance(),
                     const SizedBox(height: 32),
                   ],
                   Text(
