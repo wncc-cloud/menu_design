@@ -229,9 +229,9 @@ class _CafeClosedStrip extends ConsumerWidget {
       key: const Key('menu-cafe-closed-strip'),
       width: double.infinity,
       color: const Color(0xFFFFEBEE),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: const Text(
-        "We're closed right now — you can browse the menu, but we can't take orders until we open.",
+        "We're closed right now. You can browse but can't order.",
         style: TextStyle(color: Color(0xFFB71C1C), fontWeight: FontWeight.w600, fontSize: 13),
       ),
     );

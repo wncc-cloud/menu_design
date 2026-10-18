@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/services/external_link_service.dart';
 import '../providers/last_order_provider.dart';
+import 'widgets/while_you_wait_card.dart';
 import '../providers/order_request_provider.dart';
 import '../validation.dart';
 
@@ -267,6 +268,7 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
               _OrderRecap(lines: _lines!, orderNotes: _orderNotes),
               const SizedBox(height: 12),
             ],
+            const WhileYouWaitCard(),
             const _CleanupNudge(),
             const SizedBox(height: 12),
             OutlinedButton.icon(
@@ -328,9 +330,15 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
               "it's placed. You don't need to order again.",
         ),
         subtitle: 'This page updates by itself.',
-        extra: (_lines != null && _lines!.isNotEmpty)
-            ? _OrderRecap(lines: _lines!, orderNotes: _orderNotes)
-            : null,
+        extra: Column(
+          children: [
+            if (_lines != null && _lines!.isNotEmpty) ...[
+              _OrderRecap(lines: _lines!, orderNotes: _orderNotes),
+              const SizedBox(height: 12),
+            ],
+            const WhileYouWaitCard(),
+          ],
+        ),
       );
     }
 
@@ -361,7 +369,7 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
         icon: Icons.timer_off_outlined,
         iconColor: Colors.grey,
         title: 'This order request has expired.',
-        subtitle: 'If the cashier already has your order it will appear here shortly. '
+        subtitle: 'If the cashier already has your order, reload this page to check. '
             'Otherwise please place your order again, or tell the cashier directly at the counter.',
         button: FilledButton(
           onPressed: _placeAnotherOrder,
@@ -416,6 +424,7 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
             _OrderRecap(lines: _lines!, orderNotes: _orderNotes),
             const SizedBox(height: 12),
           ],
+          const WhileYouWaitCard(),
           const _StepTracker(),
         ],
       ),

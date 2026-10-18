@@ -319,6 +319,38 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
         foregroundColor: Colors.white,
         title: const Text('Checkout', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
+      // Phase 1 (J.8): Place Order is a sticky bottom bar so it is always
+      // visible, however long the cart or the form. Greyed and inert while the
+      // café is closed (the closed banner explains why).
+      bottomNavigationBar: (selfOrderEnabled && cart.isNotEmpty)
+          ? SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                child: FilledButton(
+                  onPressed: (_submitting || cafeClosed)
+                      ? null
+                      : () => _submit(cart, expiryMinutes, tableNumberEnabled, orderNoteEnabled),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF2E7D32),
+                    minimumSize: const Size.fromHeight(52),
+                  ),
+                  child: _submitting
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Place Order'),
+                            Text('₹${(subtotalPaise / 100).toStringAsFixed(2)} →'),
+                          ],
+                        ),
+                ),
+              ),
+            )
+          : null,
       body: !selfOrderEnabled
           ? const Center(
               child: Padding(
@@ -472,23 +504,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                       const SizedBox(height: 16),
                       Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
                     ],
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: (_submitting || cafeClosed)
-                            ? null
-                            : () => _submit(cart, expiryMinutes, tableNumberEnabled, orderNoteEnabled),
-                        style: FilledButton.styleFrom(backgroundColor: const Color(0xFF2E7D32)),
-                        child: _submitting
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                              )
-                            : const Text('Place Order'),
-                      ),
-                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
