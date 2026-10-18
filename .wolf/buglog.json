@@ -712,6 +712,52 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-10-18T19:09:12.133547"
+    },
+    {
+      "id": "bug-045",
+      "timestamp": "2026-10-18T19:53:00.530203",
+      "error_message": "Stale promotions Save showed 'Could not save: Error: Dart exception: Someone else changed...' and did not reload",
+      "file": "cafe_countryside_menu/lib/features/admin/shared_admin_business_provider.dart",
+      "root_cause": "Firestore web SDK wraps exceptions thrown inside a transaction callback, so `on StaleWriteException` never matched",
+      "fix": "match the message text as well and reload",
+      "tags": [
+        "firestore",
+        "transaction",
+        "web"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T19:53:00.530203"
+    },
+    {
+      "id": "bug-046",
+      "timestamp": "2026-10-18T19:53:00.530203",
+      "error_message": "ListTile background color or ink splashes may be invisible (While you wait card)",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/widgets/while_you_wait_card.dart",
+      "root_cause": "ExpansionTile inside a decorated Container hides the ink",
+      "fix": "wrap in Material with shape instead of Container decoration",
+      "tags": [
+        "flutter",
+        "widget-test"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T19:53:00.530203"
+    },
+    {
+      "id": "bug-047",
+      "timestamp": "2026-10-18T19:53:00.530203",
+      "error_message": "Rules test polluted the app: PATCH menu/lastPublishedDraft with schemaVersion only made the banner show 7 changes",
+      "file": "cafe_countryside_menu/lib/features/shared/repositories/draft_repository.dart",
+      "root_cause": "a snapshot doc without an items array was treated as a real snapshot",
+      "fix": "require the items key (watch + discard)",
+      "tags": [
+        "firestore",
+        "discard"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T19:53:00.530203"
     }
   ]
 }

@@ -751,6 +751,29 @@ Priority = value to the café × how cheap it is. All use the browser-storage he
 
 ---
 
+## J.16 Build log (rev 10, 2026-10-18) — Phase 1 built and tested locally
+
+**Status:** releases 1a, 1b and 1c are implemented on `phase1-planning` (not deployed). `flutter analyze`: only the 2 existing `dart:html` infos. 186 tests pass. Verified in a release web build against a local Firestore + Auth emulator (seeded menu, owner/manager/staff admins) and, for 1a, against the real menu read-only.
+
+**Spike S1 result (Back vs pop-ups): Plan A works.** Pop-ups are real go_router routes (`/popup`, opened with `context.push(..., extra: PopupSpec)`; a cold load of `/popup` redirects to `/`). On desktop Chrome, `history.back()` with a pop-up open closed it, stayed on the menu and kept the same document (no reload). **Still to verify by hand on a real Android Chrome and iOS Safari** before release. No hand-written popstate code exists.
+
+**Decisions made while building (deviations from the text above):**
+1. The business-doc display subset cache (J.15 #4) was **not** built; `businessProvider` stays fail-closed, so on a repeat visit the cached menu paints first and ADD / cart icon / café name appear when the business doc arrives.
+2. Sheets are fixed-height `SheetFrame`s with swipe-down-on-header, not `DraggableScrollableSheet` (no gesture conflict with the inner list). Item detail: handle tap toggles 62 % / 92 %.
+3. Default Chef Special icon is 🍳 (the 👨‍🍳 ZWJ sequence rendered as tofu on a machine without emoji fonts).
+4. `lastPublishedDraft` lives at `menu/lastPublishedDraft`; rules make it admin-only to read (it contains hidden items), staff may write it (the live sold-out transaction).
+5. Stale-write detection for `promotions` / `systemSections` uses a revision counter in a transaction; the web SDK wraps the thrown exception, so the message is matched as well.
+6. Cart restore keeps lines only (the whole-order note text is not persisted).
+7. Expired status copy now says "reload this page to check" (K.7 #1, assumed yes).
+8. Admin sign-in on a full page reload at an `/admin/...` URL goes back to the login page (existing router behaviour, not changed).
+9. `main.dart` accepts `FIRESTORE_EMULATOR_PORT` / `AUTH_EMULATOR_PORT` dart-defines (default unchanged) so the local emulator can run on free ports.
+
+**Verified in the browser (emulator build):** promo pop-up opens, auto-closes after 8 s with the shrinking bar; Chef Special section pop-up (no Chef badge inside, Best Sellers badge kept, unavailable item sunk with "Available 11 PM–11:30 PM"); More from us sheet; footer card; special chips with the admin's names; Back closes a pop-up; Dashboard "Today at a glance"; Promotions page (live frequency write, samples blocked from being enabled, Save bumps `promotionsRev`, a stale Save is refused, "Discard changes?" on leaving); Sections special block; publish writes the snapshot; the sold-out switch updates `menu/current`, the draft and the snapshot in one go and bumps `menuVersion`, without counting as a change; Discard restores a hidden item and keeps the sold-out state; Firestore rules (owner / manager write `businesses`, staff refused, staff write `menu/*`, snapshot not public).
+
+**Not verified (needs a real device / the real counter):** iOS Safari and Android Chrome Back; café-closed card on a real closed status (covered by logic + widget tests only); a real order through the POS (status page + order banner end to end); Cloudinary promo upload; App Check timing; production cache headers.
+
+---
+
 ## Open questions for the owner
 
 **Resolved (2026-10-07):**

@@ -456,3 +456,40 @@
 | 19:07 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/spa_server.py | — | ~181 |
 
 | 19:09 | Phase 1 release 1a built: splash+headers, storage helper, field-scoped settings, note controls, 12h times, cart persistence, order banner, shimmer+menu cache, staff publish fix, dashboard glance | cafe_countryside_menu/** | 142 tests pass, analyze 2 infos, release build tested in Chrome | ~ |
+| 19:09 | Session end: 34 writes across 12 files (phase1.md, phase1_wireframe.html, phase1_prompts.md, notes_controls_test.dart, last_order_provider.dart) | 4 reads | ~74219 tok |
+| 19:16 | Created cafe_countryside_menu/lib/features/shared/models/promotion_models.dart | — | ~3898 |
+| 19:17 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/b2.py | — | ~2613 |
+| 19:17 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/emu/rules_test.mjs | — | ~569 |
+| 19:19 | Created cafe_countryside_menu/lib/features/menu/presentation/popup_logic.dart | — | ~2319 |
+| 19:19 | Created cafe_countryside_menu/test/popup_logic_test.dart | — | ~3003 |
+| 19:21 | Created cafe_countryside_menu/lib/features/menu/presentation/popups/promo_links.dart | — | ~617 |
+| 19:21 | Created cafe_countryside_menu/lib/features/menu/presentation/popups/popup_route.dart | — | ~439 |
+| 19:21 | Created cafe_countryside_menu/lib/features/menu/presentation/popups/sheet_frame.dart | — | ~1000 |
+| 19:22 | Created cafe_countryside_menu/lib/features/menu/presentation/popups/promo_popup.dart | — | ~3200 |
+| 19:25 | Created cafe_countryside_menu/lib/features/menu/presentation/popups/sheets.dart | — | ~3978 |
+| 19:26 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/item_card_new.dart.txt | — | ~2607 |
+| 19:26 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/merge_card.py | — | ~315 |
+| 19:26 | Created cafe_countryside_menu/lib/features/menu/presentation/popup_launcher.dart | — | ~1657 |
+| 19:26 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/b3.py | — | ~401 |
+| 19:27 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/menu_content_new.dart.txt | — | ~1947 |
+| 19:27 | Created cafe_countryside_menu/lib/features/menu/presentation/widgets/section_chip.dart | — | ~879 |
+| 19:27 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/b3b.py | — | ~648 |
+| 19:29 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/emu/seed.mjs | — | ~971 |
+| 19:34 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/b4.py | — | ~1598 |
+| 19:34 | Created cafe_countryside_menu/lib/features/admin/shared_admin_business_provider.dart | — | ~678 |
+| 19:34 | Created cafe_countryside_menu/lib/features/admin/sections/widgets/special_sections_block.dart | — | ~2840 |
+| 19:34 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/b4b.py | — | ~616 |
+| 19:36 | Created cafe_countryside_menu/lib/features/admin/promotions/promotions_page.dart | — | ~7970 |
+| 19:36 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/b6.py | — | ~916 |
+| 19:37 | Created cafe_countryside_menu/lib/features/order/presentation/widgets/while_you_wait_card.dart | — | ~772 |
+| 19:37 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/b7.py | — | ~737 |
+| 19:37 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/b8.py | — | ~831 |
+| 19:39 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/c1.py | — | ~1944 |
+| 19:40 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/c2.py | — | ~1643 |
+| 19:40 | Created cafe_countryside_menu/lib/features/shared/widgets/publish_banner.dart | — | ~1195 |
+| 19:41 | Created cafe_countryside_menu/test/draft_diff_test.dart | — | ~1143 |
+| 19:44 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/emu/seed_admins.mjs | — | ~414 |
+| 19:50 | Created cafe_countryside_menu/test/popup_widgets_test.dart | — | ~2344 |
+| 19:52 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/docs.py | — | ~1855 |
+
+| 19:53 | Phase 1 releases 1b + 1c built (popups as go_router routes, promotions page, special sections, discard, live availability, rules) and tested in emulator browser | cafe_countryside_menu/** | 186 tests pass, analyze 2 infos | ~ |
