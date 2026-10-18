@@ -11,6 +11,8 @@ class PermissionService {
   bool get canManagePrices => _ownerOrManager;
   bool get canManageTimings => _ownerOrManager;
   bool get canPublish => _ownerOrManager;
+  // Phase 1: promotions / first-load pop-up are customer-facing ad space.
+  bool get canManagePromotions => _ownerOrManager;
   bool get canManageBusinessSettings => admin.role == AdminRole.owner;
   bool get canManageAdmins => admin.role == AdminRole.owner;
   // All roles (owner, manager, staff) can toggle item availability.

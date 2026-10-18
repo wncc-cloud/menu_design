@@ -21,7 +21,7 @@ class SettingsNotifier extends _$SettingsNotifier {
     try {
       await ref
           .read(settingsBusinessRepositoryProvider)
-          .saveBusiness(business);
+          .saveSettings(business);
       state = AsyncValue.data(business);
       return null;
     } catch (e) {

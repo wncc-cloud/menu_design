@@ -9,7 +9,13 @@ import '../menu_provider.dart';
 class ItemCard extends ConsumerStatefulWidget {
   final ItemModel item;
 
-  const ItemCard({super.key, required this.item});
+  /// Phase 1 (Part B): true when the card is shown inside a modal pop-up.
+  /// The floating "Added X to cart" snackbar is suppressed there because it
+  /// would appear behind the barrier / over the pop-up's "View Cart" button;
+  /// the stepper and the pop-up's own CTA already show the change.
+  final bool inPopup;
+
+  const ItemCard({super.key, required this.item, this.inPopup = false});
 
   @override
   ConsumerState<ItemCard> createState() => _ItemCardState();
@@ -27,6 +33,7 @@ class _ItemCardState extends ConsumerState<ItemCard> {
     HapticFeedback.lightImpact();
     ref.read(cartProvider.notifier).addItem(widget.item);
     setState(() => _pulseKey++);
+    if (widget.inPopup) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(

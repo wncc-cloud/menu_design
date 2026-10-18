@@ -46,6 +46,11 @@ class BusinessModel {
   /// counter) and never wants to ask for one.
   final bool tableNumberEnabled;
 
+  /// Phase 1 (Part E): admin switch for the whole-order note on checkout.
+  /// Defaults to `true` (today's behavior — the note field is always shown),
+  /// so deploying never silently removes the feature.
+  final bool orderNoteEnabled;
+
   final DateTime? updatedAt;
 
   const BusinessModel({
@@ -62,6 +67,7 @@ class BusinessModel {
     this.showBestsellersTab = true,
     this.selfOrderEnabled = false,
     this.tableNumberEnabled = true,
+    this.orderNoteEnabled = true,
     this.updatedAt,
   });
 
@@ -91,6 +97,7 @@ class BusinessModel {
         showBestsellersTab: json['showBestsellersTab'] as bool? ?? true,
         selfOrderEnabled: json['selfOrderEnabled'] as bool? ?? false,
         tableNumberEnabled: json['tableNumberEnabled'] as bool? ?? true,
+        orderNoteEnabled: json['orderNoteEnabled'] as bool? ?? true,
         updatedAt: (json['updatedAt'] as Timestamp?)?.toDate(),
       );
 
@@ -108,6 +115,7 @@ class BusinessModel {
         'showBestsellersTab': showBestsellersTab,
         'selfOrderEnabled': selfOrderEnabled,
         'tableNumberEnabled': tableNumberEnabled,
+        'orderNoteEnabled': orderNoteEnabled,
         if (updatedAt != null) 'updatedAt': Timestamp.fromDate(updatedAt!),
       };
 
@@ -125,6 +133,7 @@ class BusinessModel {
     bool? showBestsellersTab,
     bool? selfOrderEnabled,
     bool? tableNumberEnabled,
+    bool? orderNoteEnabled,
     DateTime? updatedAt,
   }) =>
       BusinessModel(
@@ -141,6 +150,25 @@ class BusinessModel {
         showBestsellersTab: showBestsellersTab ?? this.showBestsellersTab,
         selfOrderEnabled: selfOrderEnabled ?? this.selfOrderEnabled,
         tableNumberEnabled: tableNumberEnabled ?? this.tableNumberEnabled,
+        orderNoteEnabled: orderNoteEnabled ?? this.orderNoteEnabled,
         updatedAt: updatedAt ?? this.updatedAt,
       );
+
+  /// The ONLY fields the Settings page edits. Settings saves just these
+  /// (Part A write path) so a stale Settings page can never write back
+  /// newer values of fields owned by other pages (sections, promotions…).
+  Map<String, dynamic> settingsFields() => {
+        'cafeName': cafeName,
+        'logoUrl': logoUrl,
+        'logoCloudinaryId': logoCloudinaryId,
+        'phone': phone,
+        'instagram': instagram,
+        'mapsUrl': mapsUrl,
+        'openingHours': openingHours,
+        'orderRequestExpiryMinutes': orderRequestExpiryMinutes,
+        'showBestsellersTab': showBestsellersTab,
+        'selfOrderEnabled': selfOrderEnabled,
+        'tableNumberEnabled': tableNumberEnabled,
+        'orderNoteEnabled': orderNoteEnabled,
+      };
 }
