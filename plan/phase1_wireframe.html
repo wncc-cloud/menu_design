@@ -1,0 +1,1468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 1 — Clickable prototype (rev 6: includes existing app screens)</title>
+<style>
+:root{--g:#2E7D32;--g2:#1B5E20;--gl:#E8F5E9;--bg:#F1F8E9;--ink:#1b1b1b;--mut:#6b6b6b;--line:#dcdcdc;--warn:#B71C1C;--warnbg:#FFEBEE;--amber:#E65100;--page:#e9edf0;--dim:#0009}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--page);color:var(--ink);font-size:14px}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit}
+.top{background:#263238;color:#fff;display:flex;align-items:center;gap:14px;padding:8px 16px;flex-wrap:wrap}
+.top h1{font-size:15px;margin:0;font-weight:600}
+.seg{display:inline-flex;border:1px solid #607d8b;border-radius:8px;overflow:hidden}
+.seg button{background:transparent;color:#cfd8dc;border:0;padding:6px 14px}
+.seg button.on{background:#fff;color:#263238;font-weight:700}
+.layout{display:flex;gap:20px;padding:16px;align-items:flex-start;justify-content:center;flex-wrap:wrap}
+.stage{flex:none}
+.side{width:380px;max-width:100%;flex:none}
+.panel{background:#fff;border:1px solid #cfd8dc;border-radius:12px;padding:12px;margin-bottom:12px}
+.panel h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#455a64}
+.panel label{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;font-size:13px}
+.panel .res{border-radius:8px;padding:8px 10px;font-size:13px;border:1px solid #cfd8dc}
+.panel .res.yes{background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20}
+.panel .res.no{background:#eceff1;color:#455a64}
+.panel .steps{list-style:none;margin:6px 0 0;padding:0;font-size:12px}
+.panel .steps li{padding:2px 0;display:flex;gap:6px}
+.panel .steps li.ok b{color:#2e7d32}.panel .steps li.no b{color:#c62828}.panel .steps li.skip,.panel .steps li.info{color:#607d8b}
+.panel .sub2{margin:10px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#455a64;font-weight:700}
+.panel .sub2 span{text-transform:none;letter-spacing:0;font-weight:400}
+.panel .pt{width:100%;border-collapse:collapse;font-size:12px}
+.panel .pt td{padding:3px 0;vertical-align:top;border-top:1px solid #eceff1}
+.panel .pt small{display:block;color:#78909c}
+.panel .pt .mk{color:#1b5e20;margin-left:4px}
+.panel input[type=date]{font:inherit;font-size:12px}
+.panel .btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.pbtn{border:1px solid #90a4ae;background:#fff;border-radius:7px;padding:5px 9px;font-size:12px}
+.pbtn:hover{background:#eceff1}
+.try li{margin:5px 0;font-size:12.5px;color:#37474f}
+.tiny{font-size:11.5px;color:var(--mut)}
+
+/* ===== device ===== */
+.device{width:390px;height:min(800px,calc(100vh - 110px));min-height:560px;border:9px solid #263238;border-radius:34px;background:var(--bg);position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 10px 30px #0004;transition:width .2s}
+.device.wide{width:min(860px,100%);height:min(640px,calc(100vh - 110px));border-radius:14px}
+.appbar{background:var(--g);color:#fff;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-weight:700;flex:none}
+.appbar .ttl{flex:1;text-align:center;font-size:15px;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib{background:transparent;border:0;color:#fff;font-size:19px;width:44px;height:44px;border-radius:50%;position:relative}
+.ib:hover{background:#ffffff22}
+.cnt{position:absolute;top:2px;right:0;background:#d32f2f;color:#fff;border-radius:99px;font-size:10px;padding:1px 5px;font-weight:700}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;position:relative}
+.col{max-width:700px;margin:0 auto}
+.strip{background:var(--gl);padding:0 12px;font-size:11px;color:var(--g2);display:flex;flex-wrap:nowrap;gap:0 6px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;align-items:center;min-height:30px;-webkit-mask-image:linear-gradient(90deg,#000 96%,transparent);mask-image:linear-gradient(90deg,#000 96%,transparent)}
+.strip::-webkit-scrollbar{display:none}
+.strip a{color:var(--g2);text-decoration:underline;cursor:pointer;padding:14px 2px;margin:-14px 0}
+.chip.more{border-color:var(--g);color:var(--g2);font-weight:700}
+.morepill{background:#fff;border:1.5px solid var(--g);color:var(--g2);border-radius:99px;padding:0 14px;min-height:48px;font-weight:700}
+.stat{display:inline-block;font-size:10.5px;border-radius:99px;padding:1px 7px;margin-left:6px;background:#eceff1;color:#455a64;border:1px solid #cfd8dc;white-space:nowrap}
+.stat.live{background:#e8f5e9;color:#1b5e20;border-color:#a5d6a7}
+.cnt2{float:right;color:#9e9e9e;font-size:11px}
+.closedstrip{background:var(--warnbg);color:var(--warn);font-weight:600;font-size:12px;padding:7px 12px}
+.search{margin:6px 12px;display:flex;align-items:center;background:#fff;border:1px solid var(--line);border-radius:99px;padding:0 12px}
+.search input{border:0;outline:0;flex:1;padding:6px 6px;background:transparent}
+.chips{display:flex;gap:6px;padding:2px 12px 6px;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 12px;min-height:32px;line-height:1.2;font-size:13px;flex:none;position:relative}
+.chip::after{content:"";position:absolute;left:-2px;right:-2px;top:-6px;bottom:-6px}/* invisible 44 px touch area, chip looks 32 px */
+.chip.on{background:var(--g);color:#fff;border-color:var(--g)}
+.chip.sp{border-color:#ffb300}
+.sticky{position:sticky;top:0;background:var(--bg);z-index:3}
+.item{display:flex;gap:10px;background:#fff;border-radius:12px;margin:4px 12px;padding:10px;box-shadow:0 1px 3px #0002;transition:box-shadow .15s,border-color .15s;border:2px solid transparent}
+.item.sel{border-color:#81c784;box-shadow:0 2px 8px #2e7d3233}
+.item.na{opacity:.6}
+.item .t{flex:1;min-width:0}
+.item .n{font-weight:700;font-size:14.5px}
+.item{cursor:pointer}
+.item .p{margin:2px 0 0;color:#37474f;font-weight:700}
+.item .rc{position:relative;width:108px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.item .rc.hasimg{padding-bottom:18px}
+.item .rc.hasimg .ctl{position:absolute;bottom:0;left:50%;transform:translateX(-50%)}
+.item .rc .add,.item .rc .step{margin-top:0;box-shadow:0 2px 6px #0003}
+.item .rc .add{padding:0;width:84px;min-height:44px}
+.item .rc .step button{width:40px}
+.item .d.two{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.item .bd{margin:2px 0 0}
+.item .badge{margin-left:0;margin-right:4px}
+.item .ing{display:none;color:#9e9e9e;font-size:12px;font-style:italic;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .img{width:78px;height:78px}
+.device.cur .item{margin:6px 12px;padding:12px}
+.device.cur .item .d{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.device.cur .item .ing{display:block}
+.device.cur .item .img{width:90px;height:90px}
+.device.cur .item .rc.hasimg{padding-bottom:0}
+.device.cur .item .rc.hasimg .ctl{position:static;transform:none;margin-top:8px}
+.device.cmp .item{margin:3px 12px;padding:8px 10px}
+.device.cmp .item .d{display:none}
+.device.cmp .item .img{width:60px;height:60px}
+.device.cmp .item .p{min-height:44px}
+.sticky .search{max-height:60px;transition:max-height .18s,margin .18s,opacity .18s}
+.sticky.compact .search{max-height:0;margin-top:0;margin-bottom:0;opacity:0;overflow:hidden;border-width:0;padding-top:0;padding-bottom:0}
+.item .d{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.img{width:84px;height:84px;border-radius:9px;background:repeating-linear-gradient(45deg,#cfd8dc,#cfd8dc 7px,#eceff1 7px,#eceff1 14px);display:flex;align-items:center;justify-content:center;color:#78909c;font-size:10px;flex:none;text-align:center}
+.veg{display:inline-block;width:11px;height:11px;border:1.5px solid #2e7d32;position:relative;vertical-align:-1px;margin-right:4px}
+.veg.nv{border-color:#b71c1c}.veg.nv:after{background:#b71c1c}
+.veg:after{content:"";position:absolute;inset:2px;background:#2e7d32;border-radius:50%}
+.badge{font-size:10.5px;background:#fff8e1;color:#e65100;border:1px solid #ffcc80;border-radius:5px;padding:0 5px;margin-left:4px;white-space:nowrap}
+.badge.chef{background:#fbe9e7;color:#bf360c;border-color:#ffab91}
+.badge.na{background:#eceff1;color:#546e7a;border-color:#cfd8dc}
+.add{border:1.5px solid var(--g);color:var(--g);background:#fff;border-radius:8px;padding:8px 22px;min-height:44px;font-weight:700;margin-top:6px}
+.add:active{transform:scale(.95)}
+.add[disabled]{border-color:#bdbdbd;color:#9e9e9e;cursor:not-allowed}
+.step{display:inline-flex;align-items:center;border:1.5px solid var(--g);border-radius:8px;color:var(--g);font-weight:700;margin-top:6px;overflow:hidden;background:#fff}
+.step button{border:0;background:#fff;color:var(--g);font-weight:700;width:44px;height:44px;font-size:18px}
+.step button:hover{background:var(--gl)}
+.step span{min-width:26px;text-align:center}
+.cartbar.off{background:#bdbdbd;cursor:not-allowed;box-shadow:none}
+.cartbar{margin:8px 12px 12px;background:var(--g);color:#fff;border-radius:11px;padding:13px 14px;display:flex;justify-content:space-between;font-weight:700;box-shadow:0 3px 8px #0004;cursor:pointer;flex:none;animation:rise .2s}
+@keyframes rise{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+.foot{margin:14px 12px 22px;background:#fff;border-radius:12px;padding:12px;border:1px solid var(--line)}
+.foot .r,.row{display:flex;gap:8px;margin-top:8px}
+.btn{display:block;text-align:center;background:var(--g);color:#fff;border:0;border-radius:10px;padding:11px;font-weight:700;width:100%}
+.btn.o{background:#fff;color:var(--g);border:1.5px solid var(--g)}
+.btn.sm{padding:7px 12px;font-size:12.5px;width:auto;flex:1}
+.btn[disabled]{background:#bdbdbd;cursor:not-allowed}
+.empty{text-align:center;color:#9e9e9e;padding:40px 20px}
+.skc{display:flex;gap:10px;background:#fff;border-radius:12px;margin:7px 12px;padding:12px}
+.skc .l{flex:1;display:flex;flex-direction:column;gap:9px}
+.sk{background:linear-gradient(90deg,#e0e0e0 25%,#f5f5f5 37%,#e0e0e0 63%);background-size:400% 100%;animation:sh 1.4s ease infinite;border-radius:5px}
+@keyframes sh{0%{background-position:100% 0}100%{background-position:0 0}}
+.spin{width:30px;height:30px;border:3px solid #c8e6c9;border-top-color:var(--g);border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* overlay & pop-ups */
+.ov{position:absolute;inset:0;z-index:20;display:flex;animation:fade .18s}
+.still,.still .sheet,.still .card{animation:none!important}
+.sheet.half{top:auto;height:62%}
+.sheet.half.full{height:calc(100% - 60px)}
+.sheet.half.noimg{height:auto;max-height:70%}
+.device.wide .sheet.half,.device.wide .sheet.half.full{height:auto}
+.dhero{height:140px;width:100%;background:repeating-linear-gradient(45deg,#cfd8dc,#cfd8dc 8px,#eceff1 8px,#eceff1 16px);display:flex;align-items:center;justify-content:center;color:#78909c;font-size:11px;flex:none}
+.dbody{padding:12px 16px;overflow-y:auto;flex:1}
+.dbody h3{margin:0 0 2px;font-size:18px}
+.dbody .sec{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:12px 0 3px}
+.handle{cursor:pointer}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.ov .dim{position:absolute;inset:0;background:var(--dim)}
+.card{position:relative;margin:auto;width:calc(100% - 40px);max-width:420px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 12px 34px #0007;max-height:86%;display:flex;flex-direction:column;animation:pop .2s}
+@keyframes pop{from{transform:scale(.94);opacity:0}to{transform:none;opacity:1}}
+.card .cx{position:absolute;right:6px;top:6px;z-index:3}
+.cx{width:44px;height:44px;font-size:16px;border-radius:50%;border:0;background:#ffffffee;box-shadow:0 1px 5px #0004;font-weight:700;color:#37474f}
+.card .body{padding:14px;overflow-y:auto}
+.card h5{margin:0 0 5px;font-size:17px;padding-right:30px}
+.card p{margin:0 0 12px;color:#455a64;overflow-wrap:anywhere}
+.hero{aspect-ratio:16/9;width:100%;background:repeating-linear-gradient(135deg,#bcaaa4,#bcaaa4 9px,#d7ccc8 9px,#d7ccc8 18px);display:flex;align-items:center;justify-content:center;color:#5d4037;font-size:11px;flex:none}
+.hero.cam{background:repeating-linear-gradient(135deg,#90a4ae,#90a4ae 9px,#b0bec5 9px,#b0bec5 18px);color:#37474f}
+.hero.of{background:repeating-linear-gradient(135deg,#ffcc80,#ffcc80 9px,#ffe0b2 9px,#ffe0b2 18px);color:#e65100}
+.prog{height:4px;background:#e0e0e0;flex:none}.prog i{display:block;height:100%;background:var(--g);width:100%}
+.madeby{font-size:12px;color:#5d4037;background:#efebe9;border-radius:7px;padding:6px 8px;margin-bottom:9px}
+.hours{background:var(--gl);border-radius:9px;padding:9px;margin:8px 0 10px;color:var(--g2)}
+.divider{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.07em;margin:14px 0 8px;text-align:center}
+.sheet{position:absolute;left:0;right:0;bottom:0;top:60px;margin:0;background:#fff;border-radius:20px 20px 0 0;display:flex;flex-direction:column;animation:up .22s;overflow:hidden}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.device.wide .sheet{position:relative;top:auto;margin:auto;width:520px;max-height:84%;border-radius:18px;height:auto;max-height:84%;bottom:auto;animation:pop .2s}
+.cx:focus-visible,.btn:focus-visible,.chip:focus-visible,.add:focus-visible,.step button:focus-visible{outline:3px solid #1565c0;outline-offset:2px}
+.handle{width:40px;height:5px;border-radius:9px;background:#bdbdbd;margin:9px auto 4px;flex:none}
+.sheet.short{top:120px}
+.sheet h4{margin:4px 8px 4px 14px;font-size:16px;display:flex;justify-content:space-between;align-items:center;flex:none}
+.sheet .cx{background:#eceff1;box-shadow:none}
+.sheet .list{flex:1;overflow-y:auto;background:var(--bg);padding-bottom:6px}
+.sheet .bot{padding:10px 12px;border-top:1px solid #eee;background:#fff;flex:none}
+.sheet .bot .btn{display:flex;justify-content:space-between}
+.toast{position:absolute;left:14px;right:14px;bottom:76px;z-index:40;background:#323232;color:#fff;border-radius:9px;padding:10px 12px;font-size:13px;animation:rise .2s;box-shadow:0 4px 12px #0005}
+.toast.err{background:#b71c1c}
+.toast.info{background:#0d47a1}
+
+/* checkout / status */
+.cl{background:#fff;margin:8px 12px;border-radius:12px;padding:10px;box-shadow:0 1px 3px #0002}
+.cl .cltop{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.notebtn{color:var(--g);font-size:12.5px;font-weight:600;margin-top:6px;background:none;border:0;padding:0}
+.notebtn.none{color:#9e9e9e;font-weight:400;font-style:italic;cursor:default}
+.notebox{margin-top:6px;width:100%;border:1.5px solid var(--g);border-radius:8px;padding:7px 9px;background:#f9fff9;resize:none}
+.fld{display:block;margin:8px 12px}
+.fld input,.fld textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px;background:#fff}
+.fld.bad input{border-color:#d32f2f}
+.fld small{color:#d32f2f;display:block;margin-bottom:4px}
+.fld .cc{float:right;color:#9e9e9e;font-size:11px}
+.infobox{margin:8px 12px;border-radius:9px;padding:9px 11px;font-size:13px}
+.infobox.err{background:var(--warnbg);color:var(--warn)}
+.infobox.info{background:#e3f2fd;color:#0d47a1}
+.herocode{background:var(--g);color:#fff;text-align:center;margin:12px;border-radius:16px;padding:18px 10px}
+.herocode .big{font-size:52px;font-weight:800;letter-spacing:5px;line-height:1.1}
+.banner{margin:8px 12px;background:#fff3e0;border:1px solid #ffb74d;border-radius:10px;padding:10px;font-weight:700;color:#e65100}
+.wait{margin:8px 12px;background:#fff;border:1px dashed #a5d6a7;border-radius:12px;padding:10px}
+.wait .hd{display:flex;justify-content:space-between;cursor:pointer}
+
+/* ===== admin ===== */
+.adminwrap{width:min(1100px,100%);background:#fff;border:1px solid #b0bec5;border-radius:14px;overflow:hidden;box-shadow:0 8px 24px #0002;display:flex;min-height:700px}
+.anav{width:190px;background:#eceff1;padding:10px;flex:none}
+.anav h2{font-size:14px;margin:6px 8px 12px;color:var(--g2)}
+.anav button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:10px;border-radius:8px;margin:2px 0;color:#37474f}
+.anav button.on{background:#fff;color:var(--g2);font-weight:700;box-shadow:0 1px 3px #0002}
+.amain{flex:1;padding:18px;overflow:auto;max-height:760px}
+.amain h2{margin:0 0 4px}
+.sub{color:var(--mut);margin:0 0 14px}
+.pubbar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff8e1;border:1px solid #ffcc80;border-radius:10px;padding:8px 12px;margin-bottom:12px}
+.pubbar.ok{background:#e8f5e9;border-color:#a5d6a7}
+.tile{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px;margin:8px 0;background:#fafafa}
+.tile.dis{opacity:.6}
+.tile .nm{flex:1;font-weight:600;min-width:0}
+.tile small{display:block;color:var(--mut);font-weight:400}
+.ibtn{border:1px solid #b0bec5;border-radius:7px;background:#fff;padding:5px 10px}
+.ibtn[disabled]{opacity:.35;cursor:not-allowed}
+.lock{font-size:11px;background:#eceff1;border-radius:99px;padding:2px 8px;color:#455a64;font-weight:400}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #eee}
+.sw small{display:block;color:var(--mut)}
+.tg{width:40px;height:22px;border-radius:99px;background:#bdbdbd;position:relative;flex:none;border:0;padding:0}
+.tg:after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.15s}
+.tg.on{background:var(--g)}.tg.on:after{left:21px}
+.in{border:1px solid var(--line);border-radius:7px;padding:7px 9px;background:#fff;width:100%}
+.in.sm{width:auto}
+.lbl{display:block;font-size:12px;color:#455a64;margin:10px 0 3px}
+.err{color:var(--warn);font-size:12px;margin-top:4px}
+.hint{color:#0d47a1;background:#e3f2fd;border-radius:8px;padding:7px 10px;font-size:12.5px;margin:8px 0}
+table.tb{border-collapse:collapse;width:100%;font-size:13px}
+table.tb th,table.tb td{border-bottom:1px solid #eee;padding:7px 6px;text-align:left}
+table.tb th{background:#fafafa;font-size:12px;color:#455a64}
+.cols{display:flex;gap:18px;flex-wrap:wrap}.cols>div{flex:1;min-width:280px}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:4px 11px;font-size:12px;margin:2px 4px 2px 0;background:#fff}
+.pill.on{background:var(--g);color:#fff;border-color:var(--g)}
+.tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:99px;background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9;vertical-align:middle;margin-left:4px}
+.hidden{display:none!important}
+@media(max-width:900px){.adminwrap{flex-direction:column}.anav{width:auto;display:flex;flex-wrap:wrap}.anav h2{width:100%}.anav button{width:auto}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+
+/* ===== order status states (existing app) ===== */
+.stwrap{padding:22px 16px 30px;text-align:center}
+.stpill{display:inline-flex;align-items:center;gap:7px;border-radius:99px;padding:7px 14px;color:#fff;font-weight:800;font-size:12px;letter-spacing:.06em}
+.stpill i{width:8px;height:8px;border-radius:50%;background:#fff;animation:pl .9s infinite alternate}
+.stpill.done i{display:none}
+@keyframes pl{from{opacity:.3}to{opacity:1}}
+.sticon{font-size:38px;margin-top:8px}
+.sttitle{font-weight:600;color:#424242;font-size:16px;margin-top:6px}
+.sthero{max-width:360px;margin:16px auto 0;border-radius:16px;color:#fff;padding:18px 14px;box-shadow:0 4px 12px #0003}
+.sthero .lb{font-size:13px;font-weight:700;letter-spacing:.12em;opacity:.85}
+.sthero .vl{font-size:52px;font-weight:900;letter-spacing:2px;line-height:1.05;margin:6px 0 2px}
+.sthero .cp{font-size:15px;font-weight:600;opacity:.92}
+.instr{max-width:360px;margin:14px auto 0;background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:10px 12px;color:#6d4c00;text-align:left;font-weight:500;font-size:13px}
+.instr.big{border-width:2px;font-size:16px;font-weight:800;padding:14px}
+.stsub{color:#616161;font-size:14px;margin:14px 0 0}
+.recap{max-width:360px;margin:16px auto 0;background:#fff;border:1px solid #ddd;border-radius:10px;padding:12px 14px;text-align:left;font-size:14px}
+.recap .rn{font-size:12px;color:#757575}
+.tracker{display:flex;justify-content:center;align-items:flex-start;margin-top:16px;font-size:11px}
+.tracker .st{display:flex;flex-direction:column;align-items:center;gap:4px;color:#9e9e9e}
+.tracker .st b{width:24px;height:24px;border-radius:50%;background:#eee;color:#757575;display:flex;align-items:center;justify-content:center;font-size:12px}
+.tracker .st.on{color:var(--amber);font-weight:700}.tracker .st.on b{background:var(--amber);color:#fff}
+.tracker .ln{width:28px;height:2px;background:#e0e0e0;margin:11px 6px 0}
+.nudge{max-width:360px;margin:12px auto 0;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:10px;padding:12px 14px;color:#1b5e20;font-size:13px;text-align:left}
+.sbtn{max-width:360px;margin:12px auto 0}
+.wait.st{max-width:360px;margin:14px auto 0;text-align:left}
+.chkbanner{margin:12px;background:var(--warnbg);border:1px solid #ef9a9a;border-radius:8px;padding:12px;color:var(--warn);font-weight:600}
+.chkbanner button{background:none;border:0;color:var(--g);font-weight:700;padding:8px 0 0;display:block}
+.dlgov{position:absolute;inset:0;z-index:30;background:var(--dim);display:flex;align-items:center;justify-content:center;padding:20px}
+.dlgbox{background:#fff;border-radius:14px;padding:18px;max-width:340px;width:100%;box-shadow:0 12px 34px #0007}
+.dlgbox h4{margin:0 0 8px;font-size:17px}
+.dlgbox .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;flex-wrap:wrap}
+.tbtn{background:none;border:0;color:var(--g);font-weight:700;padding:10px}
+.fbtn{background:var(--g);color:#fff;border:0;border-radius:8px;padding:10px 14px;font-weight:700}
+.fbtn.red{background:#c62828}
+.logoc{width:34px;height:34px;border-radius:50%;background:#fff;color:var(--g);display:flex;align-items:center;justify-content:center;font-weight:800;margin-left:5px;font-size:12px}
+.splashmsg{text-align:center;padding-top:110px;color:#455a64}
+/* ===== admin: existing screens ===== */
+.adminwrap{position:relative}
+.amodal{position:absolute;inset:0;z-index:30;background:#0007;display:flex;align-items:center;justify-content:center;padding:16px}
+.amodalbox{background:#fff;border-radius:14px;width:min(500px,100%);max-height:92%;overflow:auto;box-shadow:0 12px 34px #0007}
+.amodalbox .mh{background:var(--g);color:#fff;padding:10px 14px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.amodalbox .mh button{background:none;border:0;color:#fff;font-weight:700;padding:6px 8px}
+.amodalbox .mb{padding:14px}
+.amodalbox .acts{display:flex;justify-content:flex-end;gap:8px;padding:0 14px 14px}
+.atoast{position:absolute;left:50%;transform:translateX(-50%);bottom:16px;z-index:40;background:#323232;color:#fff;border-radius:9px;padding:10px 14px;font-size:13px;max-width:80%}
+.atoast.err{background:#b71c1c}
+.rolebadge{display:inline-block;background:#2e7d3220;color:var(--g);font-weight:700;border-radius:12px;padding:3px 10px;font-size:12px}
+.counts{display:flex;gap:12px;margin:8px 0}
+.countc{flex:1;border:1px solid var(--line);border-radius:10px;padding:14px;background:#fff}
+.countc b{display:block;font-size:26px;color:var(--g)}
+.navcard{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0;background:#fff;cursor:pointer;width:100%;text-align:left}
+.navcard small{display:block;color:var(--mut)}
+.loginbox{width:min(380px,100%);margin:80px auto;text-align:center;background:#fff;border:1px solid #b0bec5;border-radius:14px;padding:32px 24px}
+.oldpill{font-size:11px;background:#eceff1;border-radius:99px;padding:2px 8px;color:#455a64}
+.filt{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+.filt button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font-size:12px}
+.filt button.on{background:#2e7d3226;border-color:var(--g);color:var(--g2);font-weight:700}
+.tgrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #eee}
+.fld2{margin:10px 0 0}
+.fld2 input[type=text],.fld2 input[type=time],.fld2 select,.fld2 textarea{width:100%;border:1px solid var(--line);border-radius:7px;padding:8px 9px;background:#fff}
+.fld2 .e{color:var(--warn);font-size:12px;margin-top:3px}
+.simrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.disabledbox{opacity:.55;pointer-events:none}
+.ordbanner{display:flex;align-items:center;justify-content:space-between;gap:6px;background:#fff8e1;border-bottom:1px solid #ffe082;color:#6d4c00;font-size:12.5px;padding:0 2px 0 12px;min-height:36px;cursor:pointer}
+.ordbanner .ordx{background:none;border:0;color:#6d4c00;width:40px;height:36px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>Phase 1 — clickable prototype <span class="tag">dummy data</span></h1>
+  <div class="seg" id="modeSeg"><button data-act="mode" data-v="customer" class="on">Customer app</button><button data-act="mode" data-v="admin">Admin panel</button></div>
+  <div class="seg" id="widthSeg"><button data-act="width" data-v="phone" class="on">Phone</button><button data-act="width" data-v="wide">Wide screen</button></div>
+  <span class="tiny" style="color:#b0bec5">Admin changes apply to the customer app live (items need Publish, like the real thing).</span>
+</div>
+
+<div class="layout">
+  <div class="stage" id="stage"></div>
+  <div class="side">
+    <div class="panel" id="insp"></div>
+    <div class="panel" id="sim"></div>
+    <div class="panel">
+      <h3>Pretend the world is…</h3>
+      <div class="tiny" style="margin:0 0 4px">Scenario presets (resets the session and reloads as a returning visit):</div>
+      <div class="btns" style="margin:0 0 8px">
+        <button class="pbtn" data-act="preset" data-v="all">Chef Special on load</button>
+        <button class="pbtn" data-act="preset" data-v="closed">Café closed</button>
+        <button class="pbtn" data-act="preset" data-v="noorder">Ordering off</button>
+        <button class="pbtn" data-act="preset" data-v="nosec">Promotions (rotate) on load</button>
+        <button class="pbtn" data-act="preset" data-v="nopromo">Best Sellers on load</button>
+        <button class="pbtn" data-act="preset" data-v="none">Nothing on load</button>
+        <button class="pbtn" data-act="preset" data-v="timber">Show Timber and Tales now</button>
+        <button class="pbtn" data-act="preset" data-v="artistry">Show Artistry now</button>
+        <button class="pbtn" data-act="resetall" style="border-color:#c62828;color:#c62828">⟲ Reset everything</button>
+      </div>
+      <label>Café status (from POS) <select id="dCafe"><option value="open">Open</option><option value="closed">Closed</option><option value="unknown">Unknown / slow</option></select></label>
+      <label>Today's date <input type="date" id="dDate" value="2026-10-07"></label>
+      <label>Café time (IST) <input type="time" id="dClock" value="12:00"></label>
+      <label>Menu load <select id="dMenu"><option value="ok">Loads fine</option><option value="error">Fails (network)</option><option value="empty">Not published yet</option></select></label>
+      <label>Admin sign-in <select id="dAuth"><option value="admin">Signed in (admin)</option><option value="out">Signed out</option><option value="denied">Signed in, not an admin</option></select></label>
+      <label>Admin role <select id="dRole"><option value="owner">Owner</option><option value="manager">Manager</option><option value="staff">Staff</option></select></label>
+      <label>Ordering on <input type="checkbox" id="dOrd"></label>
+      <label>First-load pop-up <select id="dFirst" style="max-width:190px"></select></label>
+      <label>Closed-café card switch <input type="checkbox" id="dPc"></label>
+      <div class="btns">
+        <button class="pbtn" data-act="nextday">Next day (clears “once per day”)</button>
+        <button class="pbtn" data-act="replay" data-v="first">↻ First visit (splash + skeleton)</button>
+        <button class="pbtn" data-act="replay" data-v="returning">↻ Returning visit (cached menu)</button>
+        <button class="pbtn" data-act="newsession">New browser session</button>
+        <button class="pbtn" data-act="bootstuck">Flutter never boots (12 s safety net)</button>
+        <button class="pbtn" data-act="deeplink">Open an order-status link cold</button>
+      </div>
+      <label style="margin-top:8px">Card style <select id="dCard"><option value="new">Tighter (proposed)</option><option value="cmp">Compact (experiment)</option><option value="cur">Current app</option></select></label>
+      <div class="tiny">Tighter: no ingredients line, 1-line description, smaller gaps, photo-less items are text-only. Scroll down: the search bar tucks away, scroll up: it returns.</div>
+      <div class="tiny" style="margin-top:6px">"New browser session" forgets that the promo was already shown. Café status takes effect on the next load / checkout.</div>
+    </div>
+    <div class="panel try">
+      <h3>Things to try</h3>
+      <ol style="padding-left:18px;margin:0">
+        <li>Reload the app (↻) and watch splash → skeleton → menu → pop-ups.</li>
+        <li>Tap chips, search, ADD / + / −, then the green cart bar → place an order.</li>
+        <li>Admin → Sections: <b>rename</b> a special section, hide it, reorder, then go back to Customer.</li>
+        <li>Admin → Items: toggle Chef flag / Allow note, <b>Publish</b>, check checkout.</li>
+        <li>Admin → <b>Promotions &amp; pop-up</b>: pick the ONE thing that opens on load (Nothing / a promotion / rotate / Chef Special / Best Sellers / any section) and how often. Note the “Live now / Not opening because…” line.</li>
+        <li>Admin → Promotions: edit text (see counters), auto-dismiss, try a placeholder number, ＋ Add / duplicate / delete (max 4), watch the “Live now / Not live: …” chips.</li>
+        <li>Choose <b>Nothing</b>: nothing pops up. Choose a promotion: only that opens (even if Chef Special exists). Choose a section that is hidden or empty: nothing opens and the page says why.</li>
+        <li>Set café <b>Closed</b>, reload: see closed-mode card.</li>
+        <li>Use the <b>scenario presets</b> and read the “Why this happens (live)” panel: it lists every check (✔/✖), which pop-up wins, which promo is picked, and which UI parts are on.</li>
+        <li>Set a promo's end date before “Today's date”, or move today's date: it drops out of the pop-up, “More from us” and the list above.</li>
+        <li>Set “How often” to <b>Once per day</b>: “New browser session” does not bring it back, “Next day” does.</li>
+        <li>With a pop-up open press the browser <b>Back</b> button — it closes (history-entry approach).</li>
+        <li><b>Order status (existing screen, all 8 states):</b> place an order, then use the <b>Counter simulator</b>: claim it, place it (#number), let the timer run out (→ “Checking…” → Expired, polling stops), delete the request, break the network and reload the page.</li>
+        <li><b>Cart-changed dialog:</b> add an item, go to Admin → Items, change its price (✎) or hide it (👁), Publish, return and Place Order.</li>
+        <li><b>Admin CRUD:</b> add / edit / hide / delete sections and items (a section with items can't be deleted), reorder, bulk import (pick a pretend file), Publish banner, dashboard counts, Settings validation (expiry 1–25), logo.</li>
+        <li><b>Order link on the menu:</b> place an order, then use “Place another order” or reload the page: a slim “Order code … · Show code ›” bar stays on the menu while the request is pending, claimed or confirmed (✕ hides it; “Pretend 3 hours passed” removes it). The cart also survives a reload.</li>
+        <li><b>Discard changes:</b> Admin → Items, edit something, then use <b>Discard</b> in the orange Publish bar (it shows the change count).</li>
+        <li><b>Start over:</b> “⟲ Reset everything” reloads the prototype with all data back to its original state (cart, orders, admin edits, switches).</li>
+        <li><b>See a promotion:</b> click “Show Timber and Tales now” (or “Show Artistry now”). It also shows in “More from us” (chip at the end of the chips, and the card at the bottom of the menu), in “While you wait” after you place an order, and in the closed-café card (Café closed preset).</li>
+        <li><b>Roles and sign-in:</b> switch Owner / Manager / Staff and “Signed out / not an admin” in the side panel and see what each can do.</li>
+        <li><b>Menu load / time / splash:</b> “Menu load” = fails or not published; “Café time” moves item time windows (Matcha Latte is 17:00–22:00); “Flutter never boots” shows the 12 s safety net; “Open an order-status link cold” shows the spinner splash.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var esc=function(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var money=function(n){return '₹'+n};
+
+/* ================= data ================= */
+var SECS0=[{id:'tea',name:'Tea',icon:'🍵',active:1},{id:'coffee',name:'Coffee',icon:'☕',active:1},{id:'snacks',name:'Snacks',icon:'🥪',active:1},{id:'shakes',name:'Shakes',icon:'🥤',active:1}];
+var ING={i1:'Tea leaves, milk, ginger, cardamom',i3:'Coffee decoction, milk, sugar',i4:'Coffee, ice cream, milk',i6:'Pasta, cream, herbs, parmesan',i8:'Chicken, tortilla, slaw, house sauce',i10:'Oreo, milk, ice cream'};
+function mkSecs(){return JSON.parse(JSON.stringify(SECS0))}
+function mkItems(){var a=[
+ {id:'i1',sec:'tea',name:'Masala Chai',price:40,veg:1,best:1,chef:0,note:1,avail:1,desc:'Fresh-brewed with ginger and cardamom.'},
+ {id:'i2',sec:'tea',name:'Lemon Tea',price:35,veg:1,best:0,chef:0,note:1,avail:1,img:0,desc:'Light and refreshing.'},
+ {id:'i3',sec:'coffee',name:'Filter Coffee',price:60,veg:1,best:1,chef:1,note:1,avail:1,desc:'Slow-dripped, South-Indian style.'},
+ {id:'i4',sec:'coffee',name:'Cold Coffee',price:110,veg:1,best:1,chef:0,note:1,avail:1,desc:'Blended with ice cream.'},
+ {id:'i5',sec:'coffee',name:'Matcha Latte',price:150,veg:1,best:0,chef:1,note:1,avail:1,from:'17:00',till:'22:00',desc:'Earthy and smooth. Evenings only.'},
+ {id:'i6',sec:'snacks',name:"Chef's Pasta",price:180,veg:1,best:1,chef:1,note:1,avail:1,desc:'White sauce, herbs, parmesan.'},
+ {id:'i7',sec:'snacks',name:'Veg Sandwich',price:90,veg:1,best:0,chef:0,note:1,avail:1,img:0,desc:'Grilled, with mint chutney.'},
+ {id:'i8',sec:'snacks',name:'Chicken Wrap',price:140,veg:0,best:0,chef:1,note:1,avail:1,desc:'Grilled chicken, slaw, house sauce.'},
+ {id:'i9',sec:'snacks',name:'Packaged Water 1 L',price:20,veg:1,best:0,chef:0,note:0,avail:1,img:0,desc:'Sealed bottle.'},
+ {id:'i10',sec:'shakes',name:'Oreo Shake',price:130,veg:1,best:1,chef:0,note:1,avail:1,desc:'Thick and chocolatey.'}
+];a.forEach(function(i){i.ing=ING[i.id]||'';i.from=i.from||'';i.till=i.till||'';i.kit=1;i.active=1});return a}
+var S={
+ mode:'customer',adminTab:'dash',width:'phone',
+ cafe:'open',boot:'ready',returning:false,route:'menu',
+ sec:null,q:'',cart:[],orderNote:'',form:{name:'',phone:'',table:''},errs:{},expanded:{},
+ toast:null,popup:null,queue:[],started:false,busy:false,seen:false,rot:0,
+ order:null,orderState:'none',waitOpen:false,
+ menuLoad:'ok',clock:'12:00',net:'ok',statusLoading:false,dlg:null,lastView:null,
+ auth:'admin',role:'owner',am:null,itemFilter:null,imp:null,setErr:{},atoastMsg:null,pubAt:'Oct 7, 2026  9:00 AM',
+ draft:mkItems(),pub:mkItems(),draftSecs:mkSecs(),pubSecs:mkSecs(),
+ biz:{
+  ordering:true,orderNote:true,table:true,name:'Why Not? Cafe Countryside',logo:false,instagram:'whynotcafe',expiryMin:3,
+  hours:'8 AM – 11 PM (every day)',phone:'+91 98000 00000',maps:'https://maps.example.com/cafe',
+  first:'chef',firstFreq:'day',
+  secPopup:{on:true,target:'chef',freq:'session'},
+  special:[{key:'chef',name:'Chef Special',icon:'👨‍🍳',visible:true},{key:'best',name:'Best Sellers',icon:'⭐',visible:true}],
+  promo:{master:true,closedInfo:true,which:'rotate',freq:'session',editing:'art',list:[
+   {id:'offer',kind:'cafeOffer',enabled:true,more:false,title:'Weekend special',text:'Buy any two coffees, get a cookie free — this Saturday and Sunday.',btnLabel:'See the menu',link:'https://example.com/menu',auto:true,secs:8,hero:'café offer photo',name:'Café offer'},
+   {id:'art',kind:'venture',enabled:true,more:true,title:'Book your event shoot',text:'Birthdays, engagements, café events — Artistry Photography captures the moment.',btnLabel:'Chat on WhatsApp',link:'https://wa.me/919800000001?text=Hi%20Artistry%20Photography%2C%20I%20saw%20you%20on%20the%20Why%20Not%20Cafe%20menu',auto:true,secs:8,hero:'photo — 16:9',cam:true,name:'Artistry Photography',emoji:'📸',tag:'Events, birthdays, portraits.'},
+   {id:'tim',kind:'venture',enabled:true,more:true,title:'Handmade wooden gifts',text:'Serving boards, coasters, frames and more. Order on WhatsApp.',btnLabel:'Order on WhatsApp',link:'https://wa.me/919800000002?text=Hi%20Timber%20and%20Tales%2C%20I%20saw%20you%20on%20the%20Why%20Not%20Cafe%20menu',auto:false,secs:8,hero:'photo — wooden pieces',name:'Timber and Tales',emoji:'🪵',tag:'All the wooden frames and pieces in this café are handmade by us.',madeBy:true}
+  ]}
+ }
+};
+function isSectionChoice(v){return v==='chef'||v==='best'||String(v).indexOf('sec:')===0}
+/* the owner picks ONE thing to open on load; the older per-feature fields are derived from it */
+function syncFirst(){var b=S.biz,v=b.first,P=b.promo;
+  b.secPopup.freq=b.firstFreq;P.freq=b.firstFreq;
+  if(isSectionChoice(v)){b.secPopup.on=true;b.secPopup.target=v;P.master=false;P.which='rotate'}
+  else if(v==='rotate'||String(v).indexOf('promo:')===0){b.secPopup.on=false;P.master=true;P.which=v==='rotate'?'rotate':v.slice(6)}
+  else{b.secPopup.on=false;P.master=false;P.which='rotate'}}
+function firstOptions(){
+  var b=S.biz,o=[{g:'Nothing',v:'none',l:'Nothing — no pop-up on load'},{g:'Promotions',v:'rotate',l:'Rotate between live promotions'}];
+  b.promo.list.forEach(function(p){o.push({g:'Promotions',v:'promo:'+p.id,l:p.name+(p.kind==='cafeOffer'?' (café offer)':'')})});
+  b.special.forEach(function(x){o.push({g:'Sections',v:x.key,l:x.icon+' '+x.name+(x.visible?'':' (hidden)')})});
+  S.pubSecs.forEach(function(x){o.push({g:'Sections',v:'sec:'+x.id,l:secLabelOf(x)+(x.active?'':' (hidden)')})});
+  if(!o.some(function(x){return x.v===b.first}))o.push({g:'Other',v:b.first,l:'(no longer available)'});
+  return o;
+}
+function firstSelectHtml(attrs){var cur=S.biz.first,groups=[],byG={};firstOptions().forEach(function(x){if(!byG[x.g]){byG[x.g]=[];groups.push(x.g)}byG[x.g].push(x)});
+  return '<select '+attrs+'>'+groups.map(function(g){return '<optgroup label="'+g+'">'+byG[g].map(function(x){return '<option value="'+esc(x.v)+'"'+(x.v===cur?' selected':'')+'>'+esc(x.l)+'</option>'}).join('')+'</optgroup>'}).join('')+'</select>'}
+function firstLabel(){var v=S.biz.first,o=firstOptions().filter(function(x){return x.v===v})[0];return o?o.l:v}
+function firstReason(){var b=S.biz,v=b.first;
+  if(v==='none')return 'Set to “Nothing”';
+  if(S.cafe==='closed')return b.promo.closedInfo?'':'Café is closed and the closed-café card is switched off';
+  if(isSectionChoice(v))return sectionPopupReason();
+  if(v==='rotate')return pickPromo(false)?'':'No promotion is live right now';
+  var p=b.promo.list.filter(function(x){return 'promo:'+x.id===v})[0];
+  return p?promoReason(p):'That promotion no longer exists';
+}
+var timers={};var progTimer=null;var orderSeq=41;syncFirst();
+function special(key){return S.biz.special.filter(function(s){return s.key===key})[0]}
+function secLabel(key){var s=special(key);return s.icon+' '+s.name}
+function itemsFor(arr,sectionKey){
+  if(sectionKey==='chef')return arr.filter(function(i){return i.chef});
+  if(sectionKey==='best')return arr.filter(function(i){return i.best});
+  if(sectionKey&&sectionKey.indexOf('sec:')===0){var id=sectionKey.slice(4);return arr.filter(function(i){return i.sec===id})}
+  return arr;
+}
+function visibleSpecials(){return S.biz.special.filter(function(s){return s.visible&&itemsFor(pubList(),s.key).length>0})}
+function cartQty(id){var l=S.cart.filter(function(x){return x.id===id})[0];return l?l.qty:0}
+var GRACE=15*60*1000;
+function memSet(k,v){try{localStorage.setItem('p1proto:'+k,JSON.stringify(v))}catch(e){}}
+function memGet(k){try{var r=localStorage.getItem('p1proto:'+k);return r?JSON.parse(r):null}catch(e){return null}}
+function saveCart(){try{sessionStorage.setItem('p1proto:cart',JSON.stringify({cart:S.cart,note:S.orderNote,savedAt:Date.now()}))}catch(e){}}
+function persistOrder(){if(S.order)memSet('order',S.order)}
+function restoreMem(){
+  var o=memGet('order'),at=memGet('lastOrderAt');
+  if(o&&at){o.checking=false;S.order=o;S.lastOrderAt=at;S.orderDismissed=memGet('dismissed')}
+  try{var c=JSON.parse(sessionStorage.getItem('p1proto:cart')||'null');if(c&&c.cart&&c.cart.length&&(Date.now()-(c.savedAt||0)<6*3600*1000)){S.cart=c.cart;S.orderNote=c.note||'';S.cartRestored=true}}catch(e){}
+}
+function ordBanner(){
+  var o=S.order;if(!o||!S.lastOrderAt)return '';
+  if(Date.now()-S.lastOrderAt>3*3600*1000)return '';
+  if(S.orderDismissed===o.code)return '';
+  var v=orderView(),txt;
+  if(v==='pending')txt='Order code <b>'+esc(o.code)+'</b> · waiting for the cashier';
+  else if(v==='claimed')txt='Cashier has your order · code <b>'+esc(o.code)+'</b>';
+  else if(v==='confirmed')txt='Order <b>#'+o.number+'</b> confirmed';
+  else return '';
+  return '<div class="ordbanner" data-act="ord-open" role="button"><span>🧾 '+txt+'</span><span><b>Show code ›</b></span><button class="ordx" data-act="ord-dismiss" aria-label="Hide this reminder">✕</button></div>';
+}
+/* the published menu as customers get it: only active items inside active sections (draft_repository.publishMenu) */
+function pubSecsActive(){return S.pubSecs.filter(function(x){return x.active})}
+function pubList(){var ok={};pubSecsActive().forEach(function(x){ok[x.id]=1});return S.pub.filter(function(i){return i.active!==0&&ok[i.sec]})}
+function secById(list,id){return list.filter(function(x){return x.id===id})[0]}
+function secLabelOf(x){return (x.icon?x.icon+' ':'')+x.name}
+function pubItem(id){return pubList().filter(function(i){return i.id===id})[0]}
+/* item time window, evaluated in IST (the café's clock, never the phone's) — empty = always */
+function inWindow(it){var f=it.from||'',t=it.till||'';if(!f&&!t)return true;var c=S.clock;if(f&&t&&f>t)return c>=f||c<=t;return (!f||c>=f)&&(!t||c<=t)}
+function orderable(it){return !!it.avail&&inWindow(it)}
+function sortAvail(a){return a.filter(orderable).concat(a.filter(function(i){return !orderable(i)}))}
+function fmt12(t){var m=/^(\d{1,2}):(\d{2})$/.exec(t||'');if(!m)return t||'';var h=+m[1],mi=m[2],ap=h>=12?'PM':'AM';h=h%12||12;return h+(mi==='00'?'':':'+mi)+' '+ap}
+function unavailText(it){return it.avail&&(it.from||it.till)?'Available '+fmt12(it.from||'00:00')+'–'+fmt12(it.till||'23:59'):'Unavailable'}
+function can(p){var r=S.role,om=(r==='owner'||r==='manager');return (p==='sections'||p==='items'||p==='publish'||p==='promos')?om:(p==='settings'?r==='owner':true)}
+function genCode(){var a='23456789ABCDEFGHJKMNPQRSTUVWXYZ',c='';for(var i=0;i<4;i++)c+=a[Math.floor(Math.random()*a.length)];return c}
+function cartCount(){return S.cart.reduce(function(a,l){return a+l.qty},0)}
+function cartTotal(){return S.cart.reduce(function(a,l){return a+l.price*l.qty},0)}
+function isPlaceholder(p){return /0000000000|placeholder/i.test((p.link||'')+' '+(p.title||''))}
+function reduceMotion(){return !!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)}
+function linkOk(p){return !p.link||/^(https:\/\/|tel:)/i.test(p.link)}
+var TODAY='2026-10-07';   /* changeable from the "Pretend the world is" panel to test promo start/end dates */
+function dateOk(p){return !((p.start&&TODAY<p.start)||(p.end&&TODAY>p.end))}
+function hasContent(p){return !!((p.title||'').trim()||(p.text||'').trim()||p.hero)}
+function promoProblem(p){
+  if(isPlaceholder(p))return 'This still looks like a placeholder number — replace it before enabling.';
+  if(!linkOk(p))return 'Only https:, tel: or wa.me links are allowed.';
+  if(!hasContent(p))return 'Add an image, a title or some text first.';
+  if(p.start&&p.end&&p.start>p.end)return 'The start date is after the end date.';
+  return '';
+}
+
+/* ================= helpers for UI ================= */
+function toast(msg,kind){S.toast={msg:msg,kind:kind||''};renderToast();clearTimeout(timers.toast);timers.toast=setTimeout(function(){S.toast=null;renderToast()},3200)}
+function renderToast(){var d=$('#device');if(!d)return;var old=$('.toast',d);if(old)old.remove();if(S.toast){var t=document.createElement('div');t.className='toast '+S.toast.kind;t.textContent=S.toast.msg;d.appendChild(t)}}
+
+/* ================= customer rendering ================= */
+function itemCard(it,inPopup,ctx){
+  var q=cartQty(it.id),na=!orderable(it);
+  var badges=(it.chef&&ctx!=='chef'&&visibleSpecials().some(function(s){return s.key==='chef'})?'<span class="badge chef">'+esc(special('chef').icon)+' '+esc(special('chef').name)+'</span>':'')+(it.best&&ctx!=='best'&&special('best').visible?'<span class="badge">'+esc(special('best').icon)+' '+esc(special('best').name)+'</span>':'')+(na?'<span class="badge na">'+esc(unavailText(it))+'</span>':'');
+  var ctrl=na?'<button class="add" disabled>ADD</button>':(q?'<div class="step"><button data-act="dec" data-id="'+it.id+'" aria-label="Remove one">−</button><span>'+q+'</span><button data-act="inc" data-id="'+it.id+'" aria-label="Add one">+</button></div>':'<button class="add" data-act="inc" data-id="'+it.id+'">ADD</button>');
+  if(!S.biz.ordering)ctrl='';
+  var hasImg=it.img!==0;
+  var imgHtml=hasImg?'<div class="img" title="Cloudinary square thumbnail">photo</div>':'';
+  var bd=(badges?'<div class="bd">'+badges+'</div>':'');
+  return '<div class="item'+(q?' sel':'')+(na?' na':'')+'" data-act="detail" data-id="'+it.id+'" data-card="'+it.id+'" tabindex="0"><div class="t"><div class="n"><span class="veg'+(it.veg?'':' nv')+'"></span>'+esc(it.name)+'</div><div class="p">'+money(it.price)+'</div>'+bd+'<div class="d'+(hasImg?'':' two')+'">'+esc(it.desc)+'</div>'+(it.ing?'<div class="ing">Ingredients: '+esc(it.ing)+'</div>':'')+'</div><div class="rc'+(hasImg?' hasimg':'')+'">'+imgHtml+(ctrl?'<div class="ctl">'+ctrl+'</div>':'')+'</div></div>';
+}
+function menuList(){
+  var items=itemsFor(pubList(),S.sec);
+  var q=S.q.trim().toLowerCase();
+  if(q)items=items.filter(function(i){return (i.name+' '+i.desc).toLowerCase().indexOf(q)>-1});
+  if(!items.length)return '<div class="empty"><div style="font-size:34px">'+(q?'🔍':'🍽️')+'</div>'+(q?'Nothing matches “'+esc(S.q)+'”<br><small>Try a different word?</small>':'No items here yet.')+'</div>';
+  return sortAvail(items).map(function(i){return itemCard(i,false,S.sec)}).join('');
+}
+function venturesMore(){return S.biz.promo.list.filter(function(p){return p.kind==='venture'&&p.enabled&&p.more&&dateOk(p)&&!promoProblem(p)})}
+function custSecs(){return pubSecsActive()}
+function renderMenu(){
+  var b=S.biz,sp=visibleSpecials();
+  var prevSec=S.sec;
+  if(S.sec&&S.sec.indexOf('sec:')!==0&&!sp.some(function(x){return x.key===S.sec}))S.sec=null;
+  if(S.sec&&S.sec.indexOf('sec:')===0&&!custSecs().some(function(x){return 'sec:'+x.id===S.sec}))S.sec=null;
+  if(prevSec&&!S.sec)setTimeout(function(){toast("That section isn't available right now — showing everything","info")},0);
+  var closed=S.cafe==='closed';
+  var chips='<button class="chip'+(S.sec===null?' on':'')+'" data-act="chip" data-id="">All</button>'+
+    sp.map(function(x){return '<button class="chip sp'+(S.sec===x.key?' on':'')+'" data-act="chip" data-id="'+x.key+'">'+esc(x.icon)+' '+esc(x.name)+'</button>'}).join('')+
+    custSecs().map(function(x){return '<button class="chip'+(S.sec==='sec:'+x.id?' on':'')+'" data-act="chip" data-id="sec:'+x.id+'">'+esc(secLabelOf(x))+'</button>'}).join('');
+  var more=venturesMore().length?'<button class="chip more" data-act="more">✨ More from us</button>':'';
+  var foot=venturesMore().length?'<div class="foot"><b>Loved the café? ✨</b><div style="color:#455a64;margin:4px 0 2px">We also shoot events &amp; make handcrafted wooden pieces — the wooden frames you see here are ours.</div><div class="row">'+venturesMore().map(function(p){return '<button class="btn sm o" data-act="open-promo-link" data-id="'+p.id+'">'+p.emoji+' '+esc(p.name)+'</button>'}).join('')+'</div></div>':'';
+  var strip=[];
+  if(b.hours)strip.push('<span>🕒 '+esc(b.hours)+'</span>');
+  if(b.phone)strip.push('<a data-act="tel" title="'+esc(b.phone)+'">📞 Call</a>');
+  if(b.instagram)strip.push('<a data-act="ig">📷 @'+esc(b.instagram)+'</a>');
+  if(b.maps)strip.push('<a data-act="dir" title="Directions">📍 Map</a>');
+  return ordBanner()+(strip.length?'<div class="strip">'+strip.join('')+'</div>':'')+
+   (closed?'<div class="closedstrip">We\'re closed right now. You can browse but can\'t order.</div>':'')+
+   '<div class="sticky'+(S.hdrCompact?' compact':'')+'" id="stickyhdr"><div class="search"><span>🔍</span><input id="q" placeholder="Search the menu" value="'+esc(S.q)+'" autocomplete="off"></div><div class="chips">'+chips+more+'</div></div>'+
+   '<div id="list">'+menuList()+'</div>'+foot;
+}
+function renderSkeleton(){
+  var r='';for(var i=0;i<6;i++)r+='<div class="skc"><div class="l"><div class="sk" style="height:16px;width:55%"></div><div class="sk" style="height:13px;width:25%"></div><div class="sk" style="height:12px"></div></div><div class="sk" style="width:84px;height:84px;border-radius:9px"></div></div>';
+  return '<div class="sk" style="height:30px;margin:10px 12px;border-radius:99px"></div><div style="display:flex;gap:7px;padding:0 12px 6px"><div class="sk" style="width:46px;height:30px;border-radius:99px"></div><div class="sk" style="width:110px;height:30px;border-radius:99px"></div><div class="sk" style="width:90px;height:30px;border-radius:99px"></div></div>'+r;
+}
+function renderCheckout(){
+  var b=S.biz,closed=S.cafe==='closed';
+  if(!b.ordering)return '<div class="empty" style="padding:70px 24px;font-size:16px">Self-ordering isn\'t available right now — please order at the counter.</div>';
+  if(!S.cart.length)return '<div class="empty"><div style="font-size:42px">🛒</div><span style="font-size:16px">Your cart is empty.</span><br><small>Add something tasty from the menu.</small><div style="margin-top:14px"><button class="btn o" style="width:auto;padding:10px 22px" data-act="go" data-v="menu">🍽 Browse the menu</button></div></div>';
+  var lines=S.cart.map(function(l){
+    var it=pubItem(l.id);
+    var allowed=it?!!it.note:true;   /* not found in the loaded menu → fail-open, same as the plan (Part E) */
+    var open=S.expanded[l.id]||l.note;
+    var link=allowed?(open?'':' · <button class="notebtn" style="margin:0" data-act="notebtn" data-id="'+l.id+'">✎ Add a note</button>'):' · <span class="notebtn none" style="margin:0">no note option</span>';
+    var box=allowed&&open?'<textarea class="notebox" rows="2" maxlength="300" placeholder="e.g. less sugar, no onion" data-act-in="note" data-id="'+l.id+'">'+esc(l.note||'')+'</textarea>':'';
+    return '<div class="cl"><div class="cltop"><div><b>'+esc(l.name)+'</b><br>'+money(l.price)+' each'+link+'</div><div class="step"><button data-act="dec" data-id="'+l.id+'">'+(l.qty===1?'🗑':'−')+'</button><span>'+l.qty+'</span><button data-act="inc" data-id="'+l.id+'">+</button></div></div>'+box+'</div>';
+  }).join('');
+  var f=S.form,e=S.errs;
+  return (closed?'<div class="chkbanner">We\'re closed right now, so we can\'t take orders. Please come back when we open.<button data-act="cafe-recheck">Check again</button></div>':'')+
+   '<div style="margin:12px 12px 0;font-weight:700;font-size:16px">Your order</div>'+lines+
+   '<div style="margin:10px 14px 0;display:flex;justify-content:space-between;font-weight:700"><span>Total</span><span>'+money(cartTotal())+'</span></div><div class="tiny" style="margin:2px 14px 4px">Prices may change at the counter.</div>'+
+   '<label class="fld'+(e.name?' bad':'')+'"><input id="fname" placeholder="Your name" value="'+esc(f.name)+'">'+(e.name?'<small>'+e.name+'</small>':'')+'</label>'+
+   '<label class="fld'+(e.phone?' bad':'')+'"><input id="fphone" inputmode="tel" placeholder="Phone (10 digit number)" value="'+esc(f.phone)+'"><span class="tiny">So we can reach you about your order if needed.</span>'+(e.phone?'<small style="margin:4px 0 0">'+e.phone+'</small>':'')+'</label>'+
+   (b.table?'<label class="fld"><input id="ftable" placeholder="Table number (optional)" value="'+esc(f.table)+'"></label>':'')+
+   (b.orderNote?'<label class="fld"><span class="cc" id="onc">'+S.orderNote.length+'/300</span><small style="color:#455a64">Notes for the kitchen (optional, applies to every item)</small><textarea rows="2" maxlength="300" id="onote" placeholder="e.g. allergic to nuts">'+esc(S.orderNote)+'</textarea></label>':'')+
+   (e.form?'<div class="infobox err">'+e.form+'</div>':'')+
+   '<div style="height:64px"></div>';
+}
+function mmss(ms){ms=Math.max(0,ms);return Math.floor(ms/60000)+':'+('0'+Math.floor(ms/1000)%60).slice(-2)}
+/* which of the 8 real screens the customer sees; mirrors order_status_page.dart's branch order */
+function orderView(){
+  var o=S.order;if(!o)return 'none';
+  var now=Date.now();
+  if(S.statusLoading)return 'loading';
+  if(!o.seen)return 'failed';
+  if(o.number&&!o.stopped)return 'confirmed';
+  if(o.status==='GONE'&&!o.stopped)return 'gone';
+  if(o.status==='CLAIMED'&&!o.number&&!o.stopped&&now<o.expiresAt+GRACE)return 'claimed';
+  if(now>o.expiresAt)return o.checking?'checking':'expired';
+  return 'pending';
+}
+function recapHtml(o){
+  return '<div class="recap"><b>Your order</b><div style="margin-top:8px">'+o.lines.map(function(l){return '<div style="margin-bottom:4px">'+esc(l.name)+' × '+l.qty+(l.note?'<div class="rn">'+esc(l.note)+'</div>':'')+'</div>'}).join('')+'</div>'+(o.note?'<hr style="border:0;border-top:1px solid #eee;margin:8px 0"><b>Note for the kitchen: '+esc(o.note)+'</b>':'')+'</div>';
+}
+function waitCard(){
+  var v=venturesMore()[0];if(!v)return '';
+  return '<div class="wait st"><div class="hd" data-act="waittoggle"><b>While you wait ✨</b><span class="tiny">'+(S.waitOpen?'▾ collapse':'▸ expand')+'</span></div>'+(S.waitOpen?'<div style="display:flex;gap:10px;margin-top:8px"><div class="img" style="width:60px;height:60px">photo</div><div style="font-size:13px">'+v.emoji+' <b>'+esc(v.name)+'</b><br>'+esc(v.tag||v.text)+'<br><a style="color:var(--g);font-weight:700;cursor:pointer" data-act="open-promo-link" data-id="'+v.id+'">'+esc(v.btnLabel)+' →</a></div></div>':'')+'</div>';
+}
+function stHero(color,label,val,cap){return '<div class="sthero" style="background:'+color+'"><div class="lb">'+label+'</div><div class="vl">'+esc(val)+'</div>'+(cap?'<div class="cp">'+esc(cap)+'</div>':'')+'</div>'}
+function stCard(icon,title,sub,btn){return '<div class="stwrap" style="padding-top:60px"><div style="font-size:54px">'+icon+'</div><div style="font-size:20px;font-weight:700;margin-top:10px">'+title+'</div>'+(sub?'<div style="color:#757575;margin-top:8px">'+sub+'</div>':'')+(btn?'<div style="margin-top:22px">'+btn+'</div>':'')+'</div>'}
+function againBtn(){return '<button class="btn" style="width:auto;padding:11px 22px;display:inline-block" data-act="again">Place another order</button>'}
+function renderStatus(){
+  var o=S.order;if(!o)return '<div class="empty" style="padding-top:80px">No order to show.<br><small>Place an order from the cart first.</small></div>';
+  var v=orderView();S.lastView=v;
+  if(v==='loading')return '<div style="display:flex;justify-content:center;padding-top:150px"><div class="spin"></div></div>';
+  if(v==='failed')return stCard('📶','Could not load your order status.','Please check your connection.','<button class="btn o" style="width:auto;padding:10px 22px" data-act="status-retry">Retry</button>');
+  if(v==='checking')return stCard('⏳','Checking with the counter…','One moment.','');
+  if(v==='gone')return stCard('ℹ️','The counter no longer has this request.','Please tell the cashier directly, or place your order again.',againBtn());
+  if(v==='expired')return stCard('⌛','This order request has expired.','If the cashier already has your order it will appear here shortly. Otherwise please place your order again, or tell the cashier directly at the counter.',againBtn());
+  if(v==='claimed')return '<div class="stwrap"><span class="stpill" style="background:#1565C0"><i></i>CASHIER HAS YOUR ORDER</span><div class="sticon">⏳</div><div class="sttitle">Cashier has your order — finishing up</div>'+stHero('#1565C0','YOUR ORDER CODE',o.code,o.name)+'<div class="instr">ℹ Stay at the counter — your order number appears here as soon as it\'s placed. You don\'t need to order again.</div><div class="stsub">This page updates by itself.</div>'+recapHtml(o)+waitCard()+'</div>';
+  if(v==='confirmed')return '<div class="stwrap"><span class="stpill done" style="background:#2E7D32">✓ CONFIRMED</span><div class="sticon" style="color:#2E7D32">✅</div><div class="sttitle">Order confirmed!</div>'+stHero('#2E7D32','YOUR ORDER NUMBER','#'+o.number,o.name)+'<div class="instr big">📸 Take a screenshot or remember this number — you may need to show it when your order is ready.</div><div class="stsub">Head to the counter — your order is on its way.</div>'+recapHtml(o)+waitCard()+'<div class="nudge">🗑 Once you\'re done eating, return the favor — <b>bin your leftovers and disposables</b> before you leave. A clean table takes 5 seconds. Thank you!</div><div class="sbtn"><button class="btn o" style="border-color:#2E7D32" data-act="rate">⭐ Rate us while you wait</button></div><div style="margin-top:20px">'+againBtn()+'</div></div>';
+  /* pending */
+  return '<div class="stwrap"><span class="stpill" style="background:#E65100"><i></i>PENDING — NOT PLACED YET</span><div class="sticon">🏪</div><div class="sttitle">Go to the counter to place your order</div>'+stHero('#E65100','YOUR ORDER CODE',o.code,o.name)+'<div class="instr">ℹ Tell the cashier this code and pay at the counter — your order is placed only once they confirm it.</div><div class="stsub">This code expires in <b id="cd">'+mmss(o.expiresAt-Date.now())+'</b> if not confirmed.</div>'+recapHtml(o)+waitCard()+'<div class="tracker"><div class="st on"><b>1</b>Show code</div><div class="ln"></div><div class="st"><b>2</b>Pay &amp; confirm</div></div></div>';
+}
+function cartBar(){
+  if(S.boot!=='ready'||!S.biz.ordering||!S.cart.length)return '';
+  if(S.route==='checkout'){var cl=S.cafe==='closed';return '<div class="cartbar'+(cl?' off':'')+'" role="button"'+(cl?' aria-disabled="true"':' data-act="place"')+'><span>Place Order</span><span>'+money(cartTotal())+' →</span></div>'}
+  if(S.route!=='menu')return '';
+  return '<div class="cartbar" data-act="go" data-v="checkout"><span>'+cartCount()+' item'+(cartCount()===1?'':'s')+' · '+money(cartTotal())+'</span><span>View Cart →</span></div>';
+}
+function appbar(){
+  var title=S.route==='menu'?(S.biz.name||'Cafe Countryside Menu'):S.route==='checkout'?'Checkout':'Your Order';
+  var left=S.route==='menu'?(S.biz.logo?'<span class="logoc">'+esc((S.biz.name||'C')[0])+'</span>':'<span style="width:38px"></span>'):(S.route==='status'?'<span style="width:38px"></span>':'<button class="ib" data-act="back" aria-label="Back">←</button>');
+  var right=S.route==='menu'?'<div style="display:flex"><button class="ib" data-act="refresh" title="Refresh menu">⟳</button>'+(S.biz.ordering?'<button class="ib" data-act="go" data-v="checkout" title="Cart"'+(cartCount()?'':' style="opacity:.5"')+'>🛒'+(cartCount()?'<span class="cnt">'+cartCount()+'</span>':'')+'</button>':'')+'</div>':'<span style="width:38px"></span>';
+  return '<div class="appbar">'+left+'<div class="ttl">'+esc(title)+'</div>'+right+'</div>';
+}
+function renderCustomer(){
+  if(S.mode!=='customer')return;
+  var el=$('#stage');
+  var focusId=document.activeElement&&document.activeElement.id,selStart=null;
+  if(focusId==='q'){selStart=document.activeElement.selectionStart}
+  var body;
+  if(S.boot==='stuck'){
+    body='<div class="appbar"><span style="width:38px"></span><div class="ttl">'+esc(S.biz.name)+'</div><span style="width:38px"></span></div><div class="scroll"><div class="splashmsg"><div class="spin" style="margin:0 auto 16px;animation:none;opacity:.35"></div><b>Taking longer than usual…</b><p style="margin:8px 24px">The menu is still starting. Check your connection.</p><button class="btn o" style="width:auto;padding:10px 24px;display:inline-block" data-act="bootreload">Reload</button></div></div><div style="position:absolute;left:0;right:0;bottom:8px;text-align:center" class="tiny">12 s safety net in index.html (also a noscript message)</div>';
+  } else if(S.boot==='splash'){
+    body='<div class="appbar"><span style="width:38px"></span><div class="ttl">Why Not? Cafe Countryside</div><span style="width:38px"></span></div><div class="scroll">'+(S.splashRoute==='menu'?renderSkeleton():'<div style="display:flex;justify-content:center;padding-top:150px"><div class="spin"></div></div>')+'</div><div style="position:absolute;left:0;right:0;bottom:8px;text-align:center" class="tiny">Stage 1 · HTML splash (before Flutter exists)</div>';
+  } else if(S.boot==='skeleton'){
+    body=appbar()+'<div class="scroll">'+renderSkeleton()+'</div><div style="position:absolute;left:0;right:0;bottom:8px;text-align:center" class="tiny">Stage 2 · Flutter skeleton while data loads</div>';
+  } else {
+    var main=S.route==='menu'?(S.menuLoad==='error'?'<div class="empty" style="padding-top:90px"><div style="font-size:54px">📡</div><div style="font-size:16px;color:#555;margin-top:10px">Could not load menu.</div><button class="btn" style="width:auto;padding:10px 20px;margin-top:14px;display:inline-block" data-act="menu-retry">⟳ Retry</button></div>':S.menuLoad==='empty'?'<div class="empty" style="padding-top:90px;font-size:16px">Menu is not available yet.<br>Please check back soon.</div>':renderMenu()):S.route==='checkout'?renderCheckout():renderStatus();
+    body=appbar()+'<div class="scroll" id="scroll"><div class="col">'+main+'</div></div>'+cartBar();
+  }
+  el.innerHTML='<div class="device'+(S.width==='wide'?' wide':'')+(S.card==='cur'?' cur':S.card==='cmp'?' cmp':'')+'" id="device">'+body+(S.dlg?dlgHtml():'')+'<div id="ovmount"></div></div>';
+  renderOverlay();renderToast();saveCart();
+  var q=$('#q');if(q&&focusId==='q'){q.focus();try{q.setSelectionRange(selStart,selStart)}catch(e){}}
+  bindInputs();
+}
+function bindScroll(){
+  var sc=$('#scroll');if(!sc||S.route!=='menu')return;var last=sc.scrollTop;
+  sc.onscroll=function(){var y=sc.scrollTop,d=y-last,h=$('#stickyhdr');if(!h){last=y;return}
+    if(!S.hdrCompact&&d>8&&y>140){S.hdrCompact=true;h.classList.add('compact');last=y}
+    else if(S.hdrCompact&&(d<-24||y<40)){S.hdrCompact=false;h.classList.remove('compact');last=y}
+    else if(Math.abs(d)>40)last=y};
+}
+function bindInputs(){bindScroll();
+  var q=$('#q');if(q)q.oninput=function(){S.q=q.value;S.busy=true;var l=$('#list');if(l)l.innerHTML=menuList()};
+  var n=$('#fname'),p=$('#fphone'),t=$('#ftable'),on=$('#onote');
+  if(n)n.oninput=function(){S.form.name=n.value};
+  if(p)p.oninput=function(){S.form.phone=p.value};
+  if(t)t.oninput=function(){S.form.table=t.value};
+  if(on)on.oninput=function(){S.orderNote=on.value;saveCart();var c=$('#onc');if(c)c.textContent=on.value.length+'/300'};
+  document.querySelectorAll('[data-act-in="note"]').forEach(function(x){x.oninput=function(){var l=S.cart.filter(function(c){return c.id===x.dataset.id})[0];if(l)l.note=x.value}});
+}
+
+/* ================= overlays ================= */
+function pickPromo(closed){
+  var P=S.biz.promo,list=P.list.filter(function(p){return p.enabled&&!promoProblem(p)&&dateOk(p)});
+  if(closed)list=list.filter(function(p){return p.kind==='venture'});
+  if(P.which!=='rotate')list=list.filter(function(p){return p.id===P.which});
+  if(!list.length)return null;
+  return list[S.rot%list.length];
+}
+function promoCard(p,mode,secsLeft){
+  var closed=mode==='closed';
+  var prog=(!closed&&p&&p.auto&&!reduceMotion())?'<div class="prog"><i id="progbar"></i></div>':'';
+  var hero=(p&&!closed)?'<div class="hero'+(p.cam?' cam':p.kind==='cafeOffer'?' of':'')+'">'+esc(p.hero||'photo')+'</div>':'';
+  var inner;
+  if(closed){
+    inner='<h5>We\'re closed right now</h5>'+(S.biz.hours?'<div class="hours">🕒 '+esc(S.biz.hours)+'</div>':'')+((S.biz.maps||S.biz.phone)?'<div class="row">'+(S.biz.maps?'<button class="btn sm o" data-act="dir">📍 Directions</button>':'')+(S.biz.phone?'<button class="btn sm o" data-act="tel">📞 Call</button>':'')+'</div>':'')+
+     (p&&(p.link&&linkOk(p))?'<div class="divider">— our other businesses —</div><b>'+p.emoji+' '+esc(p.name)+'</b><p style="margin:4px 0 10px">'+esc(p.tag||p.text)+'</p><button class="btn" data-act="open-promo-link" data-id="'+p.id+'">'+esc(p.btnLabel)+'</button>':'')+'<button class="btn o" style="margin-top:10px" data-act="close-popup">Browse the menu</button>';
+  } else {
+    inner=(p.madeBy?'<div class="madeby">🪵 Everything wooden you see here — the frames, the pieces on the counter — is handmade by Timber and Tales.</div>':'')+'<h5>'+esc(p.title)+'</h5><p>'+esc(p.text)+'</p>'+(p.btnLabel&&p.link&&linkOk(p)?'<button class="btn" data-act="open-promo-link" data-id="'+p.id+'">'+esc(p.btnLabel)+'</button>':'');
+  }
+  return '<div class="card" role="dialog" aria-modal="true" aria-label="'+(closed?'Café closed':esc(p.title))+'" id="pcard">'+prog+'<button class="cx" data-act="close-popup" aria-label="Close">✕</button>'+hero+'<div class="body">'+inner+'</div></div>';
+}
+function sectionSheet(){
+  var key=S.biz.secPopup.target,items=itemsFor(pubList(),key),title=key.indexOf('sec:')===0?(function(){var x=secById(S.pubSecs,key.slice(4));return x?secLabelOf(x):'Section'})():secLabel(key);
+  var n=cartCount();
+  return '<div class="sheet" role="dialog" aria-modal="true" aria-label="'+esc(title)+'"><div class="handle"></div><h4><span>'+esc(title)+' · '+items.length+' item'+(items.length===1?'':'s')+'</span><button class="cx" data-act="close-popup" aria-label="Close">✕</button></h4><div class="list" id="sheetlist">'+sortAvail(items).map(function(i){return itemCard(i,true,key)}).join('')+'</div><div class="bot">'+(n?'<button class="btn" data-act="sheet-cart"><span>'+n+' item'+(n===1?'':'s')+' · '+money(cartTotal())+'</span><span>View Cart →</span></button>':'<div class="tiny" style="text-align:center;padding:6px">Add items, then tap View Cart — or close this and keep browsing.</div>')+'</div></div>';
+}
+function detailSheet(){
+  var it=pubItem(S.popup.id);if(!it)return '';
+  var q=cartQty(it.id),na=!orderable(it),hasImg=it.img!==0,sp=[];
+  if(it.chef&&special('chef').visible)sp.push(special('chef').icon+' '+special('chef').name);
+  if(it.best&&special('best').visible)sp.push(special('best').icon+' '+special('best').name);
+  var sec=(secById(S.pubSecs,it.sec)||{name:''}).name;
+  var bar='';
+  if(S.biz.ordering){
+    if(na)bar='<button class="btn" disabled>Not available right now</button>';
+    else if(q)bar='<div style="display:flex;gap:10px;align-items:center"><div class="step" style="margin:0"><button data-act="dec" data-id="'+it.id+'" aria-label="Remove one">'+(q===1?'🗑':'−')+'</button><span>'+q+'</span><button data-act="inc" data-id="'+it.id+'" aria-label="Add one">+</button></div><button class="btn" data-act="close-popup">Done · '+q+' in cart</button></div>';
+    else bar='<button class="btn" data-act="inc" data-id="'+it.id+'" style="display:flex;justify-content:space-between"><span>Add to cart</span><span>'+money(it.price)+'</span></button>';
+  }
+  return '<div class="sheet half'+(S.popup.full?' full':'')+(hasImg?'':' noimg')+'" role="dialog" aria-modal="true" aria-label="'+esc(it.name)+'"><div class="handle" data-act="detail-expand" title="Tap or drag to expand"></div>'+
+   '<button class="cx" data-act="close-popup" aria-label="Close" style="position:absolute;right:8px;top:8px;z-index:3">✕</button>'+
+   (hasImg?'<div class="dhero">photo (Cloudinary, 4:3 crop)</div>':'')+
+   '<div class="dbody"><h3><span class="veg'+(it.veg?'':' nv')+'"></span>'+esc(it.name)+'</h3><div style="font-weight:700;color:var(--g2);font-size:16px">'+money(it.price)+'</div>'+
+   '<div style="margin:6px 0">'+sp.map(function(x){return '<span class="badge chef" style="margin-left:0;margin-right:4px">'+esc(x)+'</span>'}).join('')+(na?'<span class="badge na">'+esc(unavailText(it))+'</span>':'')+'</div>'+
+   '<div class="sec">About</div><div>'+esc(it.desc)+'</div>'+
+   (it.ing?'<div class="sec">Ingredients</div><div>'+esc(it.ing)+'</div>':'')+
+   '<div class="sec">Section</div><div>'+esc(sec)+(it.veg?' · Vegetarian':' · Non-vegetarian')+'</div>'+
+   ((it.from||it.till)?'<div class="sec">Availability</div><div>'+fmt12(it.from||'00:00')+'–'+fmt12(it.till||'23:59')+(na?' (not available right now)':'')+'</div>':'')+'</div>'+
+   (bar?'<div class="bot">'+bar+'</div>':'')+'</div>';
+}
+function moreSheet(){
+  return '<div class="sheet short" role="dialog" aria-modal="true" aria-label="More from us"><div class="handle"></div><h4><span>✨ More from us</span><button class="cx" data-act="close-popup" aria-label="Close">✕</button></h4><div class="list" style="padding:6px 12px">'+venturesMore().map(function(p){
+    return '<div class="foot" style="margin:8px 0"><div style="display:flex;gap:10px"><div class="img" style="width:56px;height:56px">logo</div><div><b>'+p.emoji+' '+esc(p.name)+'</b><div style="color:#455a64;font-size:13px">'+esc(p.tag||p.text)+'</div></div></div><div class="row"><button class="btn sm" data-act="open-promo-link" data-id="'+p.id+'">WhatsApp</button><button class="btn sm o" data-act="toast" data-v="Opens Instagram in a new tab (placeholder)">Instagram</button><button class="btn sm o" data-act="toast" data-v="Starts a phone call (placeholder)">Call</button></div></div>';}).join('')+'</div></div>';
+}
+function renderOverlay(){
+  var m=$('#ovmount');if(!m)return;
+  var pu=S.popup;
+  if(!pu){m.innerHTML='';return}
+  var inner='';
+  if(pu.type==='promo')inner=promoCard(pu.p,'open');
+  else if(pu.type==='closed')inner=promoCard(pu.p,'closed');
+  else if(pu.type==='section')inner=sectionSheet();
+  else if(pu.type==='more')inner=moreSheet();
+  else if(pu.type==='detail')inner=detailSheet();
+  m.innerHTML='<div class="ov'+(pu.shown?' still':'')+'" id="ov"><div class="dim" data-act="close-popup"></div>'+inner+'</div>';
+  pu.shown=true;
+  startAuto();
+}
+function startAuto(){
+  clearInterval(progTimer);var pu=S.popup;
+  if(!pu||pu.type!=='promo'||!pu.p.auto||reduceMotion())return;
+  var total=pu.p.secs*1000,left=pu.left!=null?pu.left:total,paused=false,last=Date.now();
+  var card=$('#pcard');
+  if(card){card.onmouseenter=function(){paused=true};card.onmouseleave=function(){paused=false};card.ontouchstart=function(){paused=true};card.ontouchend=function(){paused=false}}
+  progTimer=setInterval(function(){
+    var now=Date.now(),dt=now-last;last=now;
+    if(!paused)left-=dt;pu.left=left;
+    var bar=$('#progbar');if(bar)bar.style.width=Math.max(0,left/total*100)+'%';
+    if(left<=0){clearInterval(progTimer);closePopup(true)}
+  },100);
+}
+function pushHist(){try{history.pushState({popup:1},'',location.pathname+location.search+'#popup')}catch(e){}}
+var lastFocus=null;
+function openPopup(p){lastFocus=document.activeElement;S.popup=p;pushHist();renderOverlay();var x=$('#ov .cx');if(x)try{x.focus()}catch(e){}}
+function closePopup(viaCode,fromPop){
+  if(!S.popup)return;
+  if(S.popup.type==='detail'&&S.under){S.popup=S.under;S.under=null;renderOverlay();renderCustomerKeepScroll();return}
+  clearInterval(progTimer);S.popup=null;renderOverlay();
+  if(!fromPop&&location.hash==='#popup'){S.ignorePop=true;try{history.back()}catch(e){}}
+  if(S.mode==='customer')renderCustomerKeepScroll();
+  if(lastFocus&&document.body.contains(lastFocus))try{lastFocus.focus()}catch(e){}
+  clearTimeout(timers.next);
+  timers.next=setTimeout(nextPopup,300);
+}
+function renderCustomerKeepScroll(){var sc=$('#scroll'),y=sc?sc.scrollTop:0;renderCustomer();var s2=$('#scroll');if(s2)s2.scrollTop=y}
+window.addEventListener('popstate',function(){
+  if(S.ignorePop){S.ignorePop=false;return}
+  if(S.popup){closePopup(false,true);return}
+  if(S.mode!=='customer')return;
+  var h=location.hash.replace('#','');
+  var r=(h==='checkout')?'checkout':(h==='status'&&S.order)?'status':'menu';
+  if(r!==S.route){S.route=r;renderCustomerKeepScroll()}
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&S.popup)closePopup()});
+
+/* ================= pop-up coordinator ================= */
+var FREQ={every:'every load',session:'once per tab (a new QR scan opens a new tab, so this is almost every visit)',day:'once per day'};
+/* has this pop-up already used up its frequency? fresh=true means "first load of a brand-new session on a new day" */
+function seenFor(kind,freq,fresh){
+  if(fresh||freq==='every')return false;
+  if(freq==='day')return kind==='sec'?!!S.dayDoneSec:!!S.dayDonePromo;
+  return kind==='sec'?!!S.seenSec:!!S.seen;
+}
+/* the single source of truth for "which pop-up opens"; used by the app AND the inspector panel */
+function decide(fresh){
+  var b=S.biz,P=b.promo,closed=S.cafe==='closed',steps=[],res=null,v=b.first;
+  function add(s,t){steps.push({s:s,t:t})}
+  if(S.menuLoad!=='ok'){add('no','Menu did not load ('+(S.menuLoad==='error'?'network error':'not published yet')+') → no pop-ups, nothing to show them over');return {steps:steps,res:null}}
+  add('info','Café status: '+(closed?'CLOSED':S.cafe==='unknown'?'unknown → waits ≤ 2.5 s, then treated as OPEN':'open'));
+  add('info','First-load pop-up is set to: '+firstLabel()+' · '+FREQ[b.firstFreq]);
+  if(ordBanner()){add('no','The customer has an active order reminder (Order code / confirmed) → no automatic pop-up, so the order link is never covered');return {steps:steps,res:null}}
+  if(v==='none'){add('no','Set to “Nothing” → nothing opens');return {steps:steps,res:null}}
+  if(closed){
+    if(!P.closedInfo)add('no','Café is closed and the closed-café card is switched off → nothing opens');
+    else if(seenFor('promo',b.firstFreq,fresh))add('no','Closed-café card: already shown ('+FREQ[b.firstFreq]+')');
+    else{var cp=pickPromo(true);add('ok','Closed-café card (replaces your choice while closed): hours/Directions/Call'+(cp?' + '+cp.name:' only (no live venture)'));res={type:'closed',p:cp}}
+  }else if(isSectionChoice(v)){
+    var rs=sectionPopupReason();
+    if(rs)add('no','The chosen section can\'t open: '+rs+' → nothing opens');
+    else if(seenFor('sec',b.firstFreq,fresh))add('no','Section pop-up: already shown ('+FREQ[b.firstFreq]+')');
+    else{add('ok','Section pop-up: '+firstLabel());res={type:'section'}}
+  }else{
+    var rp=firstReason();
+    if(rp)add('no','The chosen promotion can\'t open: '+rp+' → nothing opens');
+    else if(seenFor('promo',b.firstFreq,fresh))add('no','Promo pop-up: already shown ('+FREQ[b.firstFreq]+')');
+    else{var pp=pickPromo(false);add('ok','Promo pop-up: '+pp.name);res={type:'promo',p:pp}}
+  }
+  return {steps:steps,res:res};
+}
+function buildQueue(){
+  if(S.busy)return [];
+  var d=decide(false);
+  return d.res?[d.res]:[];
+}
+/* why the section pop-up would NOT open (empty string = eligible); shared by the app and the admin status chip */
+function sectionPopupReason(){
+  var sp=S.biz.secPopup;
+  if(!sp.on)return 'Switch is off';
+  if(!S.biz.ordering)return 'Ordering is switched off';
+  if(S.cafe==='closed')return 'Café is closed';
+  var t=sp.target;
+  if(t==='chef'||t==='best'){if(!special(t).visible)return 'Section is hidden'}
+  else{var x=secById(S.pubSecs,t.slice(4));if(!x)return 'Section no longer available';if(!x.active)return 'Section is hidden'}
+  var its=itemsFor(pubList(),t);
+  if(!its.length)return 'Section has no items';
+  if(!its.some(orderable))return 'No available items';
+  return '';
+}
+function promoReason(p){
+  if(!p.enabled)return 'Disabled';
+  var pr=promoProblem(p);if(pr)return pr.indexOf('placeholder')>-1?'Placeholder number':pr.indexOf('links')>-1?'Bad link':pr.indexOf('Add an')>-1?'No content':'Invalid dates';
+  if(!dateOk(p))return 'Outside dates';
+  if(S.cafe==='closed'&&p.kind==='cafeOffer')return 'Hidden while café is closed';
+  return '';
+}
+function startPopups(){
+  if(S.cartRestored){S.cartRestored=false;toast('We kept your cart from earlier','info')}
+  if(S.started)return;S.started=true;
+  var delay=S.cafe==='unknown'?1500:350;   // unknown: the 2.5 s cap, shortened for the demo
+  clearTimeout(timers.start);
+  timers.start=setTimeout(function(){
+    if(S.mode!=='customer'||S.route!=='menu'){S.started=false;return}
+    S.queue=buildQueue();nextPopup();
+  },delay);
+}
+function nextPopup(){
+  if(S.popup||S.route!=='menu'||S.mode!=='customer'||S.boot!=='ready')return;
+  if(S.busy){S.queue=[];return}
+  var n=S.queue.shift();if(!n)return;
+  S.lastOpen=resText({res:n});
+  if(n.type==='promo'||n.type==='closed'){S.seen=true;S.dayDonePromo=true}
+  if(n.type==='section'){S.seenSec=true;S.dayDoneSec=true}
+  openPopup(n);
+}
+
+/* ================= boot sequence ================= */
+function bootApp(returning){
+  S.started=false;S.busy=false;S.queue=[];S.popup=null;S.route='menu';S.splashRoute='menu';S.lastOpen=null;
+  clearTimeout(timers.boot1);clearTimeout(timers.boot2);clearTimeout(timers.start);clearTimeout(timers.next);clearInterval(progTimer);
+  S.returning=!!returning;
+  if(returning){S.boot='splash';renderCustomer();timers.boot1=setTimeout(function(){S.boot='ready';renderCustomer();startPopups()},500);return}
+  S.boot='splash';renderCustomer();
+  timers.boot1=setTimeout(function(){S.boot='skeleton';renderCustomer();
+    timers.boot2=setTimeout(function(){S.boot='ready';renderCustomer();startPopups()},1300)},1100);
+}
+/* a cold /order-status/... link: route-aware splash = spinner (not the menu skeleton), no pop-ups, status page reloads from the counter */
+function bootDeep(){
+  S.started=true;S.busy=true;S.queue=[];S.popup=null;S.lastOpen=null;S.splashRoute='status';
+  clearTimeout(timers.boot1);clearTimeout(timers.boot2);clearTimeout(timers.start);clearTimeout(timers.next);clearInterval(progTimer);
+  S.mode='customer';S.boot='splash';S.route='menu';render();
+  timers.boot1=setTimeout(function(){S.boot='ready';S.splashRoute='menu';
+    if(S.order){S.route='status';statusReload()}else{S.route='menu';renderCustomer();toast('No order yet — a real link would load that order from the counter','info')}},900);
+}
+/* ================= admin rendering ================= */
+function tg(on,act,id){return '<button class="tg'+(on?' on':'')+'" data-act="'+act+'" '+(id?'data-id="'+id+'"':'')+' role="switch" aria-checked="'+(!!on)+'"></button>'}
+function unpublished(){return JSON.stringify({i:S.draft,s:S.draftSecs})!==JSON.stringify({i:S.pub,s:S.pubSecs})}
+function changeCount(){
+  var n=0,diff=function(a,b){var ids={};a.concat(b).forEach(function(i){ids[i.id]=1});Object.keys(ids).forEach(function(id){var x=a.filter(function(i){return i.id===id})[0],y=b.filter(function(i){return i.id===id})[0];if(JSON.stringify(x)!==JSON.stringify(y))n++})};
+  diff(S.draft,S.pub);diff(S.draftSecs,S.pubSecs);
+  /* section order is a change too */
+  if(S.draftSecs.map(function(x){return x.id}).join()!==S.pubSecs.map(function(x){return x.id}).join())n++;
+  return n;
+}
+function pubBanner(){
+  var n=changeCount();if(!n)return '';var cp=can('publish');
+  return '<div class="pubbar" style="background:#E65100;border-color:#E65100;color:#fff"><span>● '+n+' unpublished change'+(n===1?'':'s')+(cp?' — Publish to go live':' — a manager or owner must Publish')+'</span>'+(cp?'<span style="display:flex;gap:6px"><button class="ibtn" data-act="disc-draft" style="background:transparent;color:#fff;border-color:#fff">Discard</button><button class="ibtn" data-act="publish" style="background:#fff;color:#E65100;font-weight:700;border-color:#fff">Publish</button></span>':'')+'</div>';
+}
+function roleLabel(){return {owner:'Owner',manager:'Manager',staff:'Staff'}[S.role]}
+function tgd(on,act,id,off){return '<button class="tg'+(on?' on':'')+'" data-act="'+act+'" '+(id?'data-id="'+id+'"':'')+' role="switch" aria-checked="'+(!!on)+'"'+(off?' disabled style="opacity:.4;cursor:not-allowed"':'')+'></button>'}
+function atoast(msg,kind){S.atoastMsg={msg:msg,kind:kind||''};if(S.mode==='admin'&&S.auth==='admin')renderAdmin();clearTimeout(timers.at);timers.at=setTimeout(function(){S.atoastMsg=null;if(S.mode==='admin'&&S.auth==='admin')renderAdmin()},3200)}
+function setAuth(v){S.auth=v;var d=$('#dAuth');if(d)d.value=v;if(S.mode==='admin')renderAdmin()}
+function nowStamp(){var d=new Date(),m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],h=d.getHours()%12||12;return m[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear()+'  '+h+':'+('0'+d.getMinutes()).slice(-2)+(d.getHours()>=12?' PM':' AM')}
+function itemsInSection(id){return S.draft.filter(function(i){return i.sec===id})}
+
+function adminSections(){
+  var ro=!can('sections'),sp=S.biz.special,dis=ro?' disabled':'';
+  var html=pubBanner()+'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2>Sections</h2>'+(ro?'':'<button class="ibtn" data-act="sec-add">＋ Add section</button>')+'</div><p class="sub">Special sections are permanent — you can rename, hide and reorder them, but not delete them.</p>';
+  if(ro)html+='<div class="hint">Your role (Staff) can look at sections but not change them.</div>';
+  html+='<h3 style="margin:14px 0 4px">Special sections <span class="lock">🔒 can\'t be deleted</span></h3><div class="hint">This block is live immediately — no Publish needed. Your own sections further down still need Publish.</div>';
+  html+=sp.map(function(x,i){
+    var cnt=S.draft.filter(function(it){return x.key==='chef'?it.chef:it.best}).length;
+    return '<div class="tile'+(x.visible?'':' dis')+'"><div style="font-size:22px;width:38px;text-align:center">'+esc(x.icon)+'</div><div class="nm"><div style="display:flex;gap:6px;flex-wrap:wrap"><input class="in sm" style="width:46px;text-align:center" maxlength="4" value="'+esc(x.icon)+'" data-in="sp-icon" data-id="'+x.key+'" aria-label="Icon"'+dis+'><input class="in sm" style="width:190px" maxlength="24" value="'+esc(x.name)+'" data-in="sp-name" data-id="'+x.key+'" aria-label="Display name"'+dis+'><button class="ibtn" data-act="sp-reset" data-id="'+x.key+'" title="Reset name"'+dis+'>↺ default</button></div><small>'+(x.visible?'Shown to customers':'Hidden from customers')+' · '+cnt+' item'+(cnt===1?'':'s')+' flagged (draft — Publish to show)'+(cnt===0?' · stays hidden until you flag one':'')+'</small></div>'+
+      '<button class="ibtn" data-act="sp-vis" data-id="'+x.key+'"'+dis+'>'+(x.visible?'👁 Shown':'🚫 Hidden')+'</button><button class="ibtn" data-act="sp-up" data-id="'+x.key+'" '+(i===0||ro?'disabled':'')+'>▲</button><button class="ibtn" data-act="sp-down" data-id="'+x.key+'" '+(i===sp.length-1||ro?'disabled':'')+'>▼</button></div>';
+  }).join('');
+  if(sp[0].name.trim().toLowerCase()===sp[1].name.trim().toLowerCase())html+='<div class="err">⚠ Both special sections have the same name — customers will not be able to tell the chips apart.</div>';
+  html+='<div class="hint" style="background:#fff8e1;color:#6d4c00">Names (up to 24 characters) appear on the menu chips, the badge on item cards, the section pop-up title and in the first-load dropdown on the Promotions page. Leaving a name empty restores the default.</div>';
+  html+='<h3 style="margin:18px 0 4px">Your sections <span class="oldpill">existing screen · draft, needs Publish</span></h3>';
+  if(!S.draftSecs.length){html+='<div class="empty"><div style="font-size:42px">🗂</div>No sections yet.'+(ro?'':'<div style="margin-top:12px"><button class="ibtn" data-act="sec-add">＋ Add Section</button></div>')+'</div>'}
+  else html+=S.draftSecs.map(function(x,i,arr){
+    var n=itemsInSection(x.id).length;
+    return '<div class="tile"><div style="font-size:22px;width:38px;text-align:center;color:#9e9e9e">'+(x.icon?esc(x.icon):'⋮⋮')+'</div><div class="nm"><span style="'+(x.active?'':'color:#9e9e9e;text-decoration:line-through')+'">'+esc(x.name)+'</span><small style="color:'+(x.active?'#2e7d32':'#9e9e9e')+'">'+(x.active?'Visible on menu':'Hidden from menu')+' · '+n+' item'+(n===1?'':'s')+'</small></div>'+
+      (ro?'':tgd(x.active,'sec-vis',x.id)+'<button class="ibtn" data-act="sec-up" data-id="'+x.id+'" title="Move up (drag in the real app)"'+(i===0?' disabled':'')+'>▲</button><button class="ibtn" data-act="sec-down" data-id="'+x.id+'" title="Move down"'+(i===arr.length-1?' disabled':'')+'>▼</button><button class="ibtn" data-act="sec-edit" data-id="'+x.id+'" title="Edit">✎</button><button class="ibtn" style="color:#c62828" data-act="sec-del" data-id="'+x.id+'" title="Delete">🗑</button>')+'</div>';
+  }).join('');
+  return html;
+}
+function inp(label,id,val,err,type,extra){return '<div class="fld2"><label for="'+id+'" class="tiny">'+label+'</label><input type="'+(type||'text')+'" id="'+id+'" value="'+esc(val==null?'':val)+'"'+(extra||'')+'>'+(err?'<div class="e">'+err+'</div>':'')+'</div>'}
+function chk(label,id,on,extra){return '<div class="tgrow"><label for="'+id+'">'+label+'</label><input type="checkbox" id="'+id+'"'+(on?' checked':'')+'></div>'}
+function adminItems(){
+  var canM=can('items'),f=S.itemFilter;
+  var secs=S.draftSecs,all=S.draft;
+  var list=all.filter(function(i){return !f||i.sec===f});
+  list=list.slice().sort(function(a,b){return secs.map(function(x){return x.id}).indexOf(a.sec)-secs.map(function(x){return x.id}).indexOf(b.sec)});
+  var h=pubBanner()+'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2>Items</h2>'+(canM?'<div><button class="ibtn" data-act="atab" data-v="import">⬆ Bulk import</button> <button class="ibtn" data-act="itm-add">＋ Add item</button></div>':'')+'</div><p class="sub">Item changes are a draft until you <b>Publish</b>. The <b>availability (sold-out) switch is live</b>: it takes effect at once for everyone, with no Publish.</p>';
+  if(!canM)h+='<div class="hint">Your role (Staff) can switch availability only. That switch is live, so nothing is left waiting for a Publish.</div>';
+  if(secs.length)h+='<div class="filt"><button class="'+(!f?'on':'')+'" data-act="itm-filter" data-id="">All ('+all.length+')</button>'+secs.map(function(x){return '<button class="'+(f===x.id?'on':'')+'" data-act="itm-filter" data-id="'+x.id+'">'+esc(x.name)+' ('+itemsInSection(x.id).length+')</button>'}).join('')+'</div>';
+  if(f&&canM){var fs=secById(secs,f);h+='<div class="hint">Notes for <b>'+esc(fs?fs.name:'')+'</b>: <button class="ibtn" data-act="itm-bulknote" data-v="1">Allow notes for all</button> <button class="ibtn" data-act="itm-bulknote" data-v="0">Turn notes off for all</button> <span class="tag">NEW</span></div>'}
+  if(!list.length)return h+'<div class="empty"><div style="font-size:42px">🍽</div>No items yet.'+(canM?'<div style="margin-top:12px"><button class="ibtn" data-act="itm-add">＋ Add Item</button></div>':'')+'</div>';
+  h+=list.map(function(i){
+    var x=secById(secs,i.sec)||{name:'—'},grey=!i.active||!i.avail;
+    var meta=!i.active?'<span style="color:#ef6c00">Hidden from menu</span>':money(i.price)+' · '+esc(x.name)+(i.best?' · ⭐':'')+(i.chef?' · '+esc(special('chef').icon)+' '+esc(special('chef').name):'')+(i.note?'':' · no note')+((i.from||i.till)?' · '+esc(i.from||'00:00')+'–'+esc(i.till||'23:59'):'');
+    return '<div class="tile"><span class="veg'+(i.veg?'':' nv')+'"></span><div class="nm" style="'+(grey?'color:#9e9e9e':'')+'">'+esc(i.name)+'<small>'+meta+'</small></div>'+
+      (i.active?tgd(i.avail,'itm-avail',i.id):'')+
+      (canM?'<button class="ibtn" data-act="itm-vis" data-id="'+i.id+'" title="'+(i.active?'Hide from menu':'Show on menu')+'">'+(i.active?'👁':'🚫')+'</button><button class="ibtn" data-act="itm-edit" data-id="'+i.id+'" title="Edit">✎</button><button class="ibtn" style="color:#c62828" data-act="itm-del" data-id="'+i.id+'" title="Delete">🗑</button>':'')+'</div>';
+  }).join('');
+  return h;
+}
+function modalHtml(){
+  var m=S.am;if(!m)return '';
+  if(m.type==='discard')return '<div class="amodal"><div class="amodalbox" role="alertdialog" aria-modal="true" style="max-width:380px"><div class="mb"><h3 style="margin:0 0 8px">Discard changes?</h3><div>You have unsaved promotion edits. Leave without saving?</div></div><div class="acts"><button class="tbtn" data-act="disc-keep">Keep editing</button><button class="fbtn red" data-act="disc-go" data-v="'+m.v+'">Discard</button></div></div></div>';
+  if(m.type==='discardDraft')return '<div class="amodal"><div class="amodalbox" role="alertdialog" aria-modal="true" style="max-width:380px"><div class="mb"><h3 style="margin:0 0 8px">Discard '+m.n+' change'+(m.n===1?'':'s')+'?</h3><div>The draft goes back to exactly what customers see now. This cannot be undone.</div></div><div class="acts"><button class="tbtn" data-act="m-cancel">Keep editing</button><button class="fbtn red" data-act="disc-draft-go">Discard changes</button></div></div></div>';
+  if(m.type==='confirm')return '<div class="amodal"><div class="amodalbox" role="alertdialog" aria-modal="true" style="max-width:380px"><div class="mb"><h3 style="margin:0 0 8px">'+esc(m.title)+'</h3><div>'+esc(m.text)+'</div></div><div class="acts"><button class="tbtn" data-act="m-cancel">Cancel</button><button class="fbtn red" data-act="m-confirm">Delete</button></div></div></div>';
+  if(m.type==='sec'){var v=m.vals||{name:m.id?secById(S.draftSecs,m.id).name:'',icon:m.id?secById(S.draftSecs,m.id).icon:''},er=m.err||{};
+    return '<div class="amodal"><div class="amodalbox" role="dialog" aria-modal="true" style="max-width:380px"><div class="mb"><h3 style="margin:0 0 6px">'+(m.id?'Edit Section':'Add Section')+'</h3>'+inp('Section name *','m-name',v.name,er.name,'text',' placeholder="e.g. Starters" maxlength="40"')+inp('Icon (emoji, optional)','m-icon',v.icon,'','text',' placeholder="e.g. 🍽️" maxlength="4"')+'</div><div class="acts"><button class="tbtn" data-act="m-cancel">Cancel</button><button class="fbtn" data-act="m-save">'+(m.id?'Save':'Add')+'</button></div></div></div>';}
+  if(m.type==='item'){var d=m.vals,e=m.err||{};
+    return '<div class="amodal"><div class="amodalbox" role="dialog" aria-modal="true"><div class="mh"><span>'+(m.id?'Edit Item':'Add Item')+'</span><span><button data-act="m-cancel">Cancel</button><button data-act="m-save">Save</button></span></div><div class="mb">'+
+     '<div class="tgrow" style="border:0"><label for="m-img">Photo <span class="tiny">(stands for “Add image / Change image” → Cloudinary upload; no photo = text-only card)</span></label><input type="checkbox" id="m-img"'+(d.img?' checked':'')+'></div>'+
+     inp('Name *','m-name',d.name,e.name,'text',' maxlength="60"')+
+     inp('Price (₹) *','m-price',d.price,e.price,'text',' inputmode="decimal"')+
+     '<div class="fld2"><label for="m-sec" class="tiny">Section *</label><select id="m-sec">'+S.draftSecs.map(function(x){return '<option value="'+x.id+'"'+(d.sec===x.id?' selected':'')+'>'+esc(x.name)+'</option>'}).join('')+'</select></div>'+
+     '<div class="fld2"><label for="m-desc" class="tiny">Description</label><textarea id="m-desc" rows="2">'+esc(d.desc)+'</textarea></div>'+
+     inp('Ingredients','m-ing',d.ing,'','text')+
+     '<div style="display:flex;gap:10px"><div style="flex:1">'+inp('Available from','m-from',d.from,'','time')+'</div><div style="flex:1">'+inp('Available till','m-till',d.till,'','time')+'</div></div><div class="tiny">Empty = always available. Times are the café\'s (IST), not the customer\'s phone.</div>'+
+     chk('Vegetarian','m-veg',d.veg)+chk('Bestseller','m-best',d.best)+chk(esc(special('chef').icon+' '+special('chef').name)+' <span class="tag">NEW</span>','m-chef',d.chef)+chk('Allow a note on this item <span class="tag">NEW</span>','m-note',d.note)+chk('Available now','m-avail',d.avail)+chk('Needs kitchen preparation?','m-kit',d.kit)+
+     '</div></div></div>';}
+  return '';
+}
+function readItemForm(){
+  var g=function(id){var e=document.getElementById(id);return e?e.value:''},c=function(id){var e=document.getElementById(id);return e&&e.checked?1:0};
+  return {name:g('m-name'),price:g('m-price'),sec:g('m-sec'),desc:g('m-desc'),ing:g('m-ing'),from:g('m-from'),till:g('m-till'),veg:c('m-veg'),best:c('m-best'),chef:c('m-chef'),note:c('m-note'),avail:c('m-avail'),kit:c('m-kit'),img:c('m-img')};
+}
+function targetOptions(){
+  var o=[];S.biz.special.forEach(function(x){o.push({v:x.key,l:x.icon+' '+x.name+(x.visible?'':' (hidden)')})});
+  S.pubSecs.forEach(function(x){o.push({v:'sec:'+x.id,l:secLabelOf(x)+(x.active?'':' (hidden)')})});
+  var t=S.biz.secPopup.target;if(t.indexOf('sec:')===0&&!secById(S.pubSecs,t.slice(4)))o.push({v:t,l:'(section no longer available)'});
+  return o;
+}
+function expErr(v){var t=String(v).trim();if(!t)return 'Required';if(!/^\d+$/.test(t))return 'Enter a whole number';var n=parseInt(t,10);if(n<1||n>25)return 'Must be between 1 and 25';return ''}
+function adminSettings(){
+  var b=S.biz;
+  if(!can('settings'))return '<h2>Settings</h2><div class="empty"><div style="font-size:42px">🔒</div>Settings are restricted to owners.</div>';
+  return '<h2>Settings</h2><p class="sub">Owner only. The real page applies everything with one Save and writes only the fields it edits, so it can never overwrite sections or promotions changed elsewhere. This prototype applies edits instantly; Save re-checks them.</p>'+
+   '<div style="text-align:center;margin:8px 0 14px"><div style="width:96px;height:96px;border-radius:50%;background:#2e7d3218;border:2px solid #2e7d324d;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:34px;color:#2e7d32">'+(b.logo?esc((b.name||'C')[0]):'🏪')+'</div><button class="ibtn" style="margin-top:10px" data-act="set-logo">⬆ '+(b.logo?'Change Logo':'Upload Logo')+'</button></div>'+
+   '<h3 style="margin:10px 0 0">Cafe Information</h3>'+
+   '<label class="lbl">Cafe name *</label><input class="in" data-in="st-name" value="'+esc(b.name)+'"><div class="err" id="err-st-name"></div>'+
+   '<label class="lbl">Phone number</label><input class="in" data-in="st-phone" placeholder="+91 98765 43210" value="'+esc(b.phone)+'">'+
+   '<label class="lbl">Instagram handle</label><input class="in" data-in="st-ig" placeholder="@cafecountryside" value="'+esc(b.instagram)+'">'+
+   '<label class="lbl">Google Maps URL</label><input class="in" data-in="st-maps" placeholder="https://maps.google.com/..." value="'+esc(b.maps)+'">'+
+   '<label class="lbl">Opening hours</label><input class="in" data-in="st-hours" placeholder="Mon–Sun: 8:00 AM – 10:00 PM" value="'+esc(b.hours)+'">'+
+   '<div class="tiny" style="margin-top:4px">Empty phone / Instagram / Maps / hours simply drop out of the info strip (and out of the closed-café card).</div>'+
+   '<h3 style="margin:18px 0 0">Self-Order</h3>'+
+   '<div class="sw"><div>Enable self-ordering<small>Off immediately hides the cart and checkout (and the section pop-up) — use it if something goes wrong. Orders already placed are not affected.</small></div>'+tg(b.ordering,'set-ordering')+'</div>'+
+   '<label class="lbl">Self-order request expiry (minutes)</label><input class="in sm" style="width:90px" data-in="st-exp" value="'+b.expiryMin+'"><div class="tiny">How long a customer\'s request stays open for a cashier to claim it (1–25).</div><div class="err" id="err-st-exp"></div>'+
+   '<div class="sw"><div>Ask for a table number at checkout<small>Turn off for pure takeaway — customers are never asked for one.</small></div>'+tg(b.table,'set-table')+'</div>'+
+   '<div class="sw"><div>Allow a note for the whole order <span class="tag">NEW</span><small>Shows “Notes for the kitchen” on checkout. Live immediately.</small></div>'+tg(b.orderNote,'set-ordernote')+'</div>'+
+   '<h3 style="margin:18px 0 0">Menu Display</h3>'+
+   '<div class="hint">The old “Show Best Sellers tab” switch is replaced: Best Sellers and Chef Special are now managed in <b>Sections → Special sections</b>. (The old setting is read for one release as a fallback.)</div>'+
+   '<h3 style="margin:18px 0 0">Pop-up on open <span class="tag">NEW</span></h3>'+
+   '<div class="hint">What opens when the menu loads is now one choice, on <b>Promotions &amp; pop-up</b> (owner and manager). <button class="ibtn" data-act="atab" data-v="promos">Open</button> It currently says: <b>'+esc(firstLabel())+'</b>.</div>'+
+   '<div style="margin-top:16px"><button class="btn" style="width:auto;padding:10px 26px" data-act="set-save">Save Settings</button></div>';
+}
+function promoData(){return JSON.stringify({list:S.biz.promo.list,closedInfo:S.biz.promo.closedInfo})}
+function promoDirty(){return S.promoSnap!=null&&promoData()!==S.promoSnap}
+function adminPromos(){
+  if(!can('promos'))return '<h2>Promotions</h2><div class="empty"><div style="font-size:42px">🔒</div>Promotions can be edited by owners and managers.<br><small>(Open question in the plan: owner only, or owner + manager.)</small></div>';
+  var P=S.biz.promo,cur=P.list.filter(function(p){return p.id===P.editing})[0]||P.list[0];
+  var h='<h2>Promotions &amp; pop-up <span class="tag">NEW</span></h2><p class="sub">The real page has its own Save button and writes only promotion fields; this prototype applies edits instantly. Promos with placeholder numbers, bad links or no content cannot be enabled.</p>'+(promoDirty()?'<div class="hint" style="background:#fff8e1;color:#6d4c00">● Unsaved promotion edits. Save them, or leaving this page asks “Discard changes?”. (The prototype applies edits to customers instantly; Discard puts back the last saved version.)</div>':'')+'<div class="cols"><div>';
+  h+='<h3 style="margin:0 0 4px">First-load pop-up</h3><div class="hint">Pick <b>one</b> thing to open when the menu loads. Only that opens; nothing else pops up by itself. Change it any day, it applies at once (no Publish).</div>';
+  h+='<label class="lbl">What should open?</label>'+firstSelectHtml('class="in" data-in="first" aria-label="First-load pop-up"');
+  h+='<label class="lbl">How often</label><div>'+[['day','Once per day (recommended)'],['session','Once per tab'],['every','Every load']].map(function(f){return '<button class="pill'+(S.biz.firstFreq===f[0]?' on':'')+'" data-act="first-freq" data-id="'+f[0]+'">'+f[1]+'</button>'}).join('')+'</div>';
+  h+=(function(){var r=firstReason();return '<div class="hint" style="'+(r?'background:#fff8e1;color:#6d4c00':'background:#e8f5e9;color:#1b5e20')+'">'+(r?'Not opening right now: <b>'+esc(r)+'</b>':'<b>Live now</b> — customers will see it (how-often applies).')+'</div>'})();
+  h+='<div class="sw"><div>When the café is closed, show the café-info card<small>Hours, Directions, Call and one of your other businesses. Replaces your choice while closed (no ordering). Ignored when the choice is “Nothing”.</small></div>'+tg(P.closedInfo,'pr-closed')+'</div>';
+  h+='<h3 style="margin:16px 0 4px">Promos</h3>'+P.list.map(function(p){return '<div class="tile" style="cursor:pointer;'+(p.id===cur.id?'border-color:var(--g)':'')+'" data-act="pr-edit" data-id="'+p.id+'"><span class="pill'+(p.kind==='venture'?' on':'')+'" style="margin:0">'+(p.kind==='venture'?'Venture':'Café offer')+'</span><div class="nm">'+esc(p.name)+(function(){var r=promoReason(p);return r?'<span class="stat">Not live: '+esc(r)+'</span>':'<span class="stat live">Live now</span>'})()+'<small>'+(p.enabled?'Enabled':'Disabled')+(p.kind==='cafeOffer'?' · not shown when closed':'')+'</small></div><button class="ibtn" data-act="pr-up" data-id="'+p.id+'" aria-label="Move up">▲</button><button class="ibtn" data-act="pr-down" data-id="'+p.id+'" aria-label="Move down">▼</button>'+tg(p.enabled,'pr-enable',p.id)+'</div>'}).join('')+'<div style="margin-top:8px"><button class="ibtn" data-act="pr-add"'+(P.list.length>=4?' disabled':'')+'>＋ Add promo ('+P.list.length+'/4)</button> <button class="ibtn" data-act="pr-sample"'+(P.list.length>=4?' disabled':'')+'>Add sample promos (disabled)</button></div><div class="tiny" style="margin-top:6px">Samples use clearly fake numbers and cannot be enabled until real details are entered. Leaving this page with unsaved edits asks “Discard changes?” in the real app (it has its own Save).</div>';
+  h+='</div><div><h3 style="margin:0 0 4px">Edit: '+esc(cur.name)+'</h3>';
+  var shp=cur.imgShape||'wide',ar={wide:'16/9',tall:'4/5',square:'1/1'}[shp];
+  h+='<label class="lbl">Image <span class="tiny">(pretend upload — the real one uses the existing Cloudinary uploader)</span></label><select class="in sm" data-in="pr-img" aria-label="Pretend image file">'+[['wide','Photo 16:9 landscape'],['tall','Photo 4:5 portrait'],['square','Photo 1:1 square'],['big','Photo 3 MB (too large)']].map(function(o){return '<option value="'+o[0]+'"'+(o[0]===shp&&!cur.imgErr?' selected':'')+'>'+o[1]+'</option>'}).join('')+'</select>';
+  if(cur.imgErr)h+='<div class="err">'+esc(cur.imgErr)+'</div>';
+  h+='<div style="margin-top:8px"><div style="width:100%;max-width:300px;aspect-ratio:16/9;overflow:hidden;border-radius:8px;position:relative;border:1px solid var(--line);background:#eceff1"><div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);width:100%;aspect-ratio:'+ar+';background:repeating-linear-gradient(135deg,#90a4ae,#90a4ae 9px,#b0bec5 9px,#b0bec5 18px);display:flex;align-items:center;justify-content:center;color:#37474f;font-size:11px">'+(cur.hero?'photo '+(shp==='wide'?'16:9':shp==='tall'?'4:5':'1:1'):'no image')+'</div></div><div class="tiny">'+(shp==='wide'?'Shown as is.':'Cropped to the fixed 16:9 card box (smart crop), so the card never changes height.')+' Preview = what customers get.</div></div>';
+  h+='<label class="lbl">Title<span class="cnt2" id="cnt-pr-title">'+cur.title.length+'/60</span></label><input class="in" maxlength="60" data-in="pr-title" value="'+esc(cur.title)+'">';
+  h+='<label class="lbl">Text<span class="cnt2" id="cnt-pr-text">'+cur.text.length+'/200</span></label><textarea class="in" rows="3" maxlength="200" data-in="pr-text">'+esc(cur.text)+'</textarea>';
+  h+='<label class="lbl">Button label<span class="cnt2" id="cnt-pr-btn">'+cur.btnLabel.length+'/24</span></label><input class="in" maxlength="24" data-in="pr-btn" value="'+esc(cur.btnLabel)+'">';
+  h+='<label class="lbl">Button link (https, tel or wa.me only)</label><input class="in" data-in="pr-link" value="'+esc(cur.link)+'">';
+  if(promoProblem(cur))h+='<div class="err">⚠ '+promoProblem(cur)+'</div>';
+  h+='<div class="cols" style="gap:10px"><div style="min-width:130px"><label class="lbl">Start date (optional)</label><input class="in" type="date" data-in="pr-start" value="'+esc(cur.start||'')+'"></div><div style="min-width:130px"><label class="lbl">End date (optional)</label><input class="in" type="date" data-in="pr-end" value="'+esc(cur.end||'')+'"></div></div>';
+  if(!dateOk(cur))h+='<div class="tiny">Outside its date range today, so customers will not see it.</div>';
+  h+='<div class="sw"><div>Auto-disappear<small>The ✕ button is always shown regardless</small></div>'+tg(cur.auto,'pr-auto',cur.id)+'</div>';
+  h+='<label class="lbl">After how many seconds (3–30)</label><input class="in sm" type="number" min="3" max="30" style="width:90px" data-in="pr-secs" value="'+cur.secs+'">';
+  h+='<div class="sw"><div>Also show in “More from us”<small>and in the order-status card</small></div>'+tg(cur.more,'pr-more',cur.id)+'</div>';
+  h+='<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="ibtn" data-act="pr-save">💾 Save</button><button class="ibtn" data-act="pr-prev" data-v="open">👁 Preview: open mode</button><button class="ibtn" data-act="pr-prev" data-v="closed">👁 Preview: closed mode</button><button class="ibtn" data-act="pr-placeholder">Test: fill placeholder link</button><button class="ibtn" data-act="pr-dup" data-id="'+cur.id+'">⧉ Duplicate</button><button class="ibtn" style="color:var(--warn)" data-act="pr-del" data-id="'+cur.id+'">🗑 Delete</button></div>';
+  h+='</div></div>';
+  return h;
+}
+function navcard(icon,title,sub,tab,tag){return '<button class="navcard" data-act="atab" data-v="'+tab+'"><span style="font-size:22px">'+icon+'</span><span style="flex:1"><b>'+title+(tag?' <span class="tag">'+tag+'</span>':'')+'</b><small>'+sub+'</small></span><span>›</span></button>'}
+function adminDash(){
+  return pubBanner()+'<h2>Admin Dashboard</h2><div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0"><b style="font-size:18px">Welcome, Asha</b><span class="rolebadge">'+roleLabel()+'</span></div>'+
+   '<div class="sub" style="margin:16px 0 0">Live Menu <span class="tiny">(what customers see)</span></div><div class="counts"><div class="countc">🍽<b>'+pubList().length+'</b>Items</div><div class="countc">🗂<b>'+pubSecsActive().length+'</b>Sections</div></div><div class="tiny">✓ Last published: '+esc(S.pubAt)+'</div>'+
+   glanceCard()+
+   '<div class="sub" style="margin:22px 0 0">Manage</div>'+
+   navcard('🗂','Sections','Add, reorder, and toggle menu sections','sections')+navcard('🍽','Items','Add and edit menu items with pricing','items')+navcard('⚙️','Settings','Cafe name, logo, phone, hours','settings')+navcard('📣','Promotions','Pop-up, closed mode, ventures','promos','NEW')+
+   '<div class="sub" style="margin:22px 0 6px">Backup</div><button class="ibtn" data-act="export" style="padding:9px 14px">⬇ Export Menu JSON</button><div class="tiny" style="margin-top:4px">Downloads menu-backup-YYYY-MM-DD.json — save to your backups/ folder.</div>';
+}
+function glanceCard(){
+  var b=S.biz,rows=[];
+  rows.push(['Ordering',b.ordering?'<b style="color:#2E7D32">On</b>':'<b style="color:#C62828">Off</b> — customers cannot order']);
+  rows.push(['Café',S.cafe==='closed'?'<b style="color:#C62828">Closed</b> (from the counter)':S.cafe==='unknown'?'Unknown (treated as open)':'<b style="color:#2E7D32">Open</b>']);
+  var d=decide(true),line;
+  if(b.first==='none')line='Nothing opens on load';
+  else if(d.res)line='<b style="color:#2E7D32">Live:</b> '+esc(firstLabel())+' · '+esc(FREQ[b.firstFreq].split(' (')[0]);
+  else line='<b style="color:#E65100">Not opening:</b> '+esc((d.steps.filter(function(x){return x.s==='no'})[0]||{t:'see Promotions'}).t);
+  rows.push(['First-load pop-up',line]);
+  var n=changeCount();rows.push(['Unpublished changes',n?'<b style="color:#E65100">'+n+'</b> — Publish or Discard':'None']);
+  return '<div class="sub" style="margin:22px 0 6px">Today at a glance <span class="tag">NEW</span></div><div class="tile" style="display:block">'+rows.map(function(r){return '<div style="display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid #eee"><span>'+r[0]+'</span><span style="text-align:right">'+r[1]+'</span></div>'}).join('')+'</div>';
+}
+function adminProfile(){
+  return '<h2>Profile</h2><div style="text-align:center;margin:20px 0"><div style="width:96px;height:96px;border-radius:50%;background:#2e7d32;color:#fff;font-size:34px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto">A</div><div style="font-size:20px;font-weight:700;margin-top:12px">Asha Rao</div><div style="margin-top:6px"><span class="rolebadge">'+roleLabel()+'</span></div></div><hr style="border:0;border-top:1px solid #eee"><div class="tile" style="border:0;background:none"><span>✉️</span><div class="nm">Email<small>asha@cafe.example</small></div></div><div class="tile" style="border:0;background:none"><span>🛡</span><div class="nm">Role<small>'+roleLabel()+'</small></div></div><hr style="border:0;border-top:1px solid #eee"><div style="margin-top:16px"><button class="ibtn" style="color:#c62828;border-color:#c62828;padding:10px 18px" data-act="logout">⎋ Sign Out</button></div>';
+}
+function loginPage(){return '<div class="adminwrap" style="justify-content:center"><div class="loginbox"><div style="font-size:52px">🍽</div><h2 style="color:var(--g);margin:8px 0 2px">Cafe Countryside</h2><div style="color:#757575">Admin Panel</div><div style="margin-top:34px"><button class="ibtn" style="width:100%;padding:12px;color:var(--g);border-color:var(--g);font-weight:700" data-act="login">Sign in with Google</button></div><div class="tiny" style="margin-top:14px">Prototype: pick “Signed in, not an admin” in the side panel to see the Access Denied page.</div></div></div>'}
+function deniedPage(){return '<div class="adminwrap" style="justify-content:center"><div class="loginbox"><div style="font-size:60px">⛔</div><h2 style="margin:8px 0">Access Denied</h2><div style="color:#616161">Your account is not authorised to access this panel.<br>Contact the cafe owner to get access.</div><div style="margin-top:28px"><button class="ibtn" style="color:#c62828;border-color:#c62828;padding:10px 20px" data-act="logout">⎋ Sign Out</button></div></div></div>'}
+var IMPCASES={
+ ok:{items:[{name:'Brownie',sec:'Desserts',price:90},{name:'Cheesecake',sec:'Desserts',price:140},{name:'Cold Brew',sec:'Coffee',price:120},{name:'Garlic Bread',sec:'Snacks',price:110},{name:'Mango Shake',sec:'Shakes',price:130}],newSecs:['Desserts']},
+ errors:{errors:['Row 4: Price must be more than 0 (use a 100% discount at the counter to give an item free)','Row 6: Section is required','Row 9: Item Name is required']},
+ toomany:{errors:['File has 101 items. Maximum allowed per upload is 100.'],row0:true},
+ notxlsx:{errors:['Could not read the file: not an .xlsx workbook. Only .xlsx files are accepted.'],row0:true}
+};
+function adminImport(){
+  if(!can('items'))return '<h2>Bulk Import</h2><div class="empty">Access denied.</div>';
+  var im=S.imp,h=pubBanner()+'<h2>Bulk Import</h2><p class="sub">Add many items at once from a spreadsheet. They land in the <b>draft</b>; Publish to go live.</p>';
+  h+='<div class="tile" style="display:block"><b>Step 1 — Download sample template</b><div class="tiny">Fill it in Excel or Google Sheets, then upload.</div><div style="margin-top:8px"><button class="ibtn" data-act="imp-sample">⬇ Download Sample Sheet</button></div><div class="tiny" style="margin-top:8px">Columns: Section, Icon, Item Name, Price, Description, Ingredients, Vegetarian, Bestseller, Available, From, Till, Requires Kitchen, <b>Chef Special</b> <span class="tag">NEW</span>, <b>Allow Note</b> <span class="tag">NEW</span> (blank = defaults: not chef special, note allowed). Type a NEW section name to create one. Max 100 rows.</div></div>';
+  h+='<div class="tile" style="display:block"><b>Step 2 — Upload filled sheet</b><div class="tiny">Only .xlsx files. Max 100 rows.</div><div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><select class="in sm" data-in="imp-case" aria-label="Simulated file">'+[['ok','Pretend file: 5 valid rows'],['errors','Pretend file: has 3 errors'],['toomany','Pretend file: 101 rows'],['notxlsx','Pretend file: not an .xlsx']].map(function(c){return '<option value="'+c[0]+'"'+(S.impCase===c[0]?' selected':'')+'>'+c[1]+'</option>'}).join('')+'</select><button class="btn" style="width:auto;padding:9px 16px" data-act="imp-upload">⬆ '+(im?'Upload Again':'Upload Excel File')+'</button></div></div>';
+  if(im&&im.reading)h+='<div class="empty"><div class="spin" style="margin:0 auto 10px"></div>Reading file…</div>';
+  else if(im&&im.errors)h+='<div class="tile" style="display:block;background:#ffebee;border-color:#ef9a9a"><b style="color:#c62828">⛔ '+im.errors.length+' error'+(im.errors.length===1?'':'s')+' found — fix the file and re-upload</b><div style="margin-top:8px;font-size:13px">'+im.errors.map(function(e){return '<div>• '+esc(e)+'</div>'}).join('')+'</div></div>';
+  else if(im&&im.items)h+='<div class="tile" style="display:block"><b>Ready to import</b><div class="tiny">'+im.items.length+' items'+(im.newSecs.length?' · new section'+(im.newSecs.length===1?'':'s')+': '+esc(im.newSecs.join(', ')):'')+'</div><div style="margin:8px 0;font-size:13px">'+im.items.map(function(i){return '<div>• '+esc(i.name)+' — '+esc(i.sec)+' — '+money(i.price)+'</div>'}).join('')+'</div><button class="btn" style="width:auto;padding:9px 16px;display:inline-block" data-act="imp-confirm">Add to Draft</button> <button class="ibtn" data-act="imp-cancel">Cancel</button></div>';
+  return h;
+}
+function renderAdmin(){
+  var st=$('#stage');
+  if(S.auth==='out'){st.innerHTML=loginPage();return}
+  if(S.auth==='denied'){st.innerHTML=deniedPage();return}
+  var tabs=[['dash','Dashboard'],['sections','Sections'],['items','Items'],['import','  ↳ Bulk import'],['settings','Settings'],['promos','Promotions &amp; pop-up'],['profile','Profile']];
+  var fn={dash:adminDash,sections:adminSections,items:adminItems,import:adminImport,settings:adminSettings,promos:adminPromos,profile:adminProfile}[S.adminTab]||adminDash;
+  var body=fn();
+  var ae=document.activeElement,aid=ae&&ae.dataset&&ae.dataset.in?ae.dataset.in+'|'+(ae.dataset.id||''):null,pos=ae&&ae.selectionStart;
+  st.innerHTML='<div class="adminwrap"><div class="anav"><h2>Admin</h2><div class="tiny" style="margin:0 8px 8px">Signed in as <span class="rolebadge">'+roleLabel()+'</span></div>'+tabs.map(function(t){return '<button class="'+(S.adminTab===t[0]?'on':'')+'" data-act="atab" data-v="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div><div class="amain">'+body+'</div>'+modalHtml()+(S.atoastMsg?'<div class="atoast '+S.atoastMsg.kind+'">'+esc(S.atoastMsg.msg)+'</div>':'')+'</div>';
+  bindAdminInputs();
+  if(aid){var sel='[data-in="'+aid.split('|')[0]+'"]'+(aid.split('|')[1]?'[data-id="'+aid.split('|')[1]+'"]':'');var el=$(sel);if(el){el.focus();try{el.setSelectionRange(pos,pos)}catch(e){}}}
+}
+function bindAdminInputs(){
+  document.querySelectorAll('[data-in]').forEach(function(el){
+    var k=el.dataset.in;
+    var h=function(){
+      var v=el.value,P=S.biz.promo,cur=P.list.filter(function(p){return p.id===P.editing})[0];
+      if(k==='sp-name'){var s=special(el.dataset.id);s.name=v.trim()?v:(s.key==='chef'?'Chef Special':'Best Sellers');if(!v.trim()){}else{}}
+      else if(k==='sp-icon'){special(el.dataset.id).icon=v||'•'}
+      else if(k==='first'){S.biz.first=v;syncFirst()}
+      else if(k==='pr-title'){cur.title=v;var c1=$('#cnt-pr-title');if(c1)c1.textContent=v.length+'/60'}
+      else if(k==='pr-text'){cur.text=v;var c2=$('#cnt-pr-text');if(c2)c2.textContent=v.length+'/200'}
+      else if(k==='pr-btn'){cur.btnLabel=v;var c3=$('#cnt-pr-btn');if(c3)c3.textContent=v.length+'/24'}
+      else if(k==='pr-link'){cur.link=v;if(promoProblem(cur)&&cur.enabled){cur.enabled=false;toast('Disabled — '+promoProblem(cur),'err');renderAdmin()}}
+      else if(k==='pr-start'||k==='pr-end'){cur[k==='pr-start'?'start':'end']=v;if(promoProblem(cur)&&cur.enabled){cur.enabled=false;toast('Disabled — '+promoProblem(cur),'err')}renderAdmin()}
+      else if(k==='pr-secs'){cur.secs=Math.min(30,Math.max(3,parseInt(v||'8',10)))}
+      else if(k==='st-name'){var okn=!!v.trim();var en=$('#err-st-name');if(en)en.textContent=okn?'':'Cafe name is required';if(okn)S.biz.name=v.trim()}
+      else if(k==='st-phone')S.biz.phone=v.trim();
+      else if(k==='st-ig')S.biz.instagram=v.trim().replace(/^@/,'');
+      else if(k==='st-maps')S.biz.maps=v.trim();
+      else if(k==='st-hours')S.biz.hours=v.trim();
+      else if(k==='st-exp'){var me=expErr(v);var ee=$('#err-st-exp');if(ee)ee.textContent=me;if(!me)S.biz.expiryMin=parseInt(v,10)}
+      else if(k==='imp-case')S.impCase=v;
+      else if(k==='pr-img'){if(v==='big'){cur.imgErr='This file is 3 MB. Images must be under 1 MB — pick a smaller one.'}else{cur.imgErr='';cur.imgShape=v;cur.hero='photo — '+(v==='wide'?'16:9':v==='tall'?'4:5, cropped to 16:9':'1:1, cropped to 16:9')}}
+    };
+    if(el.tagName==='SELECT')el.onchange=function(){h();renderAdmin()};
+    else el.oninput=h;
+  });
+}
+
+/* ================= master render ================= */
+function render(){
+  $('#modeSeg').querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.v===S.mode)});
+  $('#widthSeg').querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.v===S.width)});
+  $('#widthSeg').style.display=S.mode==='customer'?'':'none';
+  if(S.mode==='customer')renderCustomer();else renderAdmin();
+}
+
+/* ================= actions ================= */
+function dlgHtml(){
+  var d=S.dlg;if(!d)return '';
+  return '<div class="dlgov"><div class="dlgbox" role="alertdialog" aria-modal="true" aria-label="Your cart has changed"><h4>Your cart has changed</h4><div style="font-size:14px">The menu was updated since you added these:</div><div style="margin-top:8px;font-size:14px">'+d.changes.map(function(c){return '<div style="margin-bottom:4px">• '+esc(c.name)+(c.removed?' is no longer available':': '+money(c.old)+' → '+money(c.nw))+'</div>'}).join('')+'</div><div class="acts"><button class="tbtn" data-act="dlg-back">Back to cart</button><button class="fbtn" data-act="dlg-update">Update &amp; place order</button></div></div></div>';
+}
+function place(skipReval){
+  var e={},f=S.form,ph=f.phone.trim();
+  if(!f.name.trim())e.name='Please enter your name';
+  if(!ph)e.phone='Please enter your phone number';else if(!/^\d{10}$/.test(ph))e.phone='Enter exactly 10 digits, no spaces or +91';
+  S.errs=e;
+  if(Object.keys(e).length){renderCustomerKeepScroll();return}
+  if(!S.biz.ordering){S.errs={form:'Ordering is switched off right now. Please order at the counter.'};renderCustomerKeepScroll();return}
+  /* re-check the café right now, not just at page load (it may have closed while typing) */
+  if(S.cafe==='closed'){S.errs={form:'We\'re closed right now, so we can\'t take your order. Please try again when we open.'};renderCustomerKeepScroll();return}
+  /* compare the cart with the FRESH published menu: a repriced / switched-off item is confirmed with the customer now */
+  if(!skipReval){
+    var changes=[];
+    S.cart.forEach(function(l){var it=pubItem(l.id);
+      if(!it||!orderable(it))changes.push({id:l.id,name:l.name,removed:true});
+      else if(it.price!==l.price)changes.push({id:l.id,name:l.name,old:l.price,nw:it.price})});
+    if(changes.length){S.dlg={changes:changes};renderCustomerKeepScroll();return}
+  }
+  var stripped=false,lines=[];
+  S.cart.forEach(function(l){var it=pubItem(l.id),note=l.note;if(note&&it&&!it.note){note=null;stripped=true}
+    lines.push({id:l.id,name:l.name,qty:l.qty,note:note,price:l.price})});
+  var onote=S.orderNote;if(onote&&!S.biz.orderNote){onote='';stripped=true}
+  if(!lines.length){S.errs={form:'None of the items in your cart are available right now.'};renderCustomerKeepScroll();return}
+  var total=lines.reduce(function(a,l){return a+l.price*l.qty},0);
+  orderSeq++;
+  S.order={lines:lines,note:onote,total:total,name:f.name.trim(),number:null,code:genCode(),status:'PENDING',createdAt:Date.now(),expiresAt:Date.now()+S.biz.expiryMin*60000,seen:true,finalDone:false,checking:false,stopped:false};
+  S.net='ok';S.lastView=null;S.lastOrderAt=Date.now();S.orderDismissed=null;memSet('order',S.order);memSet('lastOrderAt',S.lastOrderAt);memSet('dismissed',null);
+  S.cart=[];S.orderNote='';S.errs={};S.expanded={};S.dlg=null;S.route='status';try{history.replaceState({r:'status'},'',location.pathname+location.search+'#status')}catch(e2){}
+  if(stripped)toast('Notes aren\'t available for some items right now — they were removed from your order.','info');
+  renderCustomer();renderSim();
+}
+function go(v){
+  if(v!==S.route){var u=location.pathname+location.search+(v==='menu'?'':'#'+v);try{if(location.hash==='#popup')history.replaceState({r:v},'',u);else history.pushState({r:v},'',u)}catch(e){}}
+  S.route=v;S.busy=true;S.errs={};
+  if(v==='menu'&&S.orderState!=='none'&&S.cart.length===0){}
+  renderCustomer();var sc=$('#scroll');if(sc)sc.scrollTop=0;
+}
+function setSpecial(key,fn){fn(special(key));render()}
+function act(a,el){
+  var id=el.dataset.id,v=el.dataset.v;
+  if(act2(a,id,v,el))return;
+  switch(a){
+   case 'mode':if(v==='admin'&&S.popup){clearInterval(progTimer);S.popup=null;if(location.hash==='#popup'){S.ignorePop=true;try{history.back()}catch(e){}}}clearTimeout(timers.next);clearTimeout(timers.start);S.queue=[];S.mode=v;if(v==='customer'&&S.boot!=='ready'){S.boot='ready'}render();if(v==='customer')nextPopupSoon();break;
+   case 'width':S.width=v;render();break;
+   case 'replay':bootApp(v==='returning');break;
+   case 'newsession':S.seen=false;S.seenSec=false;S.rot++;toast('New session: "once per session" pop-ups can show again');break;
+   case 'nextday':S.seen=false;S.seenSec=false;S.dayDonePromo=false;S.dayDoneSec=false;S.rot++;toast('New day: even "once per day" pop-ups can show again');break;
+   case 'preset':applyPreset(v);break;
+   case 'atab':S.adminTab=v;renderAdmin();break;
+   case 'inc':{S.busy=true;var it=pubItem(id);var l=S.cart.filter(function(x){return x.id===id})[0];if(l){l.qty++}else{if(!it||!orderable(it))break;S.cart.push({id:id,qty:1,note:null,price:it.price,name:it.name})}
+      if(navigator.vibrate)try{navigator.vibrate(8)}catch(e){}
+      refreshCartUi(true);break}
+   case 'dec':{var l2=S.cart.filter(function(x){return x.id===id})[0];if(!l2)break;l2.qty--;if(l2.qty<=0)S.cart=S.cart.filter(function(x){return x.id!==id});refreshCartUi(false);break}
+   case 'chip':S.sec=(id===''||S.sec===id)?null:id;S.busy=true;renderCustomerKeepScroll();break;
+   case 'go':if(S.popup)closePopupQuiet();go(v);break;
+   case 'back':if(location.hash){try{history.back()}catch(e){S.route='menu';renderCustomer()}}else{S.route='menu';renderCustomer()}break;
+   case 'refresh':toast(S.menuLoad==='error'?'Could not reach the server — showing the last result':'Menu refreshed');break;
+   case 'notebtn':S.expanded[id]=true;renderCustomerKeepScroll();setTimeout(function(){var t=document.querySelector('textarea[data-id="'+id+'"]');if(t)t.focus()},30);break;
+   case 'place':place();break;
+   case 'waittoggle':S.waitOpen=!S.waitOpen;renderCustomerKeepScroll();break;
+   case 'detail':{S.busy=true;if(S.popup&&S.popup.type==='section'){S.under=S.popup;S.popup={type:'detail',id:id};renderOverlay()}else if(!S.popup){S.under=null;openPopup({type:'detail',id:id})}break}
+   case 'detail-expand':if(S.popup&&S.popup.type==='detail'){S.popup.full=!S.popup.full;S.popup.shown=true;renderOverlay()}break;
+   case 'more':S.busy=true;openPopup({type:'more'});break;
+   case 'close-popup':closePopup();break;
+   case 'sheet-cart':closePopupQuiet();go('checkout');break;
+   case 'tel':toast('📞 Would start a phone call (tel:)');break;
+   case 'dir':toast('📍 Would open Directions in a new tab');break;
+   case 'toast':toast(v);break;
+   case 'open-promo-link':{var p=S.biz.promo.list.filter(function(x){return x.id===id})[0];
+      var ok=p&&/^(https:\/\/|tel:)/.test(p.link);
+      toast(ok?'↗ Opens in a new tab: '+p.link.slice(0,46)+(p.link.length>46?'…':''):'Link blocked (only https, tel or wa.me allowed)',ok?'info':'err');break}
+   /* admin */
+   case 'sp-vis':setSpecial(id,function(s){s.visible=!s.visible});break;
+   case 'sp-reset':setSpecial(id,function(s){s.name=s.key==='chef'?'Chef Special':'Best Sellers';s.icon=s.key==='chef'?'👨‍🍳':'⭐'});break;
+   case 'sp-up':case 'sp-down':{var arr=S.biz.special,i=arr.map(function(s){return s.key}).indexOf(id),j=a==='sp-up'?i-1:i+1;if(j>=0&&j<arr.length){var t=arr[i];arr[i]=arr[j];arr[j]=t}renderAdmin();break}
+   case 'it-img':{var di=S.draft.filter(function(x){return x.id===id})[0];di.img=di.img===0?1:0;renderAdmin();break}
+   case 'it-best':case 'it-chef':case 'it-note':case 'it-avail':{var d=S.draft.filter(function(x){return x.id===id})[0],k={ 'it-best':'best','it-chef':'chef','it-note':'note','it-avail':'avail'}[a];d[k]=d[k]?0:1;renderAdmin();break}
+   case 'publish':S.pub=JSON.parse(JSON.stringify(S.draft));renderAdmin();toast('Published — customers will see the changes','info');break;
+   case 'set-ordering':S.biz.ordering=!S.biz.ordering;renderAdmin();break;
+   case 'set-ordernote':S.biz.orderNote=!S.biz.orderNote;renderAdmin();break;
+   case 'set-table':S.biz.table=!S.biz.table;renderAdmin();break;
+   case 'pr-closed':S.biz.promo.closedInfo=!S.biz.promo.closedInfo;renderAdmin();break;
+   case 'first-freq':S.biz.firstFreq=id;syncFirst();renderAdmin();break;
+   case 'pr-add':{var L=S.biz.promo.list;if(L.length>=4){toast('Maximum 4 promos — delete one first','err');break}
+      var np={id:'p'+Date.now().toString(36),kind:'venture',enabled:false,more:false,title:'',text:'',btnLabel:'',link:'',auto:false,secs:8,hero:'',name:'New promo',emoji:'✨'};
+      L.push(np);S.biz.promo.editing=np.id;renderAdmin();break}
+   case 'pr-dup':{var L2=S.biz.promo.list,src=L2.filter(function(x){return x.id===id})[0];if(!src)break;if(L2.length>=4){toast('Maximum 4 promos — delete one first','err');break}
+      var cp=JSON.parse(JSON.stringify(src));cp.id='p'+Date.now().toString(36);cp.enabled=false;cp.name=src.name+' (copy)';L2.push(cp);S.biz.promo.editing=cp.id;renderAdmin();break}
+   case 'pr-del':{var L3=S.biz.promo.list;if(L3.length<=1){toast('Keep at least one promo slot','err');break}
+      if(!confirm('Delete this promo? This cannot be undone.'))break;
+      S.biz.promo.list=L3.filter(function(x){return x.id!==id});if(S.biz.first==='promo:'+id){S.biz.first='rotate';syncFirst()}S.biz.promo.editing=S.biz.promo.list[0].id;renderAdmin();break}
+   case 'pr-up':case 'pr-down':{var L4=S.biz.promo.list,ix=L4.map(function(x){return x.id}).indexOf(id),jx=a==='pr-up'?ix-1:ix+1;if(jx>=0&&jx<L4.length){var tm=L4[ix];L4[ix]=L4[jx];L4[jx]=tm}renderAdmin();break}
+   case 'pr-edit':S.biz.promo.editing=id;renderAdmin();break;
+   case 'pr-enable':{var pp=S.biz.promo.list.filter(function(x){return x.id===id})[0];if(!pp.enabled&&promoProblem(pp)){toast('Cannot enable: '+promoProblem(pp),'err')}else pp.enabled=!pp.enabled;renderAdmin();break}
+   case 'pr-auto':case 'pr-more':{var q=S.biz.promo.list.filter(function(x){return x.id===id})[0];if(a==='pr-auto')q.auto=!q.auto;else q.more=!q.more;renderAdmin();break}
+   case 'pr-placeholder':{var cu=S.biz.promo.list.filter(function(x){return x.id===S.biz.promo.editing})[0];cu.link='https://wa.me/910000000000';cu.enabled=false;renderAdmin();toast('Placeholder detected — promo disabled','err');break}
+   case 'pr-prev':{S.mode='customer';S.boot='ready';S.route='menu';S.popup=null;render();var cu2=S.biz.promo.list.filter(function(x){return x.id===S.biz.promo.editing})[0];
+      var pv=v==='closed'?(cu2.kind==='venture'?cu2:pickPromo(true)):cu2;openPopup(v==='closed'?{type:'closed',p:pv}:{type:'promo',p:cu2});break}
+  }
+}
+function nextPopupSoon(){/* returning from admin: do not auto-open anything new */}
+function closePopupQuiet(){clearInterval(progTimer);S.popup=null;S.queue=[];clearTimeout(timers.next);renderOverlay()}
+function refreshCartUi(added){
+  if(S.popup&&S.popup.type==='section'){
+    var sc=$('#sheetlist'),y=sc?sc.scrollTop:0;renderOverlay();var s2=$('#sheetlist');if(s2)s2.scrollTop=y;
+    var scr=$('#scroll');
+  }
+  if(S.route==='checkout'){var y2=$('#scroll')?$('#scroll').scrollTop:0;renderCustomer();if($('#scroll'))$('#scroll').scrollTop=y2;return}
+  var y3=$('#scroll')?$('#scroll').scrollTop:0;
+  var sheetOpen=S.popup&&S.popup.type==='section';
+  var keep=sheetOpen?$('#sheetlist'):null,ky=keep?keep.scrollTop:0;
+  renderCustomer();
+  var s3=$('#scroll');if(s3)s3.scrollTop=y3;
+  var k2=$('#sheetlist');if(k2)k2.scrollTop=ky;
+}
+document.addEventListener('click',function(e){
+  var el=e.target.closest('[data-act]');if(!el)return;
+  if(el.classList.contains('dim')&&e.target!==el)return;
+  act(el.dataset.act,el);
+});
+$('#dCard').addEventListener('change',function(){S.card=this.value;if(S.mode==='customer')renderCustomerKeepScroll()});
+$('#dCafe').addEventListener('change',function(){S.cafe=this.value;toast('Café is now '+this.value+' — takes effect on next load/checkout',this.value==='closed'?'err':'info');if(S.mode==='customer')renderCustomerKeepScroll()});
+
+/* ================= scenario presets + live decision inspector ================= */
+function applyPreset(name){
+  var b=S.biz;
+  S.cafe='open';b.ordering=true;b.promo.closedInfo=true;b.first='chef';b.firstFreq='session';
+  if(name==='closed')S.cafe='closed';
+  if(name==='noorder')b.ordering=false;
+  if(name==='nosec')b.first='rotate';
+  if(name==='nopromo')b.first='best';
+  if(name==='none')b.first='none';
+  if(name==='timber'||name==='artistry'){var id=name==='timber'?'tim':'art',pp=b.promo.list.filter(function(x){return x.id===id})[0];
+    if(pp){pp.enabled=true;pp.start='';pp.end='';b.first='promo:'+id}}
+  syncFirst();
+  S.seen=false;S.seenSec=false;S.dayDonePromo=false;S.dayDoneSec=false;
+  $('#dCafe').value=S.cafe;
+  S.mode='customer';render();bootApp(true);
+}
+function targetName(){
+  var t=S.biz.secPopup.target;
+  if(t==='chef'||t==='best')return secLabel(t);
+  var o=targetOptions().filter(function(x){return x.v===t})[0];return o?o.l:'(section no longer available)';
+}
+function resText(d){
+  if(!d.res)return 'No pop-up opens';
+  if(d.res.type==='section')return 'Section pop-up → '+targetName();
+  if(d.res.type==='closed')return 'Closed-café card'+(d.res.p?' + '+d.res.p.name:' (café info only)');
+  return 'Promo pop-up → '+d.res.p.name;
+}
+function stepsHtml(d){
+  var ic={ok:'✔',no:'✖',skip:'–',info:'ℹ'};
+  return '<ul class="steps">'+d.steps.map(function(s){return '<li class="'+s.s+'"><b>'+ic[s.s]+'</b> '+esc(s.t)+'</li>'}).join('')+'</ul>';
+}
+function renderInspector(){
+  var el=$('#insp');if(!el)return;
+  var d=decide(false),f=decide(true),P=S.biz.promo,closed=S.cafe==='closed';
+  var open1=pickPromo(false),closed1=pickPromo(true);
+  var h='<h3>Why this happens (live)</h3>';
+  h+='<div class="res '+(S.lastOpen?'yes':'no')+'" id="lastopen">This load opened:<br><b>'+esc(S.lastOpen||(S.busy?'nothing (customer already interacted)':S.boot==='ready'?'nothing':'… still loading'))+'</b></div>';
+  h+='<div class="res '+(d.res?'yes':'no')+'" style="margin-top:8px" id="nextload">If the page loads again in this session:<br><b>'+esc(resText(d))+'</b></div>'+stepsHtml(d);
+  h+='<div class="res '+(f.res?'yes':'no')+'" style="margin-top:8px">First load of a new session / day:<br><b>'+esc(resText(f))+'</b></div>';
+  h+='<div class="sub2">Promos <span>(open-café pick ◀ O, closed-café pick ◀ C)</span></div><table class="pt">'+P.list.map(function(p){
+    var r=promoReason(p),mk=(open1&&open1.id===p.id?' ◀ O':'')+(closed1&&closed1.id===p.id?' ◀ C':'');
+    var why=r||(P.which!=='rotate'&&P.which!==p.id?'Not the chosen promo':'');
+    return '<tr><td>'+esc(p.name)+'<small>'+(p.kind==='venture'?'venture':'café offer')+'</small></td><td><span class="stat'+(why?'':' live')+'">'+esc(why||'Eligible')+'</span>'+(mk?'<b class="mk">'+mk+'</b>':'')+'</td></tr>';
+  }).join('')+'</table>';
+  var sp=visibleSpecials().map(function(s){return s.name}),vm=venturesMore().length;
+  function row(ok,t){return '<li class="'+(ok?'ok':'no')+'"><b>'+(ok?'✔':'✖')+'</b> '+t+'</li>'}
+  h+='<div class="sub2">UI shown right now</div><ul class="steps">'+
+    row(S.biz.ordering,'Cart, ADD buttons &amp; checkout'+(S.biz.ordering?'':' (ordering off)'))+
+    row(closed,'Red “closed” strip')+
+    row(S.biz.special[0].visible&&itemsFor(pubList(),'chef').length>0,esc(S.biz.special[0].name)+' chip')+
+    row(S.biz.special[1].visible&&itemsFor(pubList(),'best').length>0,esc(S.biz.special[1].name)+' chip')+
+    row(vm>0,'“More from us” chip + footer card ('+vm+' venture'+(vm===1?'':'s')+')')+
+    row(vm>0,'“While you wait” on order status')+
+    row(S.biz.orderNote,'Whole-order note at checkout')+'</ul>';
+  if(el.dataset.h===h)return;
+  el.dataset.h=h;el.innerHTML=h;
+  /* keep the quick controls in sync with admin edits */
+  var set=function(id,v){var c=$(id);if(c&&document.activeElement!==c)c.checked=!!v};
+  set('#dOrd',S.biz.ordering);set('#dPc',P.closedInfo);var fs=$('#dFirst');if(fs&&document.activeElement!==fs){fs.innerHTML=firstSelectHtml('').replace(/^<select >/,'').replace(/<\/select>$/,'');fs.value=S.biz.first}
+}
+function quick(fn){return function(){fn(this);if(S.mode==='customer'&&S.boot==='ready')renderCustomerKeepScroll();else if(S.mode==='admin')renderAdmin();renderInspector()}}
+$('#dOrd').addEventListener('change',quick(function(c){S.biz.ordering=c.checked}));
+$('#dFirst').addEventListener('change',quick(function(c){S.biz.first=c.value;syncFirst()}));
+$('#dPc').addEventListener('change',quick(function(c){S.biz.promo.closedInfo=c.checked}));
+$('#dClock').addEventListener('change',quick(function(c){if(c.value)S.clock=c.value;toast('Café time is now '+S.clock+' IST — item time windows use this','info')}));
+$('#dMenu').addEventListener('change',function(){S.menuLoad=this.value;toast('Menu load: '+this.options[this.selectedIndex].text+' — takes effect on next load / Retry',this.value==='ok'?'info':'err')});
+$('#dAuth').addEventListener('change',function(){S.auth=this.value;if(S.mode==='admin')renderAdmin()});
+$('#dRole').addEventListener('change',function(){S.role=this.value;if(S.mode==='admin')renderAdmin()});
+$('#dDate').addEventListener('change',quick(function(c){if(c.value)TODAY=c.value;toast('Today is now '+TODAY+' — promo start/end dates use this','info')}));
+setInterval(renderInspector,600);   /* cheap: only touches the DOM when the text changed */
+renderInspector();
+
+/* ================= order status machine + counter simulator ================= */
+function afterChange(){
+  persistOrder();
+  var typing=document.activeElement&&document.activeElement.id==='q';
+  if(S.mode==='customer'&&(S.route==='status'||(S.route==='menu'&&!typing))&&S.boot==='ready'&&!S.popup)renderCustomerKeepScroll();
+  renderSim();
+}
+function statusReload(){
+  var o=S.order;if(!o)return;
+  o.seen=false;o.stopped=false;o.checking=false;o.finalDone=false;S.statusLoading=true;S.route='status';S.lastView=null;
+  if(S.mode==='customer'&&S.boot==='ready')renderCustomer();
+  clearTimeout(timers.stload);
+  timers.stload=setTimeout(function(){S.statusLoading=false;if(S.net==='ok'){o.seen=true;o.finalDone=Date.now()>o.expiresAt}afterChange()},800);
+}
+function statusTick(){
+  var o=S.order;if(!o)return;
+  var now=Date.now();
+  if(!S.statusLoading&&!o.number&&o.status==='PENDING'&&now>o.expiresAt&&!o.finalDone&&o.seen&&!o.checking){
+    /* the moment the window closes, look once more: a claim may have landed since the last poll */
+    o.finalDone=true;o.checking=true;setTimeout(function(){o.checking=false;if(orderView()==='expired')o.stopped=true;afterChange()},1200);afterChange();return;
+  }
+  var v=orderView();
+  if(v==='expired')o.stopped=true;
+  var cd=$('#cd');if(cd)cd.textContent=mmss(o.expiresAt-now);
+  if(S.route==='status'&&v!==S.lastView)afterChange();
+  else if(S.route==='menu'&&v!==S.bannerView){S.bannerView=v;afterChange()}
+}
+var VIEWNAME={loading:'Loading',failed:'Load failed',pending:'PENDING (orange, code)',claimed:'CLAIMED (blue)',confirmed:'CONFIRMED (green, number)',checking:'Final check',expired:'Expired',gone:'Counter dropped it'};
+function renderSim(){
+  var el=$('#sim');if(!el)return;
+  var o=S.order,h='<h3>Counter simulator (cashier side)</h3>';
+  if(!o){h+='<div class="tiny">No order yet. Add items → cart → <b>Place Order</b>, then drive the status screen from here. The real page polls every few seconds; this prototype applies each action instantly.</div>'}
+  else{
+    var v=orderView(),now=Date.now();
+    h+='<div class="res yes">Customer screen: <b>'+esc(VIEWNAME[v]||v)+'</b></div>';
+    h+='<ul class="steps"><li class="info">Request at the counter: <b>'+o.status+'</b>'+(o.number?' · order #'+o.number:'')+'</li><li class="info">Expires '+(now>o.expiresAt?'<b>'+mmss(now-o.expiresAt)+' ago</b>':'in <b>'+mmss(o.expiresAt-now)+'</b>')+' ('+S.biz.expiryMin+' min window, grace after expiry while claimed: 15 min)</li><li class="info">Page polling: <b>'+(o.stopped?'stopped':'active')+'</b>'+(S.net==='fail'?' · network is DOWN':'')+'</li></ul>';
+    h+='<div class="simrow"><button class="pbtn" data-act="cs-claim">Cashier claims it</button><button class="pbtn" data-act="cs-place">Cashier places the order (#)</button><button class="pbtn" data-act="cs-expire">Let the timer run out</button><button class="pbtn" data-act="cs-gone">Counter deletes the request</button><button class="pbtn" data-act="cs-net">'+(S.net==='ok'?'Break network':'Restore network')+'</button><button class="pbtn" data-act="cs-reload">Reload status page</button><button class="pbtn" data-act="cs-open">Open status page</button><button class="pbtn" data-act="cs-3h">Pretend 3 hours passed</button></div>';
+    h+='<div class="tiny" style="margin-top:6px">Try: let the timer run out → “Checking…” → Expired (polling stops, a later claim is not seen until reload). Claim first, then let it run out → stays “Cashier has your order” for 15 min.</div>';
+  }
+  if(el.dataset.h===h)return;el.dataset.h=h;el.innerHTML=h;
+}
+setInterval(function(){statusTick();renderSim()},1000);
+function act2(a,id,v,el){
+  switch(a){
+   case 'cs-claim':{var o=S.order;if(!o)return true;if(o.number||o.status==='GONE'){toast('Too late — already '+(o.number?'placed':'gone'),'err');return true}o.status='CLAIMED';afterChange();return true}
+   case 'cs-place':{var o2=S.order;if(!o2)return true;if(!o2.number){orderSeq++;o2.number=orderSeq}o2.status='PLACED';afterChange();return true}
+   case 'cs-expire':{var o3=S.order;if(!o3){toast('Place an order first','info');return true}o3.expiresAt=Date.now()-1000;afterChange();return true}
+   case 'cs-gone':{var o4=S.order;if(!o4)return true;o4.status='GONE';afterChange();return true}
+   case 'cs-net':S.net=S.net==='ok'?'fail':'ok';renderSim();return true;
+   case 'cs-reload':case 'status-retry':statusReload();return true;
+   case 'cs-open':{if(!S.order)return true;S.mode='customer';render();statusReload();return true}
+   case 'again':go('menu');return true;
+   case 'rate':toast('↗ Opens the Google review page in a new tab','info');return true;
+   case 'ig':toast('↗ Opens instagram.com/@'+S.biz.instagram+' in a new tab','info');return true;
+   case 'cafe-recheck':toast(S.cafe==='closed'?'Checked with the counter — still closed':'Checked — we are open now','info');renderCustomerKeepScroll();return true;
+   case 'dlg-back':S.dlg=null;renderCustomerKeepScroll();return true;
+   case 'dlg-update':{var d=S.dlg;S.dlg=null;
+      d.changes.forEach(function(c){if(c.removed)S.cart=S.cart.filter(function(l){return l.id!==c.id});else{var l=S.cart.filter(function(x){return x.id===c.id})[0];if(l)l.price=c.nw}});
+      if(!S.cart.length){S.errs={form:'None of the items in your cart are available right now.'};renderCustomerKeepScroll();toast('None of the items in your cart are available right now.');return true}
+      place(true);return true}
+   case 'menu-retry':{if(S.menuLoad==='ok'){renderCustomerKeepScroll()}else toast(S.menuLoad==='error'?'Still can\'t reach the server. Check your connection and retry.':'Menu is still not published yet.','err');return true}
+   case 'bootreload':bootApp(false);return true;
+   case 'ord-open':if(S.order){S.mode='customer';statusReload()}return true;
+   case 'ord-dismiss':S.orderDismissed=S.order&&S.order.code;memSet('dismissed',S.orderDismissed);renderCustomerKeepScroll();return true;
+   case 'cs-3h':if(S.order){S.lastOrderAt=Date.now()-3*3600*1000-1000;memSet('lastOrderAt',S.lastOrderAt);afterChange();toast('Pretending 3 hours have passed — the menu reminder disappears','info')}return true;
+   case 'resetall':try{Object.keys(localStorage).forEach(function(k){if(k.indexOf('p1proto:')===0)localStorage.removeItem(k)});sessionStorage.removeItem('p1proto:cart')}catch(e){}try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}location.reload();return true;
+   case 'bootstuck':{clearTimeout(timers.boot1);clearTimeout(timers.boot2);clearTimeout(timers.start);S.mode='customer';S.boot='stuck';S.popup=null;S.queue=[];render();return true}
+   case 'deeplink':bootDeep();return true;
+   case 'expire':act2('cs-expire');return true;
+  }
+  return act3(a,id,v,el);
+}
+function act3(a,id,v,el){
+  switch(a){
+   case 'atab':{
+      if(S.adminTab==='promos'&&v!=='promos'&&promoDirty()){S.am={type:'discard',v:v};renderAdmin();return true}
+      if(v==='promos'&&S.adminTab!=='promos')S.promoSnap=promoData();
+      S.adminTab=v;S.am=null;if(v!=='import')S.imp=null;renderAdmin();return true}
+   case 'disc-draft':S.am={type:'discardDraft',n:changeCount()};renderAdmin();return true;
+   case 'disc-draft-go':S.draft=JSON.parse(JSON.stringify(S.pub));S.draftSecs=JSON.parse(JSON.stringify(S.pubSecs));S.am=null;S.itemFilter=null;atoast('Draft discarded — back to what customers see');return true;
+   case 'pr-save':S.promoSnap=promoData();atoast('Saved — live for customers');return true;
+   case 'disc-keep':S.am=null;renderAdmin();return true;
+   case 'disc-go':{var snap=JSON.parse(S.promoSnap);S.biz.promo.list=snap.list;S.biz.promo.closedInfo=snap.closedInfo;if(S.biz.first.indexOf('promo:')===0&&!S.biz.promo.list.some(function(q){return 'promo:'+q.id===S.biz.first})){S.biz.first='rotate'}syncFirst();S.am=null;S.adminTab=v;renderAdmin();return true}
+   case 'itm-bulknote':{var f=S.itemFilter,cnt=0;if(!f)return true;S.draft.forEach(function(i){if(i.sec===f){i.note=+v;cnt++}});atoast((+v?'Notes allowed':'Notes turned off')+' for '+cnt+' item'+(cnt===1?'':'s')+' (draft — Publish to go live)');return true}
+   case 'login':setAuth('admin');return true;
+   case 'logout':setAuth('out');return true;
+   case 'export':atoast('Backup downloaded.');return true;
+   case 'publish':S.pub=JSON.parse(JSON.stringify(S.draft));S.pubSecs=JSON.parse(JSON.stringify(S.draftSecs));S.pubAt=nowStamp();atoast('Published — customers will see the changes');return true;
+   /* sections (draft) */
+   case 'sec-add':S.am={type:'sec'};renderAdmin();return true;
+   case 'sec-edit':S.am={type:'sec',id:id};renderAdmin();return true;
+   case 'sec-vis':{var x=secById(S.draftSecs,id);x.active=x.active?0:1;renderAdmin();return true}
+   case 'sec-up':case 'sec-down':{var arr=S.draftSecs,i=arr.map(function(q){return q.id}).indexOf(id),j=a==='sec-up'?i-1:i+1;if(j>=0&&j<arr.length){var t=arr[i];arr[i]=arr[j];arr[j]=t}renderAdmin();return true}
+   case 'sec-del':{var sx=secById(S.draftSecs,id),n=itemsInSection(id).length;
+      if(n>0){atoast('This section has '+n+' item'+(n===1?'':'s')+'. Move or delete them first.','err');return true}
+      S.am={type:'confirm',kind:'sec',id:id,title:'Delete section?',text:'Delete "'+sx.name+'"? This cannot be undone.'};renderAdmin();return true}
+   /* items (draft) */
+   case 'itm-filter':S.itemFilter=id||null;renderAdmin();return true;
+   case 'itm-add':{if(!S.draftSecs.length){atoast('Add at least one section first.','err');return true}
+      S.am={type:'item',vals:{name:'',price:'',sec:(S.itemFilter&&secById(S.draftSecs,S.itemFilter)?S.itemFilter:S.draftSecs[0].id),desc:'',ing:'',from:'',till:'',veg:1,best:0,chef:0,note:1,avail:1,kit:1,img:1}};renderAdmin();return true}
+   case 'itm-edit':{var it=S.draft.filter(function(q){return q.id===id})[0];
+      S.am={type:'item',id:id,vals:{name:it.name,price:String(it.price),sec:it.sec,desc:it.desc,ing:it.ing,from:it.from,till:it.till,veg:it.veg,best:it.best,chef:it.chef,note:it.note,avail:it.avail,kit:it.kit,img:it.img===0?0:1}};renderAdmin();return true}
+   case 'itm-vis':{var it2=S.draft.filter(function(q){return q.id===id})[0];it2.active=it2.active?0:1;renderAdmin();return true}
+   case 'itm-avail':{var it3=S.draft.filter(function(q){return q.id===id})[0];it3.avail=it3.avail?0:1;var pi=S.pub.filter(function(q){return q.id===id})[0];if(pi)pi.avail=it3.avail;/* the sold-out switch is LIVE: written to the published menu at once, no Publish */
+      atoast('Live now: '+it3.name+' is '+(it3.avail?'available':'sold out')+'. Customers see it on their next refresh (≤ 20 min) and at checkout.');return true}
+   case 'itm-del':{var it4=S.draft.filter(function(q){return q.id===id})[0];S.am={type:'confirm',kind:'item',id:id,title:'Delete item?',text:'Delete "'+it4.name+'"? This cannot be undone.'};renderAdmin();return true}
+   /* modal buttons */
+   case 'm-cancel':S.am=null;renderAdmin();return true;
+   case 'm-confirm':{var m=S.am;S.am=null;
+      if(m.kind==='sec'){S.draftSecs=S.draftSecs.filter(function(q){return q.id!==m.id});atoast('Section deleted (draft)')}
+      else{S.draft=S.draft.filter(function(q){return q.id!==m.id});atoast('Item deleted (draft)')}
+      return true}
+   case 'm-save':{var m2=S.am;if(!m2)return true;
+      if(m2.type==='sec'){var nm=(document.getElementById('m-name').value||'').trim(),ic=(document.getElementById('m-icon').value||'').trim();
+        if(!nm){m2.vals={name:nm,icon:ic};m2.err={name:'Name is required'};renderAdmin();return true}
+        if(m2.id){var ex=secById(S.draftSecs,m2.id);ex.name=nm;ex.icon=ic}else S.draftSecs.push({id:'s'+Date.now().toString(36),name:nm,icon:ic,active:1});
+        S.am=null;atoast('Section saved (draft)');return true}
+      if(m2.type==='item'){var d=readItemForm(),er={},ps=d.price.trim();
+        if(!d.name.trim())er.name='Name is required';
+        if(!ps)er.price='Price is required';else if(isNaN(Number(ps)))er.price='Enter a valid number';else if(Number(ps)<=0)er.price='Price must be more than ₹0 (to give an item free, use a 100% discount at the counter)';
+        if(Object.keys(er).length){m2.vals=d;m2.err=er;renderAdmin();return true}
+        var rec={name:d.name.trim(),price:Number(ps),sec:d.sec,desc:d.desc.trim(),ing:d.ing.trim(),from:d.from,till:d.till,veg:d.veg,best:d.best,chef:d.chef,note:d.note,avail:d.avail,kit:d.kit,img:d.img?1:0};
+        if(m2.id){var cur=S.draft.filter(function(q){return q.id===m2.id})[0];for(var k in rec)cur[k]=rec[k];var pj=S.pub.filter(function(q){return q.id===m2.id})[0];if(pj)pj.avail=cur.avail}
+        else{rec.id='n'+Date.now().toString(36);rec.active=1;S.draft.push(rec)}
+        S.am=null;atoast('Item saved to draft — Publish to go live');return true}
+      return true}
+   /* bulk import */
+   case 'imp-sample':atoast('Downloaded menu-import-sample.xlsx (uses your real section names)');return true;
+   case 'imp-upload':{S.imp={reading:true};renderAdmin();var cs=S.impCase||'ok';setTimeout(function(){S.imp=JSON.parse(JSON.stringify(IMPCASES[cs]));if(S.mode==='admin'&&S.adminTab==='import')renderAdmin()},700);return true}
+   case 'imp-cancel':S.imp=null;renderAdmin();return true;
+   case 'imp-confirm':{var im=S.imp;if(!im||!im.items)return true;
+      im.newSecs.forEach(function(nme){if(!S.draftSecs.some(function(q){return q.name.toLowerCase()===nme.toLowerCase()}))S.draftSecs.push({id:'s'+Date.now().toString(36)+nme[0],name:nme,icon:'',active:1})});
+      im.items.forEach(function(r,ix){var sx2=S.draftSecs.filter(function(q){return q.name.toLowerCase()===r.sec.toLowerCase()})[0];
+        S.draft.push({id:'b'+Date.now().toString(36)+ix,sec:sx2.id,name:r.name,price:r.price,veg:1,best:0,chef:0,note:1,avail:1,desc:'',ing:'',from:'',till:'',kit:1,active:1,img:1})});
+      var cnt=im.items.length;S.imp=null;S.adminTab='items';renderAdmin();atoast(cnt+' items added to draft. Publish to go live.');return true}
+   /* settings */
+   case 'set-logo':S.biz.logo=true;renderAdmin();atoast('Logo updated.');return true;
+   case 'set-save':{var nv=($('[data-in="st-name"]')||{}).value||'',ev=($('[data-in="st-exp"]')||{}).value||'';
+      var e1=nv.trim()?'':'Cafe name is required',e2=expErr(ev);
+      if(e1||e2){atoast(e1||e2,'err');return true}
+      atoast('Settings saved.');return true}
+   case 'pr-sample':{var P=S.biz.promo,room=4-P.list.length;if(room<=0){atoast('Maximum 4 promos — delete one first','err');return true}
+      var add=[{id:'sa'+Date.now().toString(36),kind:'venture',enabled:false,more:true,title:'Book your event shoot',text:'Sample text — replace with your own.',btnLabel:'Chat on WhatsApp',link:'https://wa.me/910000000000',auto:false,secs:8,hero:'placeholder image',cam:true,name:'Artistry Photography (sample)',emoji:'📸',tag:'Sample'},
+               {id:'sb'+Date.now().toString(36),kind:'venture',enabled:false,more:true,title:'Handmade wooden gifts',text:'Sample text — replace with your own.',btnLabel:'Order on WhatsApp',link:'https://wa.me/910000000000',auto:false,secs:8,hero:'placeholder image',name:'Timber and Tales (sample)',emoji:'🪵',tag:'Sample'}].slice(0,room);
+      add.forEach(function(q){P.list.push(q)});P.editing=add[0].id;renderAdmin();atoast('Added '+add.length+' sample promo'+(add.length===1?'':'s')+' — disabled; placeholders can\'t be enabled');return true}
+  }
+  return false;
+}
+
+/* ================= go ================= */
+window.__S=S;
+S.splashRoute='menu';
+try{if(location.hash)history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+restoreMem();
+bootApp(false);
+})();
+</script>
+</body>
+</html>

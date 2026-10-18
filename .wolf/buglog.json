@@ -313,6 +313,373 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-09-04T15:18:00.000Z"
+    },
+    {
+      "id": "bug-020",
+      "timestamp": "2026-10-15T18:01:02.668Z",
+      "error_message": "Incorrect value in code",
+      "file": "plan/phase1.md",
+      "root_cause": "Had `origin/notes-and-order-number`",
+      "fix": "Changed to `phase1-planning`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 8,
+      "last_seen": "2026-10-15T18:02:58.301Z"
+    },
+    {
+      "id": "bug-021",
+      "timestamp": "2026-10-15T18:01:55.536Z",
+      "error_message": "Null/undefined access in ",
+      "file": "plan/phase1.md",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: ### J.7 Fourth pass (rev 5, 2026-10-15) — plan and prototype; 1. **Base branch settled:** work happens on `phase1-planning",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-10-15T18:02:53.393Z"
+    },
+    {
+      "id": "bug-022",
+      "timestamp": "2026-10-15T18:03:37.588Z",
+      "error_message": "Incorrect value in code",
+      "file": "plan/phase1_wireframe.html",
+      "root_cause": "Had '<a data-act=\"",
+      "fix": "Changed to '<button class=\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 9,
+      "last_seen": "2026-10-15T18:05:09.020Z"
+    },
+    {
+      "id": "bug-023",
+      "timestamp": "2026-10-15T18:03:58.624Z",
+      "error_message": "Wrong reference: else should be button",
+      "file": "plan/phase1_wireframe.html",
+      "root_cause": "Used \"else\" instead of \"button\"",
+      "fix": "Changed else → button",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-10-15T18:05:06.860Z"
+    },
+    {
+      "id": "bug-024",
+      "timestamp": "2026-10-15T18:04:21.439Z",
+      "error_message": "Significant refactor of ",
+      "file": "plan/phase1_wireframe.html",
+      "root_cause": "9 lines replaced/restructured",
+      "fix": "Rewrote 15→31 lines (9 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-15T18:04:21.439Z"
+    },
+    {
+      "id": "bug-025",
+      "timestamp": "2026-10-15T18:04:35.765Z",
+      "error_message": "Missing guard clause",
+      "file": "plan/phase1_wireframe.html",
+      "root_cause": "No early return/throw for edge case: L.length>=4",
+      "fix": "Added guard clause: if (L.length>=4)",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-15T18:04:35.765Z"
+    },
+    {
+      "id": "bug-026",
+      "timestamp": "2026-10-15T18:15:23.971Z",
+      "error_message": "Incorrect value in code",
+      "file": "plan/phase1.md",
+      "root_cause": "Had 's 12 px text links are too small a target, and `",
+      "fix": "Changed to \"✨ More from us\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-15T18:15:23.971Z"
+    },
+    {
+      "id": "bug-027",
+      "timestamp": "2026-10-15T18:15:25.512Z",
+      "error_message": "Null/undefined access in ",
+      "file": "plan/phase1.md",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-15T18:15:25.512Z"
+    },
+    {
+      "id": "bug-028",
+      "timestamp": "2026-10-15T18:31:01.749Z",
+      "error_message": "Incorrect value in code",
+      "file": "plan/phase1.md",
+      "root_cause": "Had `lib/features/menu/presentation/widgets/{item_card",
+      "fix": "Changed to `lib/features/menu/presentation/widgets/{item_card",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-15T18:31:01.749Z"
+    },
+    {
+      "id": "bug-029",
+      "timestamp": "2026-10-18T05:14:25.417Z",
+      "error_message": "Wrong return value",
+      "file": "plan/phase1_wireframe.html",
+      "root_cause": "Was returning: S.biz.promo.list.filter(function(p){return p.kind=",
+      "fix": "Now returns: S.biz.promo.list.filter(function(p){return p.kind=",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T05:14:25.417Z"
+    },
+    {
+      "id": "bug-030",
+      "timestamp": "2026-10-18T05:14:26.980Z",
+      "error_message": "Significant refactor of ",
+      "file": "plan/phase1_wireframe.html",
+      "root_cause": "7 lines replaced/restructured",
+      "fix": "Rewrote 12→35 lines (7 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T05:14:26.980Z"
+    },
+    {
+      "id": "bug-031",
+      "timestamp": "2026-10-18T05:14:29.940Z",
+      "error_message": "Incorrect value in code",
+      "file": "plan/phase1_wireframe.html",
+      "root_cause": "Had 'New session: pop-ups can show again'",
+      "fix": "Changed to 'New session: \"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-10-18T05:15:59.680Z"
+    },
+    {
+      "id": "bug-032",
+      "timestamp": "2026-10-18T05:14:33.150Z",
+      "error_message": "Wrong reference: 320px should be 380px",
+      "file": "plan/phase1_wireframe.html",
+      "root_cause": "Used \"320px\" instead of \"380px\"",
+      "fix": "Changed 320px → 380px",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T05:14:33.150Z"
+    },
+    {
+      "id": "bug-033",
+      "timestamp": "2026-10-18T05:14:59.310Z",
+      "error_message": "Missing guard clause",
+      "file": "plan/phase1_wireframe.html",
+      "root_cause": "No early return/throw for edge case: name==='closed'",
+      "fix": "Added guard clause: if (name==='closed')",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T05:14:59.310Z"
+    },
+    {
+      "id": "bug-034",
+      "timestamp": "2026-10-18T08:11:15.871Z",
+      "error_message": "Wrong reference: title should be rev",
+      "file": "plan/phase1_wireframe.html",
+      "root_cause": "Used \"title\" instead of \"rev\"",
+      "fix": "Changed title → rev",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T08:11:15.871Z"
+    },
+    {
+      "id": "bug-035",
+      "timestamp": "2026-10-18T08:14:17.000Z",
+      "error_message": "Prototype covered only new Phase 1 features; user: no add/delete section/item, order status code screen wrong",
+      "file": "plan/phase1_wireframe.html",
+      "root_cause": "Prototype built around new features; existing admin CRUD and 5 of 8 order-status states never modelled; cart recomputed price from live menu so cart-changed dialog unreachable",
+      "fix": "Added state-machine order status + counter simulator, draft/pub sections and items, admin CRUD, roles, login, import, settings fields, cart price freeze, time windows",
+      "tags": [
+        "wireframe",
+        "gap",
+        "order-status",
+        "admin"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T08:14:17.000Z"
+    },
+    {
+      "id": "bug-036",
+      "timestamp": "2026-10-18T08:14:17.000Z",
+      "error_message": "Gap report claimed Veg-only chip and detail sheet were out of Phase 1 scope",
+      "file": "plan/wireframe_vs_app_gaps.md",
+      "root_cause": "Did not check plan J.8 before writing section 4",
+      "fix": "Corrected report and artifact; recorded in cerebrum Do-Not-Repeat",
+      "tags": [
+        "docs",
+        "wrong-claim"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T08:14:17.000Z"
+    },
+    {
+      "id": "bug-037",
+      "timestamp": "2026-10-18T08:14:17.000Z",
+      "error_message": "Patch script would have duplicated adminSections definition",
+      "file": "scratchpad/patch3.py",
+      "root_cause": "rep_fn replaced up to next top-level function, replacement text also contained that function",
+      "fix": "Split into two rep_fn calls before running; syntax check and browser tests passed",
+      "tags": [
+        "tooling",
+        "patch"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T08:14:17.000Z"
+    },
+    {
+      "id": "bug-038",
+      "timestamp": "2026-10-18T08:27:30.716Z",
+      "error_message": "Significant refactor of ",
+      "file": "../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/e702611f-e4f3-428a-80f4-5d611bc0e46e/scratchpad/gap_report.html",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 3→4 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T08:27:30.716Z"
+    },
+    {
+      "id": "bug-039",
+      "timestamp": "2026-10-18T09:02:42.578Z",
+      "error_message": "Wrong reference: are should be were",
+      "file": "../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/e702611f-e4f3-428a-80f4-5d611bc0e46e/scratchpad/gap_report.html",
+      "root_cause": "Used \"are\" instead of \"were\"",
+      "fix": "Changed are → were",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T09:02:42.578Z"
+    },
+    {
+      "id": "bug-040",
+      "timestamp": "2026-10-18T12:33:30.194Z",
+      "error_message": "Incorrect value in code",
+      "file": "plan/phase1_wireframe.html",
+      "root_cause": "Had 're closed — you can browse, but can\\'",
+      "fix": "Changed to 're closed now. You can browse but can\\'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-18T12:33:30.194Z"
+    },
+    {
+      "id": "bug-041",
+      "timestamp": "2026-10-18T13:05:03.163Z",
+      "error_message": "Wrong reference: session should be day",
+      "file": "plan/phase1.md",
+      "root_cause": "Used \"session\" instead of \"day\"",
+      "fix": "Changed session → day",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 5,
+      "last_seen": "2026-10-18T13:05:18.464Z"
+    },
+    {
+      "id": "bug-042",
+      "timestamp": "2026-10-18T13:05:53.018Z",
+      "error_message": "Incorrect value in code",
+      "file": "plan/phase1.md",
+      "root_cause": "Had `placedAt`",
+      "fix": "Changed to `expiresAt`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 4,
+      "last_seen": "2026-10-18T13:09:16.228Z"
     }
   ]
 }

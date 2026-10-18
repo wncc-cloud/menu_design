@@ -38,6 +38,9 @@
 
 ## Key Learnings
 
+- [2026-10-18] `DraftRepository.initFromMenu` is LOSSY: sets section icon '' and active true, and hidden (inactive) items/sections are never in menu/current. Plan L4 `discardDraft()` must NOT reuse it as-is; snapshot the draft at publish time (or keep icon/active in the published doc) or Discard silently deletes hidden items and section icons.
+- [2026-10-18] Prototype (plan/phase1_wireframe.html) now models the whole existing app: items/sections are draft+pub (publish keeps only active items in active sections), cart lines freeze price at add time, order status is a state machine (orderView) driven by the Counter simulator, decide() is the single source for which pop-up opens. Plan Part K is the inventory; K.8 maps checks to prototype locations. Real-app quirks recorded in K.7.
+
 - **[2026-09-05] `OrderRequestRepository` (checkout's REST client) can be
   given a `useLocalEmulator` flag that redirects its writes at the local
   Firestore emulator without touching menu *browsing***
@@ -103,6 +106,9 @@
 
 ## Do-Not-Repeat
 
+- [2026-10-18] Before calling a prototype feature 'out of scope', grep plan/phase1.md (J.8 lists Veg-only chip, detail sheet, tighter cards as Phase 1). I wrongly called them extras in the first gap report.
+- [2026-10-18] When patching plan/phase1_wireframe.html with a rep_fn-style script, the replaced region ends at the NEXT top-level function; a replacement that also contains the following function creates a duplicate definition. Split such replacements.
+
 <!-- Mistakes made and corrected. Each entry prevents the same mistake recurring. -->
 <!-- Format: [YYYY-MM-DD] Description of what went wrong and what to do instead. -->
 
@@ -110,4 +116,13 @@
 
 ## Decision Log
 
+- [2026-10-18] First-load pop-up = ONE owner choice (none / promo:<id> / rotate / chef / best / sec:<id>) + one frequency; no fallback, no 'section wins'. Veg-only chip dropped (café always veg). Prototype keeps legacy secPopup/promo fields derived via syncFirst(); plan field is firstLoadPopup.
+
 <!-- Significant technical decisions with rationale. Why X was chosen over Y. -->
+
+- **[2026-10-07] `origin/notes-and-order-number` is 3 commits AHEAD of master (fast-forward) and holds per-item notes, orderNotes, cafe-closed strip, cart revalidation, tableNumberEnabled.** Merge it before any Phase 1 work. POS (C:\dev\billing-cafe) already accepts `orderNotes` (<=300, string, key optional) and rejects any other new top-level payload key.
+- **`BusinessRepository.saveBusiness` does a whole-doc `set()`** — fields missing from `BusinessModel` get erased on every Settings save, and stale Settings pages overwrite other edits. New business-doc fields must go in the model; independent writers should use field-level `update`.
+- **Popup once-per-load guards must live in an app-level keepAlive provider, not MenuPage State** (MenuPage rebuilds on every context.go('/')). cafeOpenProvider depends on the POS App Check token (activated unawaited) so it can be unknown/slow at load; treat unknown as open.
+- **OrderCartLine is rebuilt field-by-field in setNotes/revalidateCart** — a new field silently resets on those paths; look data up by item id instead.
+- **[2026-10-15] Phase 1 plan-vs-code review gotchas:** (1) `ItemCard._addToCart` shows a floating SnackBar via the page Scaffold — inside a modal section pop-up it would be hidden/overlap the CTA, so ItemCard needs an in-popup flag to suppress it. (2) `SectionChipBar` is only rendered `if (menu.sections.isNotEmpty)` and uses 32px-high `Chip`s (<48px tap bar). (3) `cafeOpenProvider` is `autoDispose`; a keepAlive coordinator watching it pins the value for the whole session. (4) `firebase.json` has no `headers` (default max-age=3600 on index.html/bootstrap). (5) `git merge --ff-only origin/notes-and-order-number` will refuse while local `.wolf/*` edits are uncommitted (branch also edits them). (6) Sections page is draft/Publish-based; special-section tiles are live — label per block.
+- **Flutter 3.44.8 (C:\src\flutter) dispatches the 'flutter-first-frame' Event on window** (engine platform_dispatcher.dart) — use it to remove an index.html splash; re-check on Flutter upgrades.
