@@ -47,8 +47,66 @@
        Only admin photo-upload flows need this — defer so it never blocks
        first paint for menu-browsing customers on this shared index.html. -->
   <script src="https://cdn.jsdelivr.net/npm/pica/dist/pica.min.js" defer></script>
+  <!-- Faster connection set-up for the two hosts every menu visit talks to. -->
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+
+  <!-- Splash: plain HTML/CSS painted before Flutter exists (Phase 1, Part D.1). -->
+  <style>
+    html,body{margin:0;height:100%;background:#F1F8E9}
+    #splash{position:fixed;inset:0;z-index:2147483647;background:#F1F8E9;overflow:hidden;transition:opacity .15s ease-out;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+    #splash.gone{opacity:0;pointer-events:none}
+    #splash .bar{height:56px;background:#2E7D32;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px}
+    #splash .col{max-width:700px;margin:0 auto;padding-top:6px}
+    #splash .card{display:flex;gap:12px;background:#fff;border-radius:12px;margin:6px 12px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+    #splash .card .l{flex:1;display:flex;flex-direction:column;gap:10px;padding-top:4px}
+    #splash .sk{background:linear-gradient(90deg,#e0e0e0 25%,#f5f5f5 37%,#e0e0e0 63%);background-size:400% 100%;animation:splash-sh 1.4s ease infinite;border-radius:5px}
+    #splash .card .im{width:90px;height:90px;border-radius:8px;flex:none}
+    #splash .spin{display:none;width:34px;height:34px;margin:140px auto 0;border:3px solid #C8E6C9;border-top-color:#2E7D32;border-radius:50%;animation:splash-sp 1s linear infinite}
+    #splash.plain .col{display:none}
+    #splash.plain .spin{display:block}
+    #splash .late{display:none;text-align:center;color:#455a64;padding:24px 20px}
+    #splash .late button{margin-top:12px;background:#2E7D32;color:#fff;border:0;border-radius:8px;padding:12px 22px;font-size:15px;font-weight:700}
+    #splash.late-on .late{display:block}
+    #splash.late-on .sk{animation:none}
+    @keyframes splash-sh{0%{background-position:100% 0}100%{background-position:0 0}}
+    @keyframes splash-sp{to{transform:rotate(360deg)}}
+    @media (prefers-reduced-motion:reduce){#splash .sk,#splash .spin{animation:none}}
+  </style>
 </head>
 <body>
+  <div id="splash" aria-hidden="true">
+    <div class="bar">Why Not? Cafe Countryside</div>
+    <div class="col"><div class="card"><div class="l"><div class="sk" style="height:16px;width:60%"></div><div class="sk" style="height:13px;width:25%"></div><div class="sk" style="height:12px;width:85%"></div></div><div class="sk im"></div></div><div class="card"><div class="l"><div class="sk" style="height:16px;width:60%"></div><div class="sk" style="height:13px;width:25%"></div><div class="sk" style="height:12px;width:85%"></div></div><div class="sk im"></div></div><div class="card"><div class="l"><div class="sk" style="height:16px;width:60%"></div><div class="sk" style="height:13px;width:25%"></div><div class="sk" style="height:12px;width:85%"></div></div><div class="sk im"></div></div><div class="card"><div class="l"><div class="sk" style="height:16px;width:60%"></div><div class="sk" style="height:13px;width:25%"></div><div class="sk" style="height:12px;width:85%"></div></div><div class="sk im"></div></div><div class="card"><div class="l"><div class="sk" style="height:16px;width:60%"></div><div class="sk" style="height:13px;width:25%"></div><div class="sk" style="height:12px;width:85%"></div></div><div class="sk im"></div></div><div class="card"><div class="l"><div class="sk" style="height:16px;width:60%"></div><div class="sk" style="height:13px;width:25%"></div><div class="sk" style="height:12px;width:85%"></div></div><div class="sk im"></div></div></div>
+    <div class="spin"></div>
+    <div class="late">Taking longer than usual&hellip;<br><button type="button" onclick="location.reload()">Reload</button></div>
+  </div>
+  <noscript><div style="position:fixed;inset:0;z-index:2147483647;background:#fff;padding:40px 20px;text-align:center;font-family:sans-serif">This menu needs JavaScript. Please enable it and reload.</div></noscript>
+  <script>
+    (function () {
+      var el = document.getElementById('splash');
+      if (!el) return;
+      // The menu lives at "/"; every other route (checkout, order status, admin) gets a plain spinner.
+      if (location.pathname !== '/' && location.pathname !== '/index.html') el.className = 'plain';
+      var done = false;
+      function hide() {
+        if (done) return; done = true;
+        el.className += ' gone';
+        setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 200);
+      }
+      // Primary hook: Flutter dispatches this on window right after its first frame.
+      window.addEventListener('flutter-first-frame', hide, { once: true });
+      // Backup if a future Flutter renames the event: the glass pane appears, give it a moment to paint.
+      try {
+        var mo = new MutationObserver(function () {
+          if (document.querySelector('flt-glass-pane')) { mo.disconnect(); setTimeout(hide, 2500); }
+        });
+        mo.observe(document.documentElement, { childList: true, subtree: true });
+      } catch (e) {}
+      // Safety net: never leave an endless skeleton.
+      setTimeout(function () { if (!done) el.className += ' late-on'; }, 12000);
+    })();
+  </script>
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader
