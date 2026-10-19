@@ -532,3 +532,4 @@
 | 11:01 | Session end: 3 writes across 3 files (sheets.dart, phase1_wireframe.html, phase1.2.md) | 11 reads | ~54506 tok |
 | 00:00 | Integration test menu<->POS locally (customer order -> counter claim/pay -> kitchen ready -> deliver; admin/report screens) | emulators 8080/8091, apps 8099/5050 | pass; WhatsApp+Sheets reports not testable locally | ~60000 |
 | 12:25 | Session end: 3 writes across 3 files (sheets.dart, phase1_wireframe.html, phase1.2.md) | 11 reads | ~54506 tok |
+| 00:00 | DEPLOYED menu app to PROD (cafe-countryside-menu): rules + hosting, commit 6a0bd96; prior rules saved deploy_backups/; old live main.dart.js sha256 5a30dd5bdbcf2572 | firestore.rules, build/web | live verified | ~15000 |
