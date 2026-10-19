@@ -70,7 +70,9 @@ class _ItemCardState extends ConsumerState<ItemCard> {
     final item = widget.item;
     final biz = ref.read(businessProvider).asData?.value;
     final menu = ref.read(menuControllerProvider).asData?.value;
-    final sectionName = menu?.sections.where((x) => x.id == item.sectionId).firstOrNull?.name ?? '';
+    final sectionName = item.sectionId == chefOnlySectionId
+        ? 'Chef Special'
+        : (menu?.sections.where((x) => x.id == item.sectionId).firstOrNull?.name ?? '');
     final badges = _badgeLabels(biz);
     showPopup(
       context,

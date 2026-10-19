@@ -493,3 +493,42 @@
 | 19:52 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/docs.py | — | ~1855 |
 
 | 19:53 | Phase 1 releases 1b + 1c built (popups as go_router routes, promotions page, special sections, discard, live availability, rules) and tested in emulator browser | cafe_countryside_menu/** | 186 tests pass, analyze 2 infos | ~ |
+| 19:57 | Session end: 68 writes across 46 files (phase1.md, phase1_wireframe.html, phase1_prompts.md, notes_controls_test.dart, last_order_provider.dart) | 5 reads | ~137520 tok |
+| 20:07 | Session end: 68 writes across 46 files (phase1.md, phase1_wireframe.html, phase1_prompts.md, notes_controls_test.dart, last_order_provider.dart) | 5 reads | ~137520 tok |
+| 22:38 | Session end: 68 writes across 46 files (phase1.md, phase1_wireframe.html, phase1_prompts.md, notes_controls_test.dart, last_order_provider.dart) | 5 reads | ~137520 tok |
+| 22:48 | Created cafe_countryside_menu/lib/features/order/providers/saved_customer.dart | — | ~344 |
+| 22:48 | Created cafe_countryside_menu/lib/core/services/page_alert.dart | — | ~177 |
+| 22:48 | Created cafe_countryside_menu/lib/core/services/page_alert_stub.dart | — | ~57 |
+| 22:48 | Created cafe_countryside_menu/lib/core/services/page_alert_web.dart | — | ~102 |
+| 22:48 | Created cafe_countryside_menu/lib/core/services/page_alert_web.dart | — | ~130 |
+| 22:48 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/d1.py | — | ~1240 |
+| 22:49 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/d2.py | — | ~2218 |
+| 22:49 | Created cafe_countryside_menu/test/customer_comfort_test.dart | — | ~2474 |
+| 22:52 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/d3.py | — | ~712 |
+| 22:57 | Session end: 77 writes across 54 files (phase1.md, phase1_wireframe.html, phase1_prompts.md, notes_controls_test.dart, last_order_provider.dart) | 5 reads | ~145210 tok |
+| 23:02 | Session end: 77 writes across 54 files (phase1.md, phase1_wireframe.html, phase1_prompts.md, notes_controls_test.dart, last_order_provider.dart) | 5 reads | ~145210 tok |
+| 23:14 | Session end: 77 writes across 54 files (phase1.md, phase1_wireframe.html, phase1_prompts.md, notes_controls_test.dart, last_order_provider.dart) | 6 reads | ~145210 tok |
+
+## Session: 2026-10-19 09:36
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-10-19 09:37
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 09:40 | Edited cafe_countryside_menu/lib/features/menu/presentation/popups/sheets.dart | 1→2 lines | ~42 |
+| 09:40 | Edited plan/phase1_wireframe.html | inline fix | ~20 |
+| 00:00 | Review: deploy-compat check; detail sheet no-photo stays compact; wireframe About hidden when empty | sheets.dart, phase1_wireframe.html | 194 tests pass | ~6000 |
+| 09:41 | Session end: 2 writes across 2 files (sheets.dart, phase1_wireframe.html) | 8 reads | ~49516 tok |
+| 09:49 | Session end: 2 writes across 2 files (sheets.dart, phase1_wireframe.html) | 8 reads | ~49516 tok |
+| 00:00 | Added item chefOnly flag (model, form, publish map, filters, chips, sections sheet) + chef_only_test + wireframe | many | 200 tests pass, analyze unchanged | ~15000 |
+| 09:59 | Session end: 2 writes across 2 files (sheets.dart, phase1_wireframe.html) | 11 reads | ~51835 tok |
+| 10:20 | Created plan/phase1.2.md | — | ~2493 |
+| 00:00 | Chef-only-no-section sentinel (__chef_only__), form option, publish keeps it, phase1.2.md written+reviewed, browser-tested | item_model, item_form, items_page, draft_repository, plan/phase1.2.md | 202 tests pass | ~20000 |
+| 10:28 | Session end: 3 writes across 3 files (sheets.dart, phase1_wireframe.html, phase1.2.md) | 11 reads | ~54506 tok |
+| 10:58 | Session end: 3 writes across 3 files (sheets.dart, phase1_wireframe.html, phase1.2.md) | 11 reads | ~54506 tok |
+| 11:01 | Session end: 3 writes across 3 files (sheets.dart, phase1_wireframe.html, phase1.2.md) | 11 reads | ~54506 tok |
+| 00:00 | Integration test menu<->POS locally (customer order -> counter claim/pay -> kitchen ready -> deliver; admin/report screens) | emulators 8080/8091, apps 8099/5050 | pass; WhatsApp+Sheets reports not testable locally | ~60000 |
+| 12:25 | Session end: 3 writes across 3 files (sheets.dart, phase1_wireframe.html, phase1.2.md) | 11 reads | ~54506 tok |

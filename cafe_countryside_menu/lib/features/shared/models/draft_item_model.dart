@@ -18,6 +18,7 @@ class DraftItemModel {
   final bool requiresKitchen;
   final bool noteAllowed;
   final bool isChefSpecial;
+  final bool chefOnly;
   final int sortOrder;
   final String businessId;
   final DateTime createdAt;
@@ -41,6 +42,7 @@ class DraftItemModel {
     this.requiresKitchen = true,
     this.noteAllowed = true,
     this.isChefSpecial = false,
+    this.chefOnly = false,
     required this.sortOrder,
     required this.businessId,
     required this.createdAt,
@@ -65,6 +67,7 @@ class DraftItemModel {
         requiresKitchen: json['requiresKitchen'] as bool? ?? true,
         noteAllowed: json['noteAllowed'] as bool? ?? true,
         isChefSpecial: json['isChefSpecial'] as bool? ?? false,
+        chefOnly: json['chefOnly'] as bool? ?? false,
         sortOrder: json['sortOrder'] as int? ?? 0,
         businessId: json['businessId'] as String? ?? 'default',
         createdAt:
@@ -91,6 +94,7 @@ class DraftItemModel {
         'requiresKitchen': requiresKitchen,
         'noteAllowed': noteAllowed,
         'isChefSpecial': isChefSpecial,
+        'chefOnly': chefOnly,
         'sortOrder': sortOrder,
         'businessId': businessId,
         'createdAt': Timestamp.fromDate(createdAt),
@@ -115,6 +119,7 @@ class DraftItemModel {
     bool? requiresKitchen,
     bool? noteAllowed,
     bool? isChefSpecial,
+    bool? chefOnly,
     int? sortOrder,
     String? businessId,
     DateTime? createdAt,
@@ -138,6 +143,7 @@ class DraftItemModel {
         requiresKitchen: requiresKitchen ?? this.requiresKitchen,
         noteAllowed: noteAllowed ?? this.noteAllowed,
         isChefSpecial: isChefSpecial ?? this.isChefSpecial,
+        chefOnly: chefOnly ?? this.chefOnly,
         sortOrder: sortOrder ?? this.sortOrder,
         businessId: businessId ?? this.businessId,
         createdAt: createdAt ?? this.createdAt,

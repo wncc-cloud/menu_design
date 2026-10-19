@@ -18,10 +18,26 @@ String? chipIdForChoice(String choice) {
 }
 
 /// Items behind a chip id (system sections derive from item flags).
-List<ItemModel> itemsForChip(List<ItemModel> items, String chipId) {
-  if (chipId == bestsellersChipId) return items.where((i) => i.isBestseller).toList();
+///
+/// Items the owner marked "only in Chef Special" show under the Chef Special
+/// chip and nowhere else. [chefVisible] = false (owner hid the Chef Special
+/// section) puts them back in their normal place so they can never vanish.
+List<ItemModel> itemsForChip(List<ItemModel> items, String chipId, {bool chefVisible = true}) {
   if (chipId == chefSpecialChipId) return items.where((i) => i.isChefSpecial).toList();
-  return items.where((i) => i.sectionId == chipId).toList();
+  final regular = chefVisible ? items.where((i) => !i.onlyInChefSpecial) : items;
+  if (chipId == bestsellersChipId) return regular.where((i) => i.isBestseller).toList();
+  return regular.where((i) => i.sectionId == chipId).toList();
+}
+
+/// The "All" list: everything except chef-only items (see [itemsForChip]).
+List<ItemModel> itemsForAll(List<ItemModel> items, {bool chefVisible = true}) =>
+    chefVisible ? items.where((i) => !i.onlyInChefSpecial).toList() : items;
+
+/// Is the Chef Special section shown to customers? Unknown (business not
+/// loaded) counts as visible, matching the chip bar's default.
+bool chefSectionVisible(BusinessModel? business) {
+  final sys = business?.resolvedSystemSections ?? defaultSystemSections();
+  return sys.where((s) => s.key == chefSpecialKey).every((s) => s.visible);
 }
 
 /// Orderable items first, unavailable ones last — stable inside each group.
@@ -109,7 +125,7 @@ String sectionChoiceLabel(BusinessModel b, MenuSnapshotModel? menu, String choic
     // hidden or deleted — either way the customer cannot see it.
     return (reason: 'Section is hidden or no longer available', target: null);
   }
-  final items = itemsForChip(menu.items, chip);
+  final items = itemsForChip(menu.items, chip, chefVisible: chefSectionVisible(business));
   if (items.isEmpty) return (reason: 'Section has no items', target: null);
   if (!items.any((i) => i.isAvailableAt(now))) return (reason: 'No available items', target: null);
   return (

@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true;
+    }
+
+    function isOwner() {
+      return isAdmin()
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'owner';
+    }
+
+    // Public: anyone can read the live menu and business info
+    match /menu/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /businesses/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Admins only: draft is never public
+    match /menuDraft/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Admins can read their own document
+    // Only owner can add or modify admin accounts
+    match /admins/{uid} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if isOwner();
+    }
+  }
+}

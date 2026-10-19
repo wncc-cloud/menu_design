@@ -132,6 +132,7 @@ class DraftRepository {
         availableTill: item.availableTill,
         noteAllowed: item.noteAllowed,
         isChefSpecial: item.isChefSpecial,
+        chefOnly: item.chefOnly,
         sortOrder: item.sortOrder,
         businessId: 'default',
         createdAt: now,
@@ -153,7 +154,8 @@ class DraftRepository {
       final activeSectionIds = activeSections.map((s) => s.id).toSet();
       final publishableItems = draft.sortedItems
           .where((item) =>
-              activeSectionIds.contains(item.sectionId) && item.active)
+              (activeSectionIds.contains(item.sectionId) || item.sectionId == chefOnlySectionId) &&
+              item.active)
           .toList();
 
       // cloudinaryPublicId kept: Phase 1 ItemModel uses it for image URLs.
@@ -188,6 +190,7 @@ class DraftRepository {
                   'requiresKitchen': item.requiresKitchen,
                   'noteAllowed': item.noteAllowed,
                   'isChefSpecial': item.isChefSpecial,
+                  'chefOnly': item.chefOnly,
                   'sortOrder': item.sortOrder,
                 })
             .toList(),

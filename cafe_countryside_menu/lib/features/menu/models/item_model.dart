@@ -1,5 +1,10 @@
 import '../../../core/constants/app_constants.dart';
 
+/// Reserved section id for items that live ONLY in Chef Special (no real
+/// section). It is not a row in the sections list, so it never shows as a
+/// section chip, and publishing keeps items that carry it.
+const chefOnlySectionId = '__chef_only__';
+
 class ItemModel {
   final String id;
   final String sectionId;
@@ -34,6 +39,10 @@ class ItemModel {
   /// Phase 1 (Part A): flag behind the "Chef Special" system section.
   final bool isChefSpecial;
 
+  /// Owner's "show only in Chef Special" switch. Missing = false, so every
+  /// item published before this existed keeps showing in its section.
+  final bool chefOnly;
+
   const ItemModel({
     required this.id,
     required this.sectionId,
@@ -51,6 +60,7 @@ class ItemModel {
     this.requiresKitchen = true,
     this.noteAllowed = true,
     this.isChefSpecial = false,
+    this.chefOnly = false,
   });
 
   factory ItemModel.fromJson(Map<String, dynamic> json) {
@@ -71,6 +81,7 @@ class ItemModel {
       requiresKitchen: json['requiresKitchen'] as bool? ?? true,
       noteAllowed: json['noteAllowed'] as bool? ?? true,
       isChefSpecial: json['isChefSpecial'] as bool? ?? false,
+      chefOnly: json['chefOnly'] as bool? ?? false,
     );
   }
 
@@ -91,7 +102,13 @@ class ItemModel {
         'requiresKitchen': requiresKitchen,
         'noteAllowed': noteAllowed,
         'isChefSpecial': isChefSpecial,
+        'chefOnly': chefOnly,
       };
+
+  /// True when the item is kept out of All / its section / Best Sellers and
+  /// shows only under Chef Special (and in search). Only meaningful while the
+  /// item is flagged Chef Special.
+  bool get onlyInChefSpecial => isChefSpecial && (chefOnly || sectionId == chefOnlySectionId);
 
   // Returns false if marked unavailable, or outside its time window.
   // An empty availableFrom/Till means "always available".

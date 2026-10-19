@@ -397,7 +397,8 @@ function mkItems(){var a=[
  {id:'i7',sec:'snacks',name:'Veg Sandwich',price:90,veg:1,best:0,chef:0,note:1,avail:1,img:0,desc:'Grilled, with mint chutney.'},
  {id:'i8',sec:'snacks',name:'Chicken Wrap',price:140,veg:0,best:0,chef:1,note:1,avail:1,desc:'Grilled chicken, slaw, house sauce.'},
  {id:'i9',sec:'snacks',name:'Packaged Water 1 L',price:20,veg:1,best:0,chef:0,note:0,avail:1,img:0,desc:'Sealed bottle.'},
- {id:'i10',sec:'shakes',name:'Oreo Shake',price:130,veg:1,best:1,chef:0,note:1,avail:1,desc:'Thick and chocolatey.'}
+ {id:'i10',sec:'shakes',name:'Oreo Shake',price:130,veg:1,best:1,chef:0,note:1,avail:1,desc:'Thick and chocolatey.'},
+ {id:'i11',sec:'snacks',name:"Chef's Tasting Plate",price:260,veg:1,best:0,chef:1,only:1,note:1,avail:1,img:0,desc:'Today only: small bites picked by the chef. Shown only under Chef Special.'}
 ];a.forEach(function(i){i.ing=ING[i.id]||'';i.from=i.from||'';i.till=i.till||'';i.kit=1;i.active=1});return a}
 var S={
  mode:'customer',adminTab:'dash',width:'phone',
@@ -450,11 +451,13 @@ function firstReason(){var b=S.biz,v=b.first;
 var timers={};var progTimer=null;var orderSeq=41;syncFirst();
 function special(key){return S.biz.special.filter(function(s){return s.key===key})[0]}
 function secLabel(key){var s=special(key);return s.icon+' '+s.name}
-function itemsFor(arr,sectionKey){
+function itemsFor(arr,sectionKey,withChefOnly){
+  /* "Show only in Chef Special": such items skip All, their section and Best Sellers - unless the Chef Special section is hidden (then they return, never vanish). */
+  var base=(withChefOnly||sectionKey==='chef'||!special('chef').visible)?arr:arr.filter(function(i){return !(i.chef&&i.only)});
   if(sectionKey==='chef')return arr.filter(function(i){return i.chef});
-  if(sectionKey==='best')return arr.filter(function(i){return i.best});
-  if(sectionKey&&sectionKey.indexOf('sec:')===0){var id=sectionKey.slice(4);return arr.filter(function(i){return i.sec===id})}
-  return arr;
+  if(sectionKey==='best')return base.filter(function(i){return i.best});
+  if(sectionKey&&sectionKey.indexOf('sec:')===0){var id=sectionKey.slice(4);return base.filter(function(i){return i.sec===id})}
+  return base;
 }
 function visibleSpecials(){return S.biz.special.filter(function(s){return s.visible&&itemsFor(pubList(),s.key).length>0})}
 function cartQty(id){var l=S.cart.filter(function(x){return x.id===id})[0];return l?l.qty:0}
@@ -525,8 +528,8 @@ function itemCard(it,inPopup,ctx){
   return '<div class="item'+(q?' sel':'')+(na?' na':'')+'" data-act="detail" data-id="'+it.id+'" data-card="'+it.id+'" tabindex="0"><div class="t"><div class="n"><span class="veg'+(it.veg?'':' nv')+'"></span>'+esc(it.name)+'</div><div class="p">'+money(it.price)+'</div>'+bd+'<div class="d'+(hasImg?'':' two')+'">'+esc(it.desc)+'</div>'+(it.ing?'<div class="ing">Ingredients: '+esc(it.ing)+'</div>':'')+'</div><div class="rc'+(hasImg?' hasimg':'')+'">'+imgHtml+(ctrl?'<div class="ctl">'+ctrl+'</div>':'')+'</div></div>';
 }
 function menuList(){
-  var items=itemsFor(pubList(),S.sec);
   var q=S.q.trim().toLowerCase();
+  var items=itemsFor(pubList(),S.sec,!!q&&!S.sec);/* a search with no chip looks at every item, chef-only too */
   if(q)items=items.filter(function(i){return (i.name+' '+i.desc).toLowerCase().indexOf(q)>-1});
   if(!items.length)return '<div class="empty"><div style="font-size:34px">'+(q?'🔍':'🍽️')+'</div>'+(q?'Nothing matches “'+esc(S.q)+'”<br><small>Try a different word?</small>':'No items here yet.')+'</div>';
   return sortAvail(items).map(function(i){return itemCard(i,false,S.sec)}).join('');
@@ -711,7 +714,7 @@ function detailSheet(){
    (hasImg?'<div class="dhero">photo (Cloudinary, 4:3 crop)</div>':'')+
    '<div class="dbody"><h3><span class="veg'+(it.veg?'':' nv')+'"></span>'+esc(it.name)+'</h3><div style="font-weight:700;color:var(--g2);font-size:16px">'+money(it.price)+'</div>'+
    '<div style="margin:6px 0">'+sp.map(function(x){return '<span class="badge chef" style="margin-left:0;margin-right:4px">'+esc(x)+'</span>'}).join('')+(na?'<span class="badge na">'+esc(unavailText(it))+'</span>':'')+'</div>'+
-   '<div class="sec">About</div><div>'+esc(it.desc)+'</div>'+
+   (it.desc?'<div class="sec">About</div><div>'+esc(it.desc)+'</div>':'')+
    (it.ing?'<div class="sec">Ingredients</div><div>'+esc(it.ing)+'</div>':'')+
    '<div class="sec">Section</div><div>'+esc(sec)+(it.veg?' · Vegetarian':' · Non-vegetarian')+'</div>'+
    ((it.from||it.till)?'<div class="sec">Availability</div><div>'+fmt12(it.from||'00:00')+'–'+fmt12(it.till||'23:59')+(na?' (not available right now)':'')+'</div>':'')+'</div>'+
@@ -926,7 +929,7 @@ function adminItems(){
   if(!list.length)return h+'<div class="empty"><div style="font-size:42px">🍽</div>No items yet.'+(canM?'<div style="margin-top:12px"><button class="ibtn" data-act="itm-add">＋ Add Item</button></div>':'')+'</div>';
   h+=list.map(function(i){
     var x=secById(secs,i.sec)||{name:'—'},grey=!i.active||!i.avail;
-    var meta=!i.active?'<span style="color:#ef6c00">Hidden from menu</span>':money(i.price)+' · '+esc(x.name)+(i.best?' · ⭐':'')+(i.chef?' · '+esc(special('chef').icon)+' '+esc(special('chef').name):'')+(i.note?'':' · no note')+((i.from||i.till)?' · '+esc(i.from||'00:00')+'–'+esc(i.till||'23:59'):'');
+    var meta=!i.active?'<span style="color:#ef6c00">Hidden from menu</span>':money(i.price)+' · '+esc(x.name)+(i.best?' · ⭐':'')+(i.chef?' · '+esc(special('chef').icon)+' '+esc(special('chef').name)+(i.only?' only':''):'')+(i.note?'':' · no note')+((i.from||i.till)?' · '+esc(i.from||'00:00')+'–'+esc(i.till||'23:59'):'');
     return '<div class="tile"><span class="veg'+(i.veg?'':' nv')+'"></span><div class="nm" style="'+(grey?'color:#9e9e9e':'')+'">'+esc(i.name)+'<small>'+meta+'</small></div>'+
       (i.active?tgd(i.avail,'itm-avail',i.id):'')+
       (canM?'<button class="ibtn" data-act="itm-vis" data-id="'+i.id+'" title="'+(i.active?'Hide from menu':'Show on menu')+'">'+(i.active?'👁':'🚫')+'</button><button class="ibtn" data-act="itm-edit" data-id="'+i.id+'" title="Edit">✎</button><button class="ibtn" style="color:#c62828" data-act="itm-del" data-id="'+i.id+'" title="Delete">🗑</button>':'')+'</div>';
@@ -949,13 +952,13 @@ function modalHtml(){
      '<div class="fld2"><label for="m-desc" class="tiny">Description</label><textarea id="m-desc" rows="2">'+esc(d.desc)+'</textarea></div>'+
      inp('Ingredients','m-ing',d.ing,'','text')+
      '<div style="display:flex;gap:10px"><div style="flex:1">'+inp('Available from','m-from',d.from,'','time')+'</div><div style="flex:1">'+inp('Available till','m-till',d.till,'','time')+'</div></div><div class="tiny">Empty = always available. Times are the café\'s (IST), not the customer\'s phone.</div>'+
-     chk('Vegetarian','m-veg',d.veg)+chk('Bestseller','m-best',d.best)+chk(esc(special('chef').icon+' '+special('chef').name)+' <span class="tag">NEW</span>','m-chef',d.chef)+chk('Allow a note on this item <span class="tag">NEW</span>','m-note',d.note)+chk('Available now','m-avail',d.avail)+chk('Needs kitchen preparation?','m-kit',d.kit)+
+     chk('Vegetarian','m-veg',d.veg)+chk('Bestseller','m-best',d.best)+chk(esc(special('chef').icon+' '+special('chef').name)+' <span class="tag">NEW</span>','m-chef',d.chef)+chk('Show only in '+esc(special('chef').name)+' (not in All or its section) <span class="tag">NEW</span> <span class="tiny">needs the switch above</span>','m-only',d.only)+chk('Allow a note on this item <span class="tag">NEW</span>','m-note',d.note)+chk('Available now','m-avail',d.avail)+chk('Needs kitchen preparation?','m-kit',d.kit)+
      '</div></div></div>';}
   return '';
 }
 function readItemForm(){
   var g=function(id){var e=document.getElementById(id);return e?e.value:''},c=function(id){var e=document.getElementById(id);return e&&e.checked?1:0};
-  return {name:g('m-name'),price:g('m-price'),sec:g('m-sec'),desc:g('m-desc'),ing:g('m-ing'),from:g('m-from'),till:g('m-till'),veg:c('m-veg'),best:c('m-best'),chef:c('m-chef'),note:c('m-note'),avail:c('m-avail'),kit:c('m-kit'),img:c('m-img')};
+  return {name:g('m-name'),price:g('m-price'),sec:g('m-sec'),desc:g('m-desc'),ing:g('m-ing'),from:g('m-from'),till:g('m-till'),veg:c('m-veg'),best:c('m-best'),chef:c('m-chef'),only:c('m-chef')&&c('m-only'),note:c('m-note'),avail:c('m-avail'),kit:c('m-kit'),img:c('m-img')};
 }
 function targetOptions(){
   var o=[];S.biz.special.forEach(function(x){o.push({v:x.key,l:x.icon+' '+x.name+(x.visible?'':' (hidden)')})});
@@ -1406,9 +1409,9 @@ function act3(a,id,v,el){
    /* items (draft) */
    case 'itm-filter':S.itemFilter=id||null;renderAdmin();return true;
    case 'itm-add':{if(!S.draftSecs.length){atoast('Add at least one section first.','err');return true}
-      S.am={type:'item',vals:{name:'',price:'',sec:(S.itemFilter&&secById(S.draftSecs,S.itemFilter)?S.itemFilter:S.draftSecs[0].id),desc:'',ing:'',from:'',till:'',veg:1,best:0,chef:0,note:1,avail:1,kit:1,img:1}};renderAdmin();return true}
+      S.am={type:'item',vals:{name:'',price:'',sec:(S.itemFilter&&secById(S.draftSecs,S.itemFilter)?S.itemFilter:S.draftSecs[0].id),desc:'',ing:'',from:'',till:'',veg:1,best:0,chef:0,only:0,note:1,avail:1,kit:1,img:1}};renderAdmin();return true}
    case 'itm-edit':{var it=S.draft.filter(function(q){return q.id===id})[0];
-      S.am={type:'item',id:id,vals:{name:it.name,price:String(it.price),sec:it.sec,desc:it.desc,ing:it.ing,from:it.from,till:it.till,veg:it.veg,best:it.best,chef:it.chef,note:it.note,avail:it.avail,kit:it.kit,img:it.img===0?0:1}};renderAdmin();return true}
+      S.am={type:'item',id:id,vals:{name:it.name,price:String(it.price),sec:it.sec,desc:it.desc,ing:it.ing,from:it.from,till:it.till,veg:it.veg,best:it.best,chef:it.chef,only:it.only?1:0,note:it.note,avail:it.avail,kit:it.kit,img:it.img===0?0:1}};renderAdmin();return true}
    case 'itm-vis':{var it2=S.draft.filter(function(q){return q.id===id})[0];it2.active=it2.active?0:1;renderAdmin();return true}
    case 'itm-avail':{var it3=S.draft.filter(function(q){return q.id===id})[0];it3.avail=it3.avail?0:1;var pi=S.pub.filter(function(q){return q.id===id})[0];if(pi)pi.avail=it3.avail;/* the sold-out switch is LIVE: written to the published menu at once, no Publish */
       atoast('Live now: '+it3.name+' is '+(it3.avail?'available':'sold out')+'. Customers see it on their next refresh (≤ 20 min) and at checkout.');return true}
@@ -1428,7 +1431,7 @@ function act3(a,id,v,el){
         if(!d.name.trim())er.name='Name is required';
         if(!ps)er.price='Price is required';else if(isNaN(Number(ps)))er.price='Enter a valid number';else if(Number(ps)<=0)er.price='Price must be more than ₹0 (to give an item free, use a 100% discount at the counter)';
         if(Object.keys(er).length){m2.vals=d;m2.err=er;renderAdmin();return true}
-        var rec={name:d.name.trim(),price:Number(ps),sec:d.sec,desc:d.desc.trim(),ing:d.ing.trim(),from:d.from,till:d.till,veg:d.veg,best:d.best,chef:d.chef,note:d.note,avail:d.avail,kit:d.kit,img:d.img?1:0};
+        var rec={name:d.name.trim(),price:Number(ps),sec:d.sec,desc:d.desc.trim(),ing:d.ing.trim(),from:d.from,till:d.till,veg:d.veg,best:d.best,chef:d.chef,only:(d.chef&&d.only)?1:0,note:d.note,avail:d.avail,kit:d.kit,img:d.img?1:0};
         if(m2.id){var cur=S.draft.filter(function(q){return q.id===m2.id})[0];for(var k in rec)cur[k]=rec[k];var pj=S.pub.filter(function(q){return q.id===m2.id})[0];if(pj)pj.avail=cur.avail}
         else{rec.id='n'+Date.now().toString(36);rec.active=1;S.draft.push(rec)}
         S.am=null;atoast('Item saved to draft — Publish to go live');return true}

@@ -301,17 +301,28 @@ class _MenuContentState extends ConsumerState<_MenuContent> {
     // + real sections. Hiding an empty special chip is deliberate (Part A).
     final sys = business?.resolvedSystemSections ??
         resolveSystemSections(null, legacyShowBestsellers: true);
+    final chefVisible = chefSectionVisible(business);
     final specialChips = <SectionModel>[
       for (final s in sys)
         if (s.visible &&
-            itemsForChip(menu.items, s.key == chefSpecialKey ? chefSpecialChipId : bestsellersChipId).isNotEmpty)
+            itemsForChip(menu.items, s.key == chefSpecialKey ? chefSpecialChipId : bestsellersChipId,
+                    chefVisible: chefVisible)
+                .isNotEmpty)
           SectionModel(
             id: s.key == chefSpecialKey ? chefSpecialChipId : bestsellersChipId,
             name: s.displayName,
             icon: s.displayIcon,
           ),
     ];
-    final chipIds = {...specialChips.map((c) => c.id), ...menu.sections.map((s) => s.id)};
+    // A real section whose items are ALL chef-only would show an empty chip.
+    final realSections = [
+      for (final sec in menu.sections)
+        if (!chefVisible ||
+            !menu.items.any((i) => i.sectionId == sec.id) ||
+            menu.items.any((i) => i.sectionId == sec.id && !i.onlyInChefSpecial))
+          sec,
+    ];
+    final chipIds = {...specialChips.map((c) => c.id), ...realSections.map((s) => s.id)};
     final ventures = venturesForMoreFromUs(business?.promotions ?? const [], istDateString(DateTime.now()));
 
     // A selected chip that vanished (hidden / emptied by a refresh) falls back
@@ -327,7 +338,7 @@ class _MenuContentState extends ConsumerState<_MenuContent> {
       });
     }
 
-    final showChipBar = specialChips.isNotEmpty || menu.sections.isNotEmpty || ventures.isNotEmpty;
+    final showChipBar = specialChips.isNotEmpty || realSections.isNotEmpty || ventures.isNotEmpty;
 
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -346,7 +357,7 @@ class _MenuContentState extends ConsumerState<_MenuContent> {
         ),
         if (showChipBar)
           SectionChipBar(
-            sections: [...specialChips, ...menu.sections],
+            sections: [...specialChips, ...realSections],
             specialIds: specialChips.map((c) => c.id).toSet(),
             selectedId: selected,
             onSelected: (id) => ref.read(menuFilterProvider.notifier).setSection(id),
@@ -356,7 +367,7 @@ class _MenuContentState extends ConsumerState<_MenuContent> {
           child: filteredItems.isEmpty
               ? _EmptyItemsState(
                   searchQuery: filter.searchQuery,
-                  suggestions: [...specialChips, ...menu.sections].take(5).toList(),
+                  suggestions: [...specialChips, ...realSections].take(5).toList(),
                   onPick: (id) {
                     widget.searchController.clear();
                     ref.read(menuFilterProvider.notifier).setSearch('');

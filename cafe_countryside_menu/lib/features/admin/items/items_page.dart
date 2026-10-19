@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../menu/models/item_model.dart' show chefOnlySectionId;
 import '../../shared/models/draft_item_model.dart';
 import '../../shared/models/draft_section_model.dart';
 import '../../shared/widgets/publish_banner.dart';
@@ -225,7 +226,9 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                               itemCount: visibleItems.length,
                               itemBuilder: (context, index) {
                                 final item = visibleItems[index];
-                                final sectionName = sections
+                                final sectionName = item.sectionId == chefOnlySectionId
+                                    ? '🍳 Chef Special only'
+                                    : sections
                                     .firstWhere((s) => s.id == item.sectionId,
                                         orElse: () => DraftSectionModel(
                                               id: '',
@@ -363,7 +366,7 @@ class _ItemTile extends StatelessWidget {
               ? 'Hidden from menu'
               : '₹${item.price.toStringAsFixed(0)}  ·  $sectionName'
                   '${item.isBestseller ? '  ·  ⭐' : ''}'
-                  '${item.isChefSpecial ? '  ·  🍳' : ''}'
+                  '${item.isChefSpecial && item.sectionId != chefOnlySectionId ? (item.chefOnly ? '  ·  🍳 only' : '  ·  🍳') : ''}'
                   '${item.noteAllowed ? '' : '  ·  no note'}',
           style: TextStyle(
             fontSize: 12,

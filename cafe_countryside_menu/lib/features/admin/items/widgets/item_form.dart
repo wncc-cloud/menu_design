@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../menu/models/item_model.dart' show chefOnlySectionId;
 import '../../../shared/models/draft_item_model.dart';
 import '../../../shared/models/draft_section_model.dart';
 import '../../../shared/services/cloudinary_service.dart';
@@ -38,6 +39,7 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
   late bool _requiresKitchen;
   late bool _noteAllowed;
   late bool _isChefSpecial;
+  late bool _chefOnly;
 
   late String _imageUrl;
   late String _cloudinaryPublicId;
@@ -62,9 +64,13 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
     _requiresKitchen = e?.requiresKitchen ?? true;
     _noteAllowed = e?.noteAllowed ?? true;
     _isChefSpecial = e?.isChefSpecial ?? false;
+    _chefOnly = e?.chefOnly ?? false;
     _imageUrl = e?.imageUrl ?? '';
     _cloudinaryPublicId = e?.cloudinaryPublicId ?? '';
   }
+
+  /// "Chef Special only (no section)" picked in the Section dropdown.
+  bool get _chefSpecialOnly => _sectionId == chefOnlySectionId;
 
   @override
   void dispose() {
@@ -164,7 +170,9 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
       availableTill: _tillCtrl.text.trim(),
       requiresKitchen: _requiresKitchen,
       noteAllowed: _noteAllowed,
-      isChefSpecial: _isChefSpecial,
+      isChefSpecial: _isChefSpecial || _chefSpecialOnly,
+      // Only meaningful while Chef Special is on.
+      chefOnly: (_isChefSpecial && _chefOnly) || _chefSpecialOnly,
       sortOrder: widget.existing?.sortOrder ?? 0,
       businessId: 'default',
       createdAt: widget.existing?.createdAt ?? now,
@@ -252,11 +260,14 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   initialValue: _sectionId,
+                  isExpanded: true,
                   decoration: const InputDecoration(labelText: 'Section *'),
-                  items: widget.sections
-                      .map((s) =>
-                          DropdownMenuItem(value: s.id, child: Text(s.name)))
-                      .toList(),
+                  items: [
+                    ...widget.sections
+                        .map((s) => DropdownMenuItem(value: s.id, child: Text(s.name))),
+                    const DropdownMenuItem(
+                        value: chefOnlySectionId, child: Text('🍳 Chef Special only', overflow: TextOverflow.ellipsis)),
+                  ],
                   onChanged: (v) => setState(() => _sectionId = v!),
                 ),
                 const SizedBox(height: 12),
@@ -315,10 +326,19 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
                 ),
                 _ToggleRow(
                   label: 'Chef Special',
-                  value: _isChefSpecial,
-                  onChanged: (v) => setState(() => _isChefSpecial = v),
+                  value: _isChefSpecial || _chefSpecialOnly,
+                  onChanged: (v) {
+                    if (!_chefSpecialOnly) setState(() => _isChefSpecial = v);
+                  },
                   activeColor: Colors.deepOrange,
                 ),
+                if (_isChefSpecial && !_chefSpecialOnly)
+                  _ToggleRow(
+                    label: 'Show only in Chef Special (not in All or its section)',
+                    value: _chefOnly,
+                    onChanged: (v) => setState(() => _chefOnly = v),
+                    activeColor: Colors.deepOrange,
+                  ),
                 _ToggleRow(
                   label: 'Available now',
                   value: _available,

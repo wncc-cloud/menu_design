@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-18T14:22:55.373Z
-> Files: 62 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-19T04:50:44.713Z
+> Files: 71 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
 
@@ -24,6 +24,9 @@
 - `b8.py` — Declares SizedBox (~831 tok)
 - `c1.py` — sub (~1944 tok)
 - `c2.py` — PendingChanges: sub (~1643 tok)
+- `d1.py` — sub (~1240 tok)
+- `d2.py` — sub (~2218 tok)
+- `d3.py` — sub (~712 tok)
 - `docs.py` — | 186 tests pass, analyze 2 infos | ~ |\n") (~1855 tok)
 - `item_card_new.dart.txt` — ItemCard: build, build, build (~2444 tok)
 - `menu_content_new.dart.txt` — _MenuContent: build, build (~1826 tok)
@@ -104,6 +107,9 @@
 
 ## cafe_countryside_menu/lib/core/services/
 
+- `page_alert_stub.dart` — / Test / non-web recorder so behaviour can be asserted without a browser. (~57 tok)
+- `page_alert_web.dart` — ignore_for_file: avoid_web_libraries_in_flutter, deprecated_member_use (~130 tok)
+- `page_alert.dart` — Phase 1 (L6): a tab-title change + short vibration when the order turns (~177 tok)
 
 ## cafe_countryside_menu/lib/features/admin/
 
@@ -159,7 +165,7 @@
 - `promo_links.dart` — / Promo image, fixed 16:9 smart crop so any upload fits the same box. (~617 tok)
 - `promo_popup.dart` — / Pre-loads a promo image for up to [wait]. If it is not ready in time (or (~3200 tok)
 - `sheet_frame.dart` — / Shared chrome for every bottom sheet (phone) / centred dialog (>= 720 px): (~1000 tok)
-- `sheets.dart` — Stateful widget: MoreFromUsSheet (~3978 tok)
+- `sheets.dart` — Stateful widget: MoreFromUsSheet (~4103 tok)
 
 ## cafe_countryside_menu/lib/features/menu/presentation/widgets/
 
@@ -184,6 +190,7 @@
 ## cafe_countryside_menu/lib/features/order/providers/
 
 - `last_order_provider.dart` — Class: LastOrder (~1478 tok)
+- `saved_customer.dart` — Class: SavedCustomer (~344 tok)
 
 ## cafe_countryside_menu/lib/features/shared/models/
 
@@ -207,6 +214,7 @@
 
 ## cafe_countryside_menu/test/
 
+- `customer_comfort_test.dart` — Phase 1 extras: L3 remember me, L6 confirmed alert, L8 reorder, L10 search help. (~2474 tok)
 - `draft_diff_test.dart` — Phase 1 (L4 / L2b): change counting and the live-availability helper. (~1143 tok)
 - `menu_cache_test.dart` — Phase 1 D.4 Tier 1 — stale-while-revalidate menu cache. (~817 tok)
 - `notes_controls_test.dart` — Phase 1 Part E — admin control over notes (per item + whole order). (~2184 tok)
@@ -223,6 +231,7 @@
 ## plan/
 
 - `phase1_prompts.md` — Phase 1 — prompts to paste, in order (~1771 tok)
-- `phase1_wireframe.html` — Phase 1 — Clickable prototype (rev 6: includes existing app screens) (~39695 tok)
+- `phase1_wireframe.html` — Phase 1 — Clickable prototype (rev 6: includes existing app screens) (~39698 tok)
+- `phase1.2.md` — Phase 1.2 — Chef-Special-only items, and "Today's Special" pop-up (~2337 tok)
 - `phase1.md` — Phase 1 — Special Sections, Section Pop-up, Promotion Pop-up, Notes Controls, Instant Loading, Cross (~32759 tok)
 - `wireframe_vs_app_gaps.md` — Wireframe vs. current app — gap report (~2192 tok)

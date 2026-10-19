@@ -161,10 +161,15 @@ List<ItemModel> filteredItems(Ref ref) {
     skipLoadingOnRefresh: true,
     data: (menu) {
       if (menu == null) return [];
+      final chefVisible = chefSectionVisible(ref.watch(businessProvider).asData?.value);
       var items = menu.items;
       if (filter.selectedSectionId != null) {
-        items = itemsForChip(items, filter.selectedSectionId!);
+        items = itemsForChip(items, filter.selectedSectionId!, chefVisible: chefVisible);
+      } else if (filter.searchQuery.isEmpty) {
+        items = itemsForAll(items, chefVisible: chefVisible);
       }
+      // A search with no chip selected looks at every item, chef-only ones
+      // included, so a customer who types a dish's name always finds it.
       if (filter.searchQuery.isNotEmpty) {
         items = items.where((i) => i.matchesSearch(filter.searchQuery)).toList();
       }

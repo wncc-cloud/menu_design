@@ -26,7 +26,8 @@ class SectionPopupSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final menu = ref.watch(menuControllerProvider).asData?.value;
-    final items = sortAvailableFirst(itemsForChip(menu?.items ?? const [], chipId));
+    final chefVisible = chefSectionVisible(ref.watch(businessProvider).asData?.value);
+    final items = sortAvailableFirst(itemsForChip(menu?.items ?? const [], chipId, chefVisible: chefVisible));
     final cart = ref.watch(cartProvider);
     final count = cart.fold<int>(0, (s, l) => s + l.quantity);
     final total = cart.fold<int>(0, (s, l) => s + l.lineTotalPaise);
@@ -283,7 +284,8 @@ class _ItemDetailSheetState extends ConsumerState<ItemDetailSheet> {
 
     return SheetFrame(
       title: item.name,
-      heightFraction: img == null && !_full ? null : (_full ? 0.92 : 0.62),
+      // No photo = compact, content-sized sheet (expanding would only add blank space).
+      heightFraction: img == null ? null : (_full ? 0.92 : 0.62),
       onHandleTap: () => setState(() => _full = !_full),
       bottom: bar,
       body: ListView(
