@@ -1018,6 +1018,38 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-10-21T16:37:43.288576Z"
+    },
+    {
+      "id": "bug-064",
+      "timestamp": "2026-10-21T16:44:38.922Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/lib/features/shared/models/admin_copy.dart",
+      "root_cause": "Had '$n leave “$reservedSectionLabel”: they will show ",
+      "fix": "Changed to '$n leave “Chef Special only”: they will show in $",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T16:44:38.922Z"
+    },
+    {
+      "id": "bug-065",
+      "timestamp": "2026-10-21T16:50:01.850Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/lib/features/shared/models/draft_ops.dart",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 7→11 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T16:50:01.850Z"
     }
   ]
 }

@@ -691,3 +691,11 @@
 | 22:04 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/sample_menu.json | — | ~195 |
 | 22:04 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/verify_seed.mjs | — | ~581 |
 | 22:07 | 1a-0 done in code: characterization test + normalizeItemFlags swap, updateDraft transaction (+tests), R1 delete-confirm fix (section_delete_flow), menudraft_tx emulator test 15/15, seed_from_prod.mjs; suite 267 pass, analyze 2 infos | draft_ops.dart, draft_repository.dart, section_delete_flow.dart, sections_page.dart, item_form.dart, tool/* | green | ~70000 |
+| 22:07 | Session end: 56 writes across 25 files (phase1a.md, phase1a_wireframe.html, client_log_bounded_test.dart, edit_cl.py, client_log.dart) | 18 reads | ~49198 tok |
+| 22:14 | Created cafe_countryside_menu/lib/features/shared/models/admin_copy.dart | — | ~1214 |
+| 22:14 | Edited cafe_countryside_menu/lib/features/shared/models/admin_copy.dart | 2→1 lines | ~27 |
+| 22:15 | Created cafe_countryside_menu/lib/features/shared/models/draft_ops.dart | — | ~7756 |
+| 22:17 | Created cafe_countryside_menu/test/draft_ops_test.dart | — | ~8977 |
+| 22:20 | Edited cafe_countryside_menu/lib/features/shared/models/draft_ops.dart | added 1 condition(s) | ~158 |
+| 22:20 | Created cafe_countryside_menu/test/admin_copy_test.dart | — | ~1542 |
+| 22:23 | 1a-1 pure core: moveItems, mergeSections, bulk set/delete/price (integer), applyUndo (field-level, timestamps ignored x2), search, menuProblems, AdminCopy; 75 new tests; suite 342 pass, analyze 2 infos | draft_ops.dart, admin_copy.dart, test/draft_ops_test.dart, test/admin_copy_test.dart | green | ~90000 |

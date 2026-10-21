@@ -91,6 +91,31 @@
       "count": 1,
       "tokens": 795,
       "first_read": "2026-10-21T16:24:37.013Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/models/draft_item_model.dart": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-10-21T16:43:26.796Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/models/draft_section_model.dart": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-10-21T16:43:26.955Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/models/promotion_models.dart": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-10-21T16:43:31.931Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/models/business_model.dart": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-10-21T16:43:32.872Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/models/item_order.dart": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-10-21T16:43:39.747Z"
     }
   },
   "files_written": [
@@ -429,6 +454,42 @@
       "action": "create",
       "tokens": 622,
       "at": "2026-10-21T16:34:48.062Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/models/admin_copy.dart",
+      "action": "create",
+      "tokens": 1300,
+      "at": "2026-10-21T16:44:23.138Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/models/admin_copy.dart",
+      "action": "edit",
+      "tokens": 29,
+      "at": "2026-10-21T16:44:38.913Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/models/draft_ops.dart",
+      "action": "create",
+      "tokens": 8310,
+      "at": "2026-10-21T16:45:44.792Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/test/draft_ops_test.dart",
+      "action": "create",
+      "tokens": 9618,
+      "at": "2026-10-21T16:47:29.874Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/models/draft_ops.dart",
+      "action": "edit",
+      "tokens": 169,
+      "at": "2026-10-21T16:50:01.840Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/test/admin_copy_test.dart",
+      "action": "create",
+      "tokens": 1652,
+      "at": "2026-10-21T16:50:53.866Z"
     }
   ],
   "edit_counts": {
@@ -447,8 +508,8 @@
     "scripts/build-prod.ps1": 1,
     "../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/spa_server.mjs": 1,
     "cafe_countryside_menu/test/item_form_flags_test.dart": 1,
-    "cafe_countryside_menu/lib/features/shared/models/draft_ops.dart": 2,
-    "cafe_countryside_menu/test/draft_ops_test.dart": 1,
+    "cafe_countryside_menu/lib/features/shared/models/draft_ops.dart": 4,
+    "cafe_countryside_menu/test/draft_ops_test.dart": 2,
     "cafe_countryside_menu/lib/features/admin/items/widgets/item_form.dart": 3,
     "cafe_countryside_menu/lib/features/admin/sections/section_delete_flow.dart": 3,
     "cafe_countryside_menu/test/section_delete_flow_test.dart": 1,
@@ -456,11 +517,13 @@
     "cafe_countryside_menu/tool/rules_tests/menudraft_tx_test.mjs": 1,
     "cafe_countryside_menu/tool/seed_from_prod.mjs": 1,
     "../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/sample_menu.json": 1,
-    "../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/verify_seed.mjs": 1
+    "../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/verify_seed.mjs": 1,
+    "cafe_countryside_menu/lib/features/shared/models/admin_copy.dart": 2,
+    "cafe_countryside_menu/test/admin_copy_test.dart": 1
   },
   "anatomy_hits": 3,
-  "anatomy_misses": 15,
-  "repeated_reads_warned": 4,
+  "anatomy_misses": 20,
+  "repeated_reads_warned": 5,
   "cerebrum_warnings": 0,
-  "stop_count": 8
+  "stop_count": 9
 }

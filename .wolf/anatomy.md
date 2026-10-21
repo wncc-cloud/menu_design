@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-21T16:34:48.030Z
-> Files: 41 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-21T16:50:53.831Z
+> Files: 43 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
 
@@ -181,7 +181,8 @@
 
 ## cafe_countryside_menu/lib/features/shared/models/
 
-- `draft_ops.dart` — / Pure draft operations for the admin tools (Phase 1a). No Firebase, no (~299 tok)
+- `admin_copy.dart` — / Every user-facing sentence of the Phase 1a admin tools, in ONE place (plan (~1193 tok)
+- `draft_ops.dart` — / Pure draft operations for the admin tools (Phase 1a). No Firebase, no (~7843 tok)
 
 ## cafe_countryside_menu/lib/features/shared/permissions/
 
@@ -200,9 +201,10 @@
 
 ## cafe_countryside_menu/test/
 
+- `admin_copy_test.dart` — Plan B.4: the wording of the admin tools is pinned so it cannot drift (~1542 tok)
 - `client_log_bounded_test.dart` — 1a-L0: bounded anonymous logs. Pure helpers (hash, bucket, id, URL cleaning), (~2233 tok)
 - `client_log_hash_test.dart` — The slot hash must be identical on the VM and in the browser (where ints are (~314 tok)
-- `draft_ops_test.dart` — Phase 1a pure draft operations (VM, no Firebase). Grows with each step. (~344 tok)
+- `draft_ops_test.dart` — Phase 1a pure draft operations (VM, no Firebase): flags, move, merge, undo, (~8977 tok)
 - `draft_update_test.dart` — 1a-0(c): the pure parts of DraftRepository.updateDraft. The transaction itself (~800 tok)
 - `item_form_flags_test.dart` — 1a-0(b)/(d) characterization test for the Chef Special flags the item form (~993 tok)
 - `section_delete_flow_test.dart` — 1a-0(e): the "Delete section?" confirm must come BEFORE any write (bug-050: (~1995 tok)
@@ -229,7 +231,5 @@
 ## scripts/
 
 - `build-prod.ps1` (~415 tok)
-- cafe_countryside_menu/lib/features/shared/models/draft_ops.dart: pure draft ops: normalizeItemFlags, canDeleteSection (grows in 1a-1). (~500 tok)
-- cafe_countryside_menu/lib/features/admin/sections/section_delete_flow.dart: confirm-first section delete (fresh business read, fail closed). (~800 tok)
-- DraftRepository.updateDraft (draft_repository.dart): transaction on fresh draft, 4-field update, timeout status.
-- cafe_countryside_menu/tool/rules_tests/menudraft_tx_test.mjs, tool/seed_from_prod.mjs: emulator transaction test; prod-shaped emulator seed (local only).
+- cafe_countryside_menu/lib/features/shared/models/draft_ops.dart (1a-1): moveItems, mergeSections, bulkSetActive/NoteAllowed/ChefSpecial, deleteItems, bulkPrice (basis points), applyUndo, searchItems/Sections, menuProblems, targetWarnings; OpResult/UndoPatch types. Pure, VM-tested. (~6k tok)
+- cafe_countryside_menu/lib/features/shared/models/admin_copy.dart: every user-facing string of the 1a tools (pinned by test/admin_copy_test.dart). (~1.5k tok)
