@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-21T09:50:58.474Z
-> Files: 18 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-21T16:11:45.300Z
+> Files: 30 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
 
@@ -11,6 +11,13 @@
 
 ## ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/812d24a3-7f0b-493b-a059-3282a5cd312f/scratchpad/
 
+
+## ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/
+
+- `edit_cl.py` — Declares logTypes (~2232 tok)
+- `edit_rules.py` — logShapeOk: boundedLogOk, adminLogOk (~1327 tok)
+- `spa_server.mjs` — Declares root (~223 tok)
+- `split_logid.py` (~280 tok)
 
 ## ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/
 
@@ -55,6 +62,9 @@
 ## .claude/rules/
 
 
+## 1a-L0 additions (admin-panel-optimisation branch)
+
+
 ## cafe_countryside_menu/
 
 
@@ -90,6 +100,7 @@
 
 ## cafe_countryside_menu/lib/core/logging/
 
+- `client_log.dart` — / Bug Logs: a durable, admin-visible record of errors and warnings, written (~3654 tok)
 
 ## cafe_countryside_menu/lib/core/services/
 
@@ -102,6 +113,7 @@
 
 ## cafe_countryside_menu/lib/features/admin/bug_logs/
 
+- `bug_logs_page.dart` — Stateful widget: _LogTile (~2633 tok)
 
 ## cafe_countryside_menu/lib/features/admin/dashboard/
 
@@ -183,9 +195,17 @@
 
 ## cafe_countryside_menu/test/
 
+- `client_log_bounded_test.dart` — 1a-L0: bounded anonymous logs. Pure helpers (hash, bucket, id, URL cleaning), (~2233 tok)
+- `client_log_hash_test.dart` — The slot hash must be identical on the VM and in the browser (where ints are (~314 tok)
 
 ## cafe_countryside_menu/tool/
 
+- `check_log_hash_js.mjs` — Checks that fnv1a32 (lib/core/logging/log_id.dart) gives the same result when (~403 tok)
+- `log_hash_probe.dart` — Compiled to JS by tool/check_log_hash_js.mjs: prints fnv1a32 for fixed inputs (~175 tok)
+
+## cafe_countryside_menu/tool/rules_tests/
+
+- `clientlogs_rules_test.mjs` — create-only (precondition exists:false), createdAt = request time. (~3816 tok)
 
 ## cafe_countryside_menu/web/
 
@@ -194,3 +214,7 @@
 
 - `phase1a_wireframe.html` — Phase 1a — Clickable prototype (admin speed tools) — plan v8 (~16921 tok)
 - `phase1a.md` — Phase 1a — Admin speed tools: move / merge sections, find-and-edit, menu check (~21059 tok)
+
+## scripts/
+
+- `build-prod.ps1` (~415 tok)

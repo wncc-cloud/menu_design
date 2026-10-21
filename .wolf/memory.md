@@ -647,3 +647,30 @@
 | 15:21 | Second review: replaced flawed opId guard with verify-read + 60s price lock in plan | plan/phase1a.md | done | ~4000 |
 | 15:21 | Session end: 18 writes across 2 files (phase1a.md, phase1a_wireframe.html) | 4 reads | ~25418 tok |
 | 15:28 | Session end: 18 writes across 2 files (phase1a.md, phase1a_wireframe.html) | 4 reads | ~25418 tok |
+| 15:33 | Session end: 18 writes across 2 files (phase1a.md, phase1a_wireframe.html) | 4 reads | ~25418 tok |
+| 21:09 | Created cafe_countryside_menu/test/client_log_bounded_test.dart | — | ~2233 |
+| 21:10 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/edit_cl.py | — | ~2117 |
+| 21:10 | Edited ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/edit_cl.py | modified fnv1a32() | ~158 |
+| 21:10 | Edited cafe_countryside_menu/lib/core/logging/client_log.dart | 4→5 lines | ~29 |
+| 21:10 | Edited cafe_countryside_menu/lib/core/logging/client_log.dart | 3→4 lines | ~17 |
+| 21:10 | Edited cafe_countryside_menu/lib/core/logging/client_log.dart | 2→3 lines | ~23 |
+| 21:11 | Edited cafe_countryside_menu/lib/core/logging/client_log.dart | inline fix | ~11 |
+| 21:11 | Edited cafe_countryside_menu/lib/features/admin/bug_logs/bug_logs_page.dart | added 1 condition(s) | ~40 |
+| 21:11 | Edited cafe_countryside_menu/lib/features/admin/bug_logs/bug_logs_page.dart | added 1 condition(s) | ~26 |
+| 21:11 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/edit_rules.py | — | ~1327 |
+| 21:12 | Edited cafe_countryside_menu/test/client_log_bounded_test.dart | inline fix | ~10 |
+| 21:13 | Created cafe_countryside_menu/test/client_log_hash_test.dart | — | ~298 |
+| 21:13 | Edited cafe_countryside_menu/test/client_log_hash_test.dart | added 1 import(s) | ~22 |
+| 21:13 | Edited cafe_countryside_menu/test/client_log_hash_test.dart | inline fix | ~4 |
+| 21:20 | Created cafe_countryside_menu/tool/rules_tests/clientlogs_rules_test.mjs | — | ~3821 |
+| 21:21 | Edited cafe_countryside_menu/tool/rules_tests/clientlogs_rules_test.mjs | inline fix | ~14 |
+| 21:32 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/split_logid.py | — | ~280 |
+| 21:32 | Created cafe_countryside_menu/tool/log_hash_probe.dart | — | ~175 |
+| 21:32 | Created cafe_countryside_menu/tool/check_log_hash_js.mjs | — | ~403 |
+| 21:32 | Created scripts/build-prod.ps1 | — | ~415 |
+| 21:32 | Edited cafe_countryside_menu/test/client_log_hash_test.dart | modified to() | ~62 |
+| 21:37 | 1a-L0 impl: bounded clientLogs rules (boundedLogOk/adminLogOk/logShapeOk), build field, sanitised appUrl, FNV slot/bucket ids, admin->bounded fallback; rules test 58/58 + mutation check; JS hash check; full suite 234 pass, analyze 2 infos (baseline) | firestore.rules, client_log.dart, log_id.dart, bug_logs_page.dart, tool/rules_tests/clientlogs_rules_test.mjs, tool/check_log_hash_js.mjs, scripts/build-prod.ps1, test/client_log_*_test.dart | green, E2E browser check pending | ~60000 |
+| 21:38 | Session end: 39 writes across 13 files (phase1a.md, phase1a_wireframe.html, client_log_bounded_test.dart, edit_cl.py, client_log.dart) | 8 reads | ~37441 tok |
+| 21:39 | Session end: 39 writes across 13 files (phase1a.md, phase1a_wireframe.html, client_log_bounded_test.dart, edit_cl.py, client_log.dart) | 8 reads | ~37441 tok |
+| 21:41 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/spa_server.mjs | — | ~223 |
+| 21:48 | Session end: 40 writes across 14 files (phase1a.md, phase1a_wireframe.html, client_log_bounded_test.dart, edit_cl.py, client_log.dart) | 9 reads | ~37680 tok |

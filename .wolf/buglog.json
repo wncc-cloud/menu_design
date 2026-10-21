@@ -872,6 +872,102 @@
       "related_bugs": [],
       "occurrences": 3,
       "last_seen": "2026-10-21T09:50:56.961Z"
+    },
+    {
+      "id": "bug-055",
+      "timestamp": "2026-10-21T15:40:42.091Z",
+      "error_message": "Significant refactor of ",
+      "file": "../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/edit_cl.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 8→15 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T15:40:42.091Z"
+    },
+    {
+      "id": "bug-056",
+      "timestamp": "2026-10-21T15:40:56.310Z",
+      "error_message": "Wrong reference: createdAt should be build",
+      "file": "cafe_countryside_menu/lib/core/logging/client_log.dart",
+      "root_cause": "Used \"createdAt\" instead of \"build\"",
+      "fix": "Changed createdAt → build",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T15:40:56.310Z"
+    },
+    {
+      "id": "bug-057",
+      "timestamp": "2026-10-21T15:41:05.580Z",
+      "error_message": "Null/undefined access in ",
+      "file": "cafe_countryside_menu/lib/features/admin/bug_logs/bug_logs_page.dart",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: if (e.build != null) 'build: ${e.build}',",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-10-21T15:41:07.238Z"
+    },
+    {
+      "id": "bug-058",
+      "timestamp": "2026-10-21T15:43:25.599Z",
+      "error_message": "Missing import: dart:convert",
+      "file": "cafe_countryside_menu/test/client_log_hash_test.dart",
+      "root_cause": "Module(s) not imported: dart:convert",
+      "fix": "Added import(s) for dart:convert",
+      "tags": [
+        "auto-detected",
+        "missing-import",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T15:43:25.599Z"
+    },
+    {
+      "id": "bug-059",
+      "timestamp": "2026-10-21T15:43:27.772Z",
+      "error_message": "Wrong reference: Utf8Codec should be utf8",
+      "file": "cafe_countryside_menu/test/client_log_hash_test.dart",
+      "root_cause": "Used \"Utf8Codec\" instead of \"utf8\"",
+      "fix": "Changed Utf8Codec → utf8",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T15:43:27.772Z"
+    },
+    {
+      "id": "bug-060",
+      "timestamp": "2026-10-21T16:02:51.998Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/test/client_log_hash_test.dart",
+      "root_cause": "Had `flutter test`",
+      "fix": "Changed to `node tool/check_log_hash_js.mjs`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T16:02:51.998Z"
     }
   ]
 }

@@ -43,50 +43,94 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
-    // Bug Logs: errors/warnings from the app. Customers are anonymous, so ANYONE
-    // may create a log, but only in the exact shape the app writes (fixed keys,
-    // size caps, server time, expiry within 8 days) and never edit one. Only
-    // admins read them; owner/manager delete the expired ones (Admin > Bug logs).
+    // ---- Bug Logs (clientLogs) ------------------------------------------
+    // Errors/warnings from the app. Customers are anonymous, so the server cannot
+    // tell a real phone from a script; an open "anyone may create" rule could burn
+    // the free plan's 20,000 writes/day. So there are TWO create paths:
+    //
+    //  * admin path   - signed in AND isAdmin(), random id, any source.
+    //  * bounded path - anyone (incl. anonymous): id `<source>~<slot>~<bucket>`
+    //    with source on a fixed allow-list, slot 0..2 and bucket = 30-minute
+    //    number (current +-1). Create-only (update is false), so a second write
+    //    to the same id is refused. Hard cap: 16 x 3 x 48 = 2,304 docs per day,
+    //    however many requests are sent. No get()/exists() on this path.
+    //
+    // KILL SWITCH: replace the body of boundedLogOk() with `return false;` and
+    // run `firebase deploy --only firestore:rules`.
+    //
+    // The allow-list below MUST equal kCustomerLogSources in
+    // lib/core/logging/client_log.dart (test/client_log_bounded_test.dart parses
+    // this file and compares). Tests: tool/rules_tests/clientlogs_rules_test.mjs.
+    function logShapeOk() {
+      let d = request.resource.data;
+      return d.keys().hasOnly([
+            'type', 'source', 'message', 'stackTrace', 'userId', 'userEmail',
+            'userAgent', 'appUrl', 'createdAt', 'expireAt', 'schemaVersion',
+            'errorCode', 'breadcrumbs', 'build'
+          ])
+        && d.keys().hasAll([
+            'type', 'source', 'message', 'userAgent', 'appUrl', 'createdAt',
+            'expireAt', 'schemaVersion'
+          ])
+        && d.type in ['ERROR', 'WARN']
+        && d.source is string
+        && d.source.size() <= 200
+        && d.message is string
+        && d.message.size() <= 2000
+        && (d.get('stackTrace', null) == null
+            || (d.stackTrace is string && d.stackTrace.size() <= 4000))
+        && (d.get('userId', null) == null
+            || d.userId == request.auth.uid)
+        && (d.get('userEmail', null) == null
+            || (d.userEmail is string && d.userEmail.size() <= 200))
+        && d.userAgent is string
+        && d.userAgent.size() <= 500
+        && d.appUrl is string
+        && d.appUrl.size() <= 500
+        && (!('errorCode' in d)
+            || (d.errorCode is string && d.errorCode.size() <= 100))
+        && (!('breadcrumbs' in d)
+            || (d.breadcrumbs is string && d.breadcrumbs.size() <= 3000))
+        && (!('build' in d)
+            || (d.build is string && d.build.size() <= 80))
+        && d.schemaVersion == 1
+        && d.createdAt == request.time
+        && d.expireAt > request.time
+        && d.expireAt <= request.time + duration.value(8, 'd');
+    }
+
+    function boundedLogOk(logId) {
+      let d = request.resource.data;
+      let parts = logId.split('~');
+      let bucket = math.floor(request.time.toMillis() / 1800000);
+      return parts.size() == 3
+        && d.source == parts[0]
+        && d.source in [
+            'FlutterError', 'PlatformDispatcher', 'runZonedGuarded',
+            'Checkout.submit', 'Checkout.appCheck', 'Checkout.freshBusiness',
+            'Checkout.revalidateCart', 'OrderRequest.create',
+            'OrderRequest.fetchCafeOpen', 'OrderRequest.getRequest',
+            'OrderStatus.poll', 'PosAppCheck.activate', 'PosAppCheck.getToken',
+            'Menu.revalidate', 'MenuCache.read', 'LoginPage.signIn'
+          ]
+        && parts[1] in ['0', '1', '2']
+        && parts[2].matches('[0-9]{1,12}')
+        && int(parts[2]) >= bucket - 1
+        && int(parts[2]) <= bucket + 1
+        && (d.get('userEmail', null) == null || d.get('userId', null) != null);
+    }
+
+    function adminLogOk() {
+      return isAdmin() && request.resource.data.get('userId', null) == request.auth.uid;
+    }
+
     match /clientLogs/{logId} {
       allow get, list: if isAdmin();
       allow delete: if isOwnerOrManager();
       allow update: if false;
-      allow create: if request.resource.data.keys().hasOnly([
-            'type', 'source', 'message', 'stackTrace', 'userId', 'userEmail',
-            'userAgent', 'appUrl', 'createdAt', 'expireAt', 'schemaVersion',
-            'errorCode', 'breadcrumbs'
-          ])
-        && request.resource.data.keys().hasAll([
-            'type', 'source', 'message', 'userAgent', 'appUrl', 'createdAt',
-            'expireAt', 'schemaVersion'
-          ])
-        && request.resource.data.type in ['ERROR', 'WARN']
-        && request.resource.data.source is string
-        && request.resource.data.source.size() <= 200
-        && request.resource.data.message is string
-        && request.resource.data.message.size() <= 2000
-        && (request.resource.data.get('stackTrace', null) == null
-            || (request.resource.data.stackTrace is string
-                && request.resource.data.stackTrace.size() <= 4000))
-        && (request.resource.data.get('userId', null) == null
-            || request.resource.data.userId == request.auth.uid)
-        && (request.resource.data.get('userEmail', null) == null
-            || (request.resource.data.userEmail is string
-                && request.resource.data.userEmail.size() <= 200))
-        && request.resource.data.userAgent is string
-        && request.resource.data.userAgent.size() <= 500
-        && request.resource.data.appUrl is string
-        && request.resource.data.appUrl.size() <= 500
-        && (!('errorCode' in request.resource.data)
-            || (request.resource.data.errorCode is string
-                && request.resource.data.errorCode.size() <= 100))
-        && (!('breadcrumbs' in request.resource.data)
-            || (request.resource.data.breadcrumbs is string
-                && request.resource.data.breadcrumbs.size() <= 3000))
-        && request.resource.data.schemaVersion == 1
-        && request.resource.data.createdAt == request.time
-        && request.resource.data.expireAt > request.time
-        && request.resource.data.expireAt <= request.time + duration.value(8, 'd');
+      // Bounded path first: it costs no reads, and an anonymous request that
+      // fails it stops at isSignedIn() inside adminLogOk() without any lookup.
+      allow create: if logShapeOk() && (boundedLogOk(logId) || adminLogOk());
     }
 
     // Admins can read their own document

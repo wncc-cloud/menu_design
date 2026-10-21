@@ -6,7 +6,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 import 'app_log.dart' as app_log;
+import 'log_id.dart';
 import 'user_agent.dart';
+
+export 'log_id.dart';
 
 /// Bug Logs: a durable, admin-visible record of errors and warnings, written
 /// to `clientLogs/{id}` (same idea as billing-cafe's clientLogs). Logs expire
@@ -18,6 +21,52 @@ const logLifetime = Duration(days: 7);
 
 /// Types the rules accept.
 const logTypes = {'ERROR', 'WARN'};
+
+/// Compile-time build id (`--dart-define=BUILD_ID=<short-commit>[+wip]@<time>`,
+/// see scripts/build-prod.ps1). Empty for local/debug runs; then no `build`
+/// field is written.
+const _buildId = String.fromEnvironment('BUILD_ID');
+
+/// `build` as written to the log, or null when empty. At most 80 UTF-8 bytes
+/// (rules cap).
+String? capBuildId(String id) {
+  final t = id.trim();
+  return t.isEmpty ? null : capUtf8(t, 80);
+}
+
+/// Sources a customer (not signed in) can produce. Anonymous logs are accepted
+/// by the rules ONLY for these, into a small fixed key space (see
+/// [boundedLogId]). MUST equal the list in `boundedLogOk()` in firestore.rules
+/// (test/client_log_bounded_test.dart parses the rules and compares).
+const kCustomerLogSources = <String>{
+  'FlutterError',
+  'PlatformDispatcher',
+  'runZonedGuarded',
+  'Checkout.submit',
+  'Checkout.appCheck',
+  'Checkout.freshBusiness',
+  'Checkout.revalidateCart',
+  'OrderRequest.create',
+  'OrderRequest.fetchCafeOpen',
+  'OrderRequest.getRequest',
+  'OrderStatus.poll',
+  'PosAppCheck.activate',
+  'PosAppCheck.getToken',
+  'Menu.revalidate',
+  'MenuCache.read',
+  'LoginPage.signIn',
+};
+
+/// Only the path of the page, with ids masked, never the query or hash: the
+/// full URL contains `/order-status/<requestId>` (a POS document id).
+String sanitiseAppUrl(Uri uri) {
+  final segs = uri.pathSegments.where((s) => s.isNotEmpty).toList();
+  final opaque = RegExp(r'^[A-Za-z0-9_-]{16,}$');
+  for (var i = 0; i < segs.length; i++) {
+    if ((i > 0 && segs[i - 1] == 'order-status') || opaque.hasMatch(segs[i])) segs[i] = ':id';
+  }
+  return capUtf8('/${segs.join('/')}', 500);
+}
 
 class ClientLogEntry {
   final String id;
@@ -31,6 +80,7 @@ class ClientLogEntry {
   final String appUrl;
   final String? errorCode;
   final String? breadcrumbs;
+  final String? build;
   final DateTime? createdAt;
 
   const ClientLogEntry({
@@ -45,6 +95,7 @@ class ClientLogEntry {
     this.appUrl = '',
     this.errorCode,
     this.breadcrumbs,
+    this.build,
     this.createdAt,
   });
 
@@ -66,6 +117,7 @@ class ClientLogEntry {
       appUrl: s(d['appUrl']) ?? '',
       errorCode: s(d['errorCode']),
       breadcrumbs: s(d['breadcrumbs']),
+      build: s(d['build']),
       createdAt: created is Timestamp ? created.toDate() : null,
     );
   }
@@ -117,29 +169,50 @@ String capUtf8(String s, int maxBytes) {
 }
 
 class ClientLogRepository {
-  final FirebaseFirestore firestore;
+  /// Null means "the app's default Firestore" (resolved lazily so tests need no
+  /// Firebase).
+  final FirebaseFirestore? firestore;
   final LogGate gate;
 
   /// Who is signed in (admins only; customers are anonymous). Overridable so
   /// tests need no Firebase.
   final ({String uid, String? email})? Function() currentUser;
 
+  final DateTime Function() clock;
+  final String Function() randomId;
+  final Future<void> Function(String id, Map<String, dynamic> data) setDoc;
+
   ClientLogRepository({
-    required this.firestore,
+    this.firestore,
     LogGate? gate,
     ({String uid, String? email})? Function()? currentUser,
+    DateTime Function()? clock,
+    String Function()? randomId,
+    Future<void> Function(String id, Map<String, dynamic> data)? setDoc,
   })  : gate = gate ?? LogGate(),
-        currentUser = currentUser ?? _firebaseUser;
+        currentUser = currentUser ?? _firebaseUser,
+        clock = clock ?? DateTime.now,
+        randomId = randomId ?? (() => (firestore ?? FirebaseFirestore.instance).collection('clientLogs').doc().id),
+        setDoc = setDoc ??
+            ((id, data) => (firestore ?? FirebaseFirestore.instance).collection('clientLogs').doc(id).set(data));
 
   static ({String uid, String? email})? _firebaseUser() {
     final u = FirebaseAuth.instance.currentUser;
     return u == null ? null : (uid: u.uid, email: u.email);
   }
 
-  CollectionReference<Map<String, dynamic>> get _logs => firestore.collection('clientLogs');
+  FirebaseFirestore get _fs => firestore ?? FirebaseFirestore.instance;
+  CollectionReference<Map<String, dynamic>> get _logs => _fs.collection('clientLogs');
 
-  /// Fire-and-forget. Returns the new log's id (shown to the user as an Error
-  /// ID if ever needed), or null when nothing was written. Never throws.
+  /// Fire-and-forget. Returns the new log's id, or null when nothing was
+  /// written. Never throws.
+  ///
+  /// Two paths (see firestore.rules):
+  /// * signed in -> random id first (accepted for admins); if the rules refuse
+  ///   it (not an admin / expired token) the SAME log is retried ONCE on the
+  ///   bounded path;
+  /// * anonymous -> bounded id only. A duplicate id or a denial is expected
+  ///   and ignored silently; it never loops back into logging.
   String? write({
     required String type,
     required String source,
@@ -150,32 +223,51 @@ class ClientLogRepository {
     try {
       if (!logTypes.contains(type)) return null;
       if (!gate.allow(type, source, message)) return null;
-      final now = DateTime.now();
+      final now = clock();
       final user = currentUser();
-      final ref = _logs.doc();
-      unawaited(ref.set({
+      final cappedSource = capUtf8(source, 200);
+      final data = <String, dynamic>{
         'type': type,
-        'source': capUtf8(source, 200),
+        'source': cappedSource,
         'message': capUtf8(message, 2000),
         'stackTrace': stackTrace == null ? null : capUtf8(stackTrace, 4000),
         'userId': user?.uid,
         'userEmail': user?.email == null ? null : capUtf8(user!.email!, 200),
         'userAgent': capUtf8(currentUserAgent(), 500),
-        'appUrl': capUtf8(Uri.base.toString(), 500),
+        'appUrl': sanitiseAppUrl(Uri.base),
         'createdAt': FieldValue.serverTimestamp(),
         'expireAt': Timestamp.fromDate(now.add(logLifetime)),
         'schemaVersion': 1,
+        'build': ?capBuildId(_buildId),
         if (errorCode != null) 'errorCode': capUtf8(errorCode, 100),
         if (type == 'ERROR')
           if (app_log.Breadcrumbs.render(at: now) case final b?) 'breadcrumbs': capUtf8(b, 3000),
-      }).catchError((Object e, StackTrace st) {
-        // e.g. offline or rules denial: console only, never loop back here.
-        app_log.logError('ClientLogRepository.write', e, st);
-      }));
-      return ref.id;
+      };
+      final boundedId = boundedLogId(cappedSource, data['message'] as String, now);
+      final firstId = user == null ? boundedId : randomId();
+      unawaited(_send(firstId, data, retryBoundedAs: user == null ? null : boundedId));
+      return firstId;
     } catch (e, st) {
       app_log.logError('ClientLogRepository.write', e, st);
       return null;
+    }
+  }
+
+  Future<void> _send(String id, Map<String, dynamic> data, {String? retryBoundedAs}) async {
+    try {
+      await setDoc(id, data);
+    } on FirebaseException catch (e, st) {
+      if (retryBoundedAs != null && e.code == 'permission-denied') {
+        try {
+          await setDoc(retryBoundedAs, data);
+        } catch (e2, st2) {
+          app_log.logError('ClientLogRepository.write', e2, st2); // console only
+        }
+      } else {
+        app_log.logError('ClientLogRepository.write', e, st);
+      }
+    } catch (e, st) {
+      app_log.logError('ClientLogRepository.write', e, st);
     }
   }
 
@@ -202,7 +294,7 @@ class ClientLogRepository {
       final take = (maxDeletes - deleted).clamp(0, chunk);
       final snap = await query.limit(take).get();
       if (snap.docs.isEmpty) break;
-      final batch = firestore.batch();
+      final batch = _fs.batch();
       for (final doc in snap.docs) {
         batch.delete(doc.reference);
       }
