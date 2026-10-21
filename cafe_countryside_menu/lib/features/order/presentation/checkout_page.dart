@@ -19,6 +19,7 @@ import '../providers/saved_customer.dart';
 import '../providers/order_request_provider.dart';
 import '../validation.dart';
 import 'widgets/honeypot_field.dart';
+import '../../../core/logging/client_log.dart';
 
 class CheckoutPage extends ConsumerStatefulWidget {
   const CheckoutPage({super.key});
@@ -119,7 +120,9 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
         tableNumberEnabled = freshBiz.tableNumberEnabled;
         orderNoteEnabled = freshBiz.orderNoteEnabled;
       }
-    } catch (_) {}
+    } catch (e, st) {
+      logClientWarn('Checkout.freshBusiness', e, stackTrace: st);
+    }
 
     var effectiveCart = cart;
     try {
@@ -162,8 +165,9 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
           );
         }
       }
-    } catch (_) {
+    } catch (e, st) {
       // fail-open: submit the cart as it is
+      logClientWarn('Checkout.revalidateCart', e, stackTrace: st);
     }
     if (!mounted) return;
 
@@ -210,7 +214,8 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
             expiresAt: expiresAt,
           );
       context.go('/order-status/$requestId');
-    } on AppCheckTokenException catch (e) {
+    } on AppCheckTokenException catch (e, st) {
+      logClientWarn('Checkout.appCheck', e, stackTrace: st, message: e.message);
       // phase_plan/phase11_6.md — a distinct, non-retry message; no
       // automatic retry attempted, there's nothing a retry would fix.
       if (mounted) {
@@ -219,7 +224,8 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
           _errorMessage = e.message;
         });
       }
-    } on OrderRequestException catch (e) {
+    } on OrderRequestException catch (e, st) {
+      logClientError('Checkout.submit', e, stackTrace: st, message: e.message);
       // Retry-able — button re-enables, cart stays intact, customer
       // stays on this page (not navigated away).
       if (mounted) {
@@ -228,7 +234,8 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
           _errorMessage = e.message;
         });
       }
-    } catch (e) {
+    } catch (e, st) {
+      logClientError('Checkout.submit', e, stackTrace: st);
       if (mounted) {
         setState(() {
           _submitting = false;

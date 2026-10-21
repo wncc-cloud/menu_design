@@ -8,6 +8,7 @@ import '../../../shared/models/draft_item_model.dart';
 import '../../../shared/models/draft_section_model.dart';
 import '../../../shared/services/cloudinary_service.dart';
 import '../../../shared/services/image_service.dart';
+import '../../../../core/logging/client_log.dart';
 
 class ItemFormDialog extends StatefulWidget {
   final List<DraftSectionModel> sections;
@@ -142,6 +143,7 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
     } catch (e, st) {
       // ignore: avoid_print
       print('[ItemForm] image upload error: $e\n$st');
+      logClientError('ItemForm.imageUpload', e, stackTrace: st);
       if (!mounted) return;
       setState(() {
         _imageError = 'Upload failed: $e';

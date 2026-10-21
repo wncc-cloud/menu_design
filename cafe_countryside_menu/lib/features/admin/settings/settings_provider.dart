@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../shared/models/business_model.dart';
 import '../../shared/repositories/business_repository.dart';
+import '../../../core/logging/client_log.dart';
 
 part 'settings_provider.g.dart';
 
@@ -24,7 +25,8 @@ class SettingsNotifier extends _$SettingsNotifier {
           .saveSettings(business);
       state = AsyncValue.data(business);
       return null;
-    } catch (e) {
+    } catch (e, st) {
+      logClientError('Settings.save', e, stackTrace: st);
       return e.toString();
     }
   }

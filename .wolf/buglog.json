@@ -758,6 +758,120 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-10-18T19:53:00.530203"
+    },
+    {
+      "id": "bug-048",
+      "timestamp": "2026-10-21T05:14:57.994Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/lib/router.dart",
+      "root_cause": "Had 'features/admin/dashboard/dashboard_page.dart'",
+      "fix": "Changed to 'features/admin/bug_logs/bug_logs_page.dart'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T05:14:57.994Z"
+    },
+    {
+      "id": "bug-049",
+      "timestamp": "2026-10-21T05:20:00.000Z",
+      "error_message": "Two 'Chef Special' chips on prod menu (screenshot 2026-10-21 103746)",
+      "file": "prod Firestore menu/current (data, not code)",
+      "root_cause": "Prod has a REAL section named 'Chef Specials' (id 9Nvq8Uye32hNvYOuCQGa, 10 items, 5 flagged isChefSpecial) next to the Phase 1 system 'Chef Special' chip. Owner made the section before the system section existed. Read via public REST GET of menu/current.",
+      "fix": "Not changed (prod data is the owner's call). Options: delete/rename the real section, or move its items out and use the system section.",
+      "tags": [
+        "chef-special",
+        "duplicate",
+        "prod-data",
+        "system-section"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T05:20:00.000Z"
+    },
+    {
+      "id": "bug-050",
+      "timestamp": "2026-10-21T06:10:00.000Z",
+      "error_message": "Sections > Delete: an empty section is deleted before the 'Delete section?' dialog appears (found in plan review, not yet fixed)",
+      "file": "cafe_countryside_menu/lib/features/admin/sections/sections_page.dart (_confirmDelete)",
+      "root_cause": "_confirmDelete calls DraftNotifier.deleteSection first just to learn whether items block it; for an empty section that call performs the delete, then the dialog asks and calls it again.",
+      "fix": "Planned in plan/phase1a.md step 1a-0(c): pure canDeleteSection check, dialog, then a single delete.",
+      "tags": [
+        "sections",
+        "delete",
+        "confirm",
+        "planned"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T06:10:00.000Z"
+    },
+    {
+      "id": "bug-051",
+      "timestamp": "2026-10-21T05:39:54.770Z",
+      "error_message": "Wrong reference: absolute should be fixed",
+      "file": "plan/phase1a_wireframe.html",
+      "root_cause": "Used \"absolute\" instead of \"fixed\"",
+      "fix": "Changed absolute → fixed",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-10-21T05:39:56.103Z"
+    },
+    {
+      "id": "bug-052",
+      "timestamp": "2026-10-21T09:45:07.496Z",
+      "error_message": "Incorrect value in code",
+      "file": "plan/phase1a.md",
+      "root_cause": "Had \"Couldn'",
+      "fix": "Changed to \"not saved\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 4,
+      "last_seen": "2026-10-21T09:45:13.342Z"
+    },
+    {
+      "id": "bug-053",
+      "timestamp": "2026-10-21T09:45:21.412Z",
+      "error_message": "Wrong condition in logic",
+      "file": "plan/phase1a_wireframe.html",
+      "root_cause": "Condition was: if (o.round>0)",
+      "fix": "Changed to: if (o.mode==='pct')",
+      "tags": [
+        "auto-detected",
+        "logic-fix",
+        "html"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T09:45:21.412Z"
+    },
+    {
+      "id": "bug-054",
+      "timestamp": "2026-10-21T09:50:49.476Z",
+      "error_message": "Incorrect value in code",
+      "file": "plan/phase1a.md",
+      "root_cause": "Had \"This is taking too long. It may or may not have s",
+      "fix": "Changed to `get`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-10-21T09:50:56.961Z"
     }
   ]
 }

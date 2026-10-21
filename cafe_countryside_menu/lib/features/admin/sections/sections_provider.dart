@@ -10,6 +10,7 @@ import '../../shared/models/draft_section_model.dart';
 import '../../shared/repositories/draft_repository.dart';
 import '../auth/auth_provider.dart';
 import '../../menu/presentation/menu_provider.dart';
+import '../../../core/logging/client_log.dart';
 
 part 'sections_provider.g.dart';
 
@@ -233,7 +234,8 @@ class DraftNotifier extends _$DraftNotifier {
     try {
       await _repo.discardDraft(_adminUid);
       return null;
-    } catch (e) {
+    } catch (e, st) {
+      logClientError('Sections.discardDraft', e, stackTrace: st);
       return e.toString().replaceFirst('Bad state: ', '');
     }
   }

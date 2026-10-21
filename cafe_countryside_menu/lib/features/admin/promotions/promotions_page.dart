@@ -17,6 +17,7 @@ import '../../shared/services/cloudinary_service.dart';
 import '../../shared/services/image_service.dart';
 import '../auth/auth_provider.dart';
 import '../shared_admin_business_provider.dart';
+import '../../../core/logging/client_log.dart';
 
 String _newId() {
   const a = 'abcdefghijkmnpqrstuvwxyz23456789';
@@ -626,7 +627,8 @@ class _PromoFormState extends State<_PromoForm> {
       final r = await CloudinaryService().upload(bytes: compressed, publicId: '${AppConstants.cloudinaryFolder}/promo_$ts');
       if (!mounted) return;
       widget.onChanged(p.copyWith(imagePublicId: r.publicId));
-    } catch (e) {
+    } catch (e, st) {
+      logClientWarn('Promotions.imageUpload', e, stackTrace: st);
       if (mounted) setState(() => _imgError = e.toString().replaceFirst('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _uploading = false);

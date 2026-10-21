@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../../core/services/pos_app_check_service.dart';
+import '../../../core/logging/client_log.dart';
 
 /// Thrown when no App Check token could be obtained — a real, expected
 /// failure mode (the device's browser/network genuinely blocking
@@ -104,11 +105,14 @@ class OrderRequestRepository {
         headers: {'X-Firebase-AppCheck': token, 'Content-Type': 'application/json'},
         body: jsonEncode(_encodeFields(data)),
       );
-    } catch (e) {
+    } catch (e, st) {
+      logClientError('OrderRequest.create', e, stackTrace: st);
       throw OrderRequestException('Could not place your order — check your connection and try again.');
     }
 
     if (response.statusCode != 200) {
+      logClientError('OrderRequest.create', 'HTTP ${response.statusCode}',
+          message: 'Order request rejected: HTTP ${response.statusCode}');
       throw OrderRequestException('Could not place your order — check your connection and try again.');
     }
 
@@ -143,7 +147,8 @@ class OrderRequestRepository {
       final open = fields?['open'] as Map<String, dynamic>?;
       final value = open?['booleanValue'];
       return value is bool ? value : null;
-    } catch (_) {
+    } catch (e, st) {
+      logClientWarn('OrderRequest.fetchCafeOpen', e, stackTrace: st);
       return null;
     }
   }
@@ -160,7 +165,8 @@ class OrderRequestRepository {
     final http.Response response;
     try {
       response = await http.get(_documentUri(requestId), headers: {'X-Firebase-AppCheck': token});
-    } catch (e) {
+    } catch (e, st) {
+      logClientWarn('OrderRequest.getRequest', e, stackTrace: st);
       throw const OrderRequestException('Could not check your order status right now.');
     }
 

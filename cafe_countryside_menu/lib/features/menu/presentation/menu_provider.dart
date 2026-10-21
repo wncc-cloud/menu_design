@@ -13,6 +13,7 @@ import '../models/menu_snapshot_model.dart';
 import '../../shared/models/business_model.dart';
 import '../../shared/repositories/business_repository.dart';
 import '../../order/providers/cafe_status_provider.dart';
+import '../../../core/logging/client_log.dart';
 
 part 'menu_provider.g.dart';
 
@@ -103,8 +104,9 @@ class MenuController extends _$MenuController {
       final fresh = await repo.fetchMenu();
       writeMenuCache(store, fresh);
       if (!_disposed) state = AsyncData(fresh);
-    } catch (_) {
+    } catch (e, st) {
       // Keep showing the saved menu; the next refresh tries again.
+      logClientWarn('Menu.revalidate', e, stackTrace: st);
     }
   }
 }

@@ -14,6 +14,7 @@
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import '../logging/client_log.dart';
 
 class PosAppCheckService {
   PosAppCheckService._();
@@ -87,6 +88,7 @@ class PosAppCheckService {
       _posApp = posApp;
     } catch (e, st) {
       debugPrint('[PosAppCheckService] activation failed: $e\n$st');
+      logClientWarn('PosAppCheck.activate', e, stackTrace: st);
     }
   }
 
@@ -115,6 +117,7 @@ class PosAppCheckService {
           .timeout(const Duration(seconds: 8));
     } catch (e, st) {
       debugPrint('[PosAppCheckService] getToken failed: $e\n$st');
+      logClientWarn('PosAppCheck.getToken', e, stackTrace: st);
       return null;
     }
   }

@@ -106,6 +106,16 @@
 
 ## Do-Not-Repeat
 
+- [2026-10-21] Bug Logs = first ANONYMOUS write surface on cafe-countryside-menu: rules cannot rate-limit, so a scripted client could exhaust the free 20k writes/day and block admin saves/Publish (menu reads unaffected). Kill switch: set anonymous clientLogs create to false + deploy rules. PublishBanner is only on Dashboard/Sections/Items (not Promotions/Settings) and hides itself when nothing is pending.
+
+- [2026-10-21] POS (billing-cafe menu_repository.dart:84-85) maps categoryName from section names; items in the reserved chef-only section have none, so they lose their category heading on the POS manual-bill screen. Sections page ReorderableListView renumbers by index: never filter that list (search) while drag-reorder is on. Items arrows use visible index: hide while searching. SnackBars get hidden by hideCurrentSnackBar, so do not use them for Undo.
+
+- [2026-10-21] Draft ops: never whole-draft Undo or whole-doc _save for new bulk ops (stale write reverts live sold-out toggles); use a transaction on the fresh draft + inverse patch. Never renumber untouched items (countDraftChanges counts sortOrder). Never touch `state`/`ref` after await in DraftNotifier (auto-disposed, see appendBulkImport). Chef-only reserved-section items store chefOnly=true (item_form.dart:175-177), not false.
+- [2026-10-21] Check prod data before adding 'quality' warnings: 100/100 items have no image, 70/100 no description, so those checks would be pure noise.
+
+- [2026-10-21] 'Two Chef Special chips' on prod was DATA (a real section named 'Chef Specials' next to the system chip), not a code bug. Check prod menu/current before hunting in code.
+- [2026-10-21] Bash heredoc with apostrophes failed again: write python edit scripts to the scratchpad with the Write tool.
+
 - [2026-10-18] Before calling a prototype feature 'out of scope', grep plan/phase1.md (J.8 lists Veg-only chip, detail sheet, tighter cards as Phase 1). I wrongly called them extras in the first gap report.
 - [2026-10-18] When patching plan/phase1_wireframe.html with a rep_fn-style script, the replaced region ends at the NEXT top-level function; a replacement that also contains the following function creates a duplicate definition. Split such replacements.
 
@@ -115,6 +125,13 @@
 - **[2026-09-05] `OrderCartLine.copyWith`'s `notes: notes ?? this.notes` can never express "clear this field to null" — only "leave it as-is" (pass nothing/null) or "set a new non-null value".** Caught while building `phase_plan/notes_in_order.md` Task 1's `CartNotifier.setNotes(menuItemId, String? notes)`: calling `line.copyWith(notes: normalizedOrNull)` to clear a note would have silently kept the old note instead, since `null ?? this.notes` always resolves to the existing value. Fixed by having `setNotes` construct a new `OrderCartLine(...)` directly instead of going through `copyWith` for this one case. **Any future method on this class that needs to explicitly null out `notes` (or any other nullable field `copyWith` treats the same way) must NOT use `copyWith` for that — either construct the object directly, or first add a real "clear" sentinel/flag to `copyWith` itself.** `setQuantity`'s existing use of `copyWith(quantity: ...)` is unaffected (it never touches `notes`).
 
 ## Decision Log
+
+- [2026-10-21] Bug Logs lack a build id; the /check-bug-logs skill (plan phase1a Part E, billing-cafe pattern) needs an optional clientLogs.build field (1a-L0, the only rules change in 1a) and a prod build script with --dart-define=BUILD_ID. Read-only access = keyless service account bug-log-reader@cafe-countryside-menu via gcloud impersonation; setup changes IAM so ask first. Emulator test: Authorization Bearer owner.
+
+- [2026-10-21] DraftNotifier has 12 _save() callers (whole-draft set from a stale in-memory copy): stale form value overwrites a live sold-out toggle (updateItem), stale list drops another admin new section (reorderSections). Plan phase1a step 1a-7 moves them onto a fresh-draft transaction. Rules cannot be tightened for staff because setAvailabilityLive must write menuDraft.
+
+- [2026-10-21] Bug Logs (mirrors billing-cafe clientLogs): top-level `clientLogs/{id}`, types ERROR/WARN, expireAt = +7d, admin page /admin/bug-logs deletes expired (owner/manager). Customers are ANONYMOUS, so rules allow public create with fixed keys/size caps/server time/expiry<=8d and the client caps one session at 30 logs + 30s dedupe (LogGate). Rules MUST be deployed before the app build or log writes are silently denied. New catch blocks should call logClientError/logClientWarn (core/logging/client_log.dart).
+- [2026-10-21] Read-only PROD access for this project: public docs (menu/current, businesses/*) can be read with an unauthenticated GET to firestore.googleapis.com/v1/projects/cafe-countryside-menu/databases/(default)/documents/<path>. Anything admin-only needs the billing-cafe style read-only service account (scripts/setup-bug-log-reader.ps1 pattern, changes IAM: ask first).
 
 - [2026-10-18] First-load pop-up = ONE owner choice (none / promo:<id> / rotate / chef / best / sec:<id>) + one frequency; no fallback, no 'section wins'. Veg-only chip dropped (café always veg). Prototype keeps legacy secPopup/promo fields derived via syncFirst(); plan field is firstLoadPopup.
 
@@ -137,3 +154,5 @@
 - [2026-10-19] chefOnly ("show only in Chef Special"): effective only if isChefSpecial; ignored (items return to normal places) when the Chef Special system section is hidden; search with no chip still finds them. Any new item field must also go in draft_repository publish map (done for chefOnly).
 
 - [2026-10-19] Local two-app test: POS emulator (firebase/ in billing-cafe, auth 9099/fs 8080) + menu emulator on 8091/9108; build POS with --dart-define=USE_FIREBASE_EMULATOR=true --dart-define=MENU_FIRESTORE_EMULATOR_PORT=8091, serve via firebase/dev-seed/qa/serve.mjs (5050). Seed items need requiresKitchen:true or they become Counter Items that skip the kitchen. chrome-devtools click/fill are unreliable on Flutter inputs: prefill name/phone via localStorage key wnc:v1:customer; for POS buttons dispatch pointer events at coordinates; use emulate viewport 1400x1200 so bottom buttons are reachable.
+- [2026-10-21] Plan gotchas: exclude updatedAt/createdAt from Undo before/after clash test; a Dart .timeout does not cancel a Firestore transaction (make non-idempotent ops like bulk price repeat-safe via opId); bulk price must use integer basis-point maths, never doubles; keep firestore.rules with the open clientLogs rule out of git commits and always deploy with --only.
+- [2026-10-21] Do not use a client opId to make bulk price repeat-safe: a closed/reopened dialog makes a new id and it adds a field to the draft doc. Use verify-read after timeout + temporary lock.

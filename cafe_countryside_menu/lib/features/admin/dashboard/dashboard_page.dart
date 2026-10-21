@@ -266,6 +266,13 @@ class DashboardPage extends ConsumerWidget {
                     subtitle: 'Cafe name, logo, phone, hours',
                     onTap: () => context.push('/admin/settings'),
                   ),
+                  const SizedBox(height: 8),
+                  _NavCard(
+                    icon: Icons.bug_report_outlined,
+                    title: 'Bug logs',
+                    subtitle: 'Errors and warnings from the app; clear old ones',
+                    onTap: () => context.push('/admin/bug-logs'),
+                  ),
                   const SizedBox(height: 32),
                   Text(
                     'Backup',

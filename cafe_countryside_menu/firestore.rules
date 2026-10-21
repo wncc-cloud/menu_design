@@ -43,6 +43,52 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // Bug Logs: errors/warnings from the app. Customers are anonymous, so ANYONE
+    // may create a log, but only in the exact shape the app writes (fixed keys,
+    // size caps, server time, expiry within 8 days) and never edit one. Only
+    // admins read them; owner/manager delete the expired ones (Admin > Bug logs).
+    match /clientLogs/{logId} {
+      allow get, list: if isAdmin();
+      allow delete: if isOwnerOrManager();
+      allow update: if false;
+      allow create: if request.resource.data.keys().hasOnly([
+            'type', 'source', 'message', 'stackTrace', 'userId', 'userEmail',
+            'userAgent', 'appUrl', 'createdAt', 'expireAt', 'schemaVersion',
+            'errorCode', 'breadcrumbs'
+          ])
+        && request.resource.data.keys().hasAll([
+            'type', 'source', 'message', 'userAgent', 'appUrl', 'createdAt',
+            'expireAt', 'schemaVersion'
+          ])
+        && request.resource.data.type in ['ERROR', 'WARN']
+        && request.resource.data.source is string
+        && request.resource.data.source.size() <= 200
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 2000
+        && (request.resource.data.get('stackTrace', null) == null
+            || (request.resource.data.stackTrace is string
+                && request.resource.data.stackTrace.size() <= 4000))
+        && (request.resource.data.get('userId', null) == null
+            || request.resource.data.userId == request.auth.uid)
+        && (request.resource.data.get('userEmail', null) == null
+            || (request.resource.data.userEmail is string
+                && request.resource.data.userEmail.size() <= 200))
+        && request.resource.data.userAgent is string
+        && request.resource.data.userAgent.size() <= 500
+        && request.resource.data.appUrl is string
+        && request.resource.data.appUrl.size() <= 500
+        && (!('errorCode' in request.resource.data)
+            || (request.resource.data.errorCode is string
+                && request.resource.data.errorCode.size() <= 100))
+        && (!('breadcrumbs' in request.resource.data)
+            || (request.resource.data.breadcrumbs is string
+                && request.resource.data.breadcrumbs.size() <= 3000))
+        && request.resource.data.schemaVersion == 1
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.expireAt > request.time
+        && request.resource.data.expireAt <= request.time + duration.value(8, 'd');
+    }
+
     // Admins can read their own document
     // Only owner can add or modify admin accounts
     match /admins/{uid} {

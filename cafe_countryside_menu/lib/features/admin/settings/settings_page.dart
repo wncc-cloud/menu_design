@@ -8,6 +8,7 @@ import '../../shared/services/image_service.dart';
 import '../../../core/constants/app_constants.dart';
 import '../auth/auth_provider.dart';
 import 'settings_provider.dart';
+import '../../../core/logging/client_log.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -150,7 +151,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               backgroundColor: Colors.red),
         );
       }
-    } catch (e, _) {
+    } catch (e, st) {
+      logClientError('Settings.logoUpload', e, stackTrace: st);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

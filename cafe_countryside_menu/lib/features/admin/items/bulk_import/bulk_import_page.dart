@@ -12,6 +12,7 @@ import '../../../shared/models/draft_data.dart';
 import '../../../shared/models/draft_item_model.dart';
 import 'bulk_import_service.dart';
 import 'bulk_import_result.dart';
+import '../../../../core/logging/client_log.dart';
 
 class BulkImportPage extends ConsumerStatefulWidget {
   const BulkImportPage({super.key});
@@ -56,6 +57,7 @@ class _BulkImportPageState extends ConsumerState<BulkImportPage> {
           if (mounted) setState(() { _isParsing = false; _result = result; });
         } catch (e, st) {
           debugPrint('[BulkImport] parse error: $e\n$st');
+          logClientWarn('BulkImport.parse', e, stackTrace: st);
           if (mounted) {
             setState(() {
               _isParsing = false;
@@ -86,7 +88,8 @@ class _BulkImportPageState extends ConsumerState<BulkImportPage> {
             newSections: preview.newSections,
             newItems: preview.newItems,
           );
-    } catch (e) {
+    } catch (e, st) {
+      logClientError('BulkImport.confirm', e, stackTrace: st);
       if (!mounted) return;
       setState(() => _isConfirming = false);
       ScaffoldMessenger.of(context).showSnackBar(

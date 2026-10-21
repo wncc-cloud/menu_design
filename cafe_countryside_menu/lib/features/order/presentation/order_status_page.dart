@@ -10,6 +10,7 @@ import '../providers/last_order_provider.dart';
 import 'widgets/while_you_wait_card.dart';
 import '../providers/order_request_provider.dart';
 import '../validation.dart';
+import '../../../core/logging/client_log.dart';
 
 const _googleReviewUrl = 'https://share.google/nDBay1qFWCO2rTLKq';
 
@@ -181,7 +182,8 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
         final intervalSeconds = calculatePollIntervalSeconds(expiresAt: expiresAt, now: DateTime.now());
         _pollTimer = Timer.periodic(Duration(seconds: intervalSeconds), (_) => _pollOnce());
       }
-    } catch (e) {
+    } catch (e, st) {
+      logClientError('OrderStatus.poll', e, stackTrace: st);
       if (mounted) {
         setState(() {
           _loadFailed = _expiresAt == null;

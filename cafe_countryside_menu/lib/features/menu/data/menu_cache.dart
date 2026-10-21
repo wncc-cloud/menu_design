@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../../../core/services/browser_storage.dart';
 import '../models/menu_snapshot_model.dart';
+import '../../../core/logging/client_log.dart';
 
 /// Phase 1 (D.4 Tier 1) — stale-while-revalidate cache of the PUBLISHED menu
 /// for returning visitors. Only the menu is cached; the business document
@@ -41,7 +42,8 @@ MenuSnapshotModel? readMenuCache(KeyValueStore store, {DateTime? now}) {
       return null;
     }
     return menu;
-  } catch (_) {
+  } catch (e, st) {
+    logClientWarn('MenuCache.read', e, stackTrace: st);
     try {
       store.remove(menuCacheStorageKey);
     } catch (_) {}

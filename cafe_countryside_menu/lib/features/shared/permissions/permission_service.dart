@@ -14,6 +14,8 @@ class PermissionService {
   // Phase 1: promotions / first-load pop-up are customer-facing ad space.
   bool get canManagePromotions => _ownerOrManager;
   bool get canManageBusinessSettings => admin.role == AdminRole.owner;
+  // Matches the clientLogs delete rule (owner/manager).
+  bool get canDeleteBugLogs => _ownerOrManager;
   bool get canManageAdmins => admin.role == AdminRole.owner;
   // All roles (owner, manager, staff) can toggle item availability.
   bool get canToggleAvailability => true;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'auth_provider.dart';
+import '../../../core/logging/client_log.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -23,7 +24,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       await ref.read(authServiceProvider).signInWithGoogle();
       // On success, the router's refreshListenable detects the auth change
       // and redirects to /admin/dashboard automatically.
-    } catch (e) {
+    } catch (e, st) {
+      logClientWarn('LoginPage.signIn', e, stackTrace: st);
       if (mounted) {
         setState(() {
           _error = 'Sign-in failed. Please try again.';

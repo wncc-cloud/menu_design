@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../shared/models/business_model.dart';
 import '../shared/models/promotion_models.dart';
 import '../shared/repositories/business_repository.dart';
+import '../../core/logging/client_log.dart';
 
 /// Fresh (never cached) business document for the admin pages that own a
 /// slice of it: Sections (system sections) and Promotions. Writes go through
@@ -25,13 +26,14 @@ class AdminBusinessNotifier extends AsyncNotifier<BusinessModel> {
     try {
       state = AsyncData(await op(cur));
       return null;
-    } catch (e) {
+    } catch (e, st) {
       // The web SDK wraps exceptions thrown inside a transaction callback, so
       // recognise the stale-write by its message too.
       if (e is StaleWriteException || e.toString().contains(const StaleWriteException().toString())) {
         await reload();
         return const StaleWriteException().toString();
       }
+      logClientError('AdminBusiness.save', e, stackTrace: st);
       return 'Could not save: $e';
     }
   }

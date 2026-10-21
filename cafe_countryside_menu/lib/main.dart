@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
+import 'core/logging/client_log.dart';
 import 'core/services/pos_app_check_service.dart';
 import 'firebase_options.dart';
 import 'router.dart';
@@ -45,7 +47,25 @@ const _emulatorOptions = FirebaseOptions(
   authDomain: 'why-not-cafe-menu-dev.firebaseapp.com',
 );
 
-void main() async {
+void main() {
+  // Every uncaught error ends up in the admin's Bug Logs (Admin > Bug logs),
+  // from the three places Flutter can drop one. FlutterError.presentError
+  // keeps the normal console output.
+  FlutterError.onError = (details) {
+    logClientError('FlutterError', details.exception,
+        stackTrace: details.stack, message: details.exceptionAsString());
+    FlutterError.presentError(details);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    logClientError('PlatformDispatcher', error, stackTrace: stack);
+    return true;
+  };
+  runZonedGuarded(_start, (error, stack) {
+    logClientError('runZonedGuarded', error, stackTrace: stack);
+  });
+}
+
+Future<void> _start() async {
   usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(

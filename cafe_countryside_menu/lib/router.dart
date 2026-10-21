@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import 'features/admin/auth/admin_guard.dart';
 import 'features/admin/auth/login_page.dart';
+import 'features/admin/bug_logs/bug_logs_page.dart';
 import 'features/admin/dashboard/dashboard_page.dart';
 import 'features/admin/items/items_page.dart';
 import 'features/admin/items/bulk_import/bulk_import_page.dart';
@@ -79,6 +80,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/admin/promotions',
       builder: (_, _) => const AdminGuard(child: PromotionsPage()),
+    ),
+    GoRoute(
+      path: '/admin/bug-logs',
+      builder: (_, _) => const AdminGuard(child: BugLogsPage()),
     ),
     GoRoute(
       path: '/admin/settings',

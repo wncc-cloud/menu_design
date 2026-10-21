@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 1a — Clickable prototype (admin speed tools) — plan v8</title>
+<style>
+:root{--g:#2E7D32;--g2:#1B5E20;--gl:#E8F5E9;--bg:#F6FAF2;--ink:#1b1b1b;--mut:#6b6b6b;--line:#dcdcdc;--warn:#B71C1C;--warnbg:#FFEBEE;--amber:#E65100;--page:#e9edf0}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--page);color:var(--ink);font-size:14px}
+button{font:inherit;cursor:pointer}
+input,select{font:inherit}
+.top{background:#263238;color:#fff;display:flex;align-items:center;gap:14px;padding:8px 16px;flex-wrap:wrap}
+.top h1{font-size:15px;margin:0;font-weight:600}
+.seg{display:inline-flex;border:1px solid #607d8b;border-radius:8px;overflow:hidden}
+.seg button{background:transparent;color:#cfd8dc;border:0;padding:6px 14px}
+.seg button.on{background:#fff;color:#263238;font-weight:700}
+.layout{display:flex;gap:18px;padding:16px;align-items:flex-start;justify-content:center;flex-wrap:wrap}
+.stage{flex:1 1 640px;max-width:980px;min-width:320px}
+.side{width:370px;max-width:100%;flex:none}
+.panel{background:#fff;border:1px solid #cfd8dc;border-radius:12px;padding:12px;margin-bottom:12px}
+.panel h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#455a64}
+.panel label{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;font-size:13px}
+.pbtn{border:1px solid #90a4ae;background:#fff;border-radius:7px;padding:5px 9px;font-size:12px;margin:2px 2px 2px 0}
+.pbtn:hover{background:#eceff1}
+.tiny{font-size:11.5px;color:var(--mut)}
+.try{margin:4px 0 0;padding-left:18px;font-size:12.5px;color:#37474f}.try li{margin:5px 0}
+
+/* admin frame */
+.admin{background:var(--bg);border:1px solid #b0bec5;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-height:640px;position:relative;box-shadow:0 6px 24px #0002}
+.abar{background:var(--g);color:#fff;display:flex;align-items:center;gap:10px;padding:0 14px;height:48px;font-weight:700;flex:none}
+.abar .sp{flex:1}
+.abar small{font-weight:400;opacity:.85}
+.shell{display:flex;flex:1;min-height:0}
+.nav{width:150px;background:#fff;border-right:1px solid var(--line);padding:8px;flex:none}
+.nav button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:10px;border-radius:8px;margin-bottom:2px}
+.nav button.on{background:var(--gl);color:var(--g2);font-weight:700}
+.nav .bd{float:right;background:#c62828;color:#fff;border-radius:99px;font-size:10px;padding:1px 6px}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.pub{background:#E65100;color:#fff;padding:8px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pub .sp{flex:1}
+.pub button{border:0;border-radius:7px;padding:6px 12px;font-weight:700}
+.pub .b1{background:#fff;color:#E65100}.pub .b2{background:transparent;color:#fff;border:1px solid #fff}
+.content{padding:14px;overflow:auto;flex:1}
+h2{margin:0 0 10px;font-size:17px}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.row{display:flex;align-items:center;gap:8px}.row.wrap{flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.btn{border:0;background:var(--g);color:#fff;border-radius:8px;padding:8px 14px;font-weight:700}
+.btn.o{background:#fff;color:var(--g);border:1.5px solid var(--g)}
+.btn.r{background:#c62828}.btn.sm{padding:5px 10px;font-size:12.5px}
+.btn[disabled]{background:#bdbdbd;border-color:#bdbdbd;color:#fff;cursor:not-allowed}
+.in{border:1px solid #b0bec5;border-radius:8px;padding:8px 10px;background:#fff;width:100%}
+.search{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:0 12px}
+.search input{border:0;outline:0;flex:1;padding:8px 4px;background:transparent}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:8px 0;white-space:nowrap}
+.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 12px;flex:none;font-size:13px}
+.chip.on{background:var(--g);color:#fff;border-color:var(--g)}
+.tag{display:inline-block;font-size:10.5px;border-radius:5px;padding:0 5px;margin-left:4px;border:1px solid #cfd8dc;background:#eceff1;color:#455a64;white-space:nowrap}
+.tag.chef{background:#fbe9e7;color:#bf360c;border-color:#ffab91}.tag.warn{background:#fff3e0;color:#e65100;border-color:#ffcc80}.tag.bad{background:var(--warnbg);color:var(--warn);border-color:#ef9a9a}
+.sw{position:relative;width:38px;height:22px;display:inline-block;flex:none}
+.sw input{opacity:0;width:0;height:0}.sw i{position:absolute;inset:0;background:#bbb;border-radius:99px;transition:.15s}
+.sw i:before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.15s}
+.sw input:checked+i{background:var(--g)}.sw input:checked+i:before{transform:translateX(16px)}
+.sw input:disabled+i{opacity:.5}
+.item.na .nm{opacity:.55}
+.item.hid .nm{text-decoration:line-through;color:#888}
+.item.picked{border-color:#81c784;background:#f1f8e9}
+.selbar{position:sticky;bottom:0;background:#263238;color:#fff;border-radius:10px;padding:8px 10px;margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.selbar button{border:1px solid #607d8b;background:#37474f;color:#fff;border-radius:7px;padding:5px 9px;font-size:12.5px}
+.selbar button.d{background:#b71c1c;border-color:#b71c1c}
+.selbar .sec{display:contents}.selbar details.more{display:none;position:relative}.selbar details.more summary{border:1px solid #607d8b;background:#37474f;border-radius:7px;padding:5px 9px;font-size:12.5px;cursor:pointer;list-style:none}.selbar details.more div{position:absolute;bottom:110%;left:0;background:#37474f;border-radius:8px;padding:6px;display:flex;flex-wrap:wrap;gap:4px;width:220px}
+@media(max-width:600px){.selbar .sec{display:none}.selbar details.more{display:block;position:static}.selbar button{min-height:44px}.selbar details.more div{position:fixed;left:12px;right:12px;bottom:84px;width:auto;z-index:20}}
+.ov{position:fixed;inset:0;background:#0007;z-index:30;display:flex;align-items:center;justify-content:center;padding:14px}
+.dlg{background:#fff;border-radius:12px;width:min(560px,100%);max-height:100%;overflow:auto;padding:16px;box-shadow:0 10px 30px #0006}
+.dlg h3{margin:0 0 8px;font-size:16px}
+.dlg .act{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.pv{background:#f5f7f8;border:1px solid #e0e6e9;border-radius:8px;padding:8px 10px;margin:8px 0;font-size:13px}
+.pv li{margin:3px 0}.pv ul{margin:0;padding-left:18px}
+.pv .tipl{color:#37474f;list-style:none;margin-left:-18px}.pv .w{color:#b26a00}.pv .e{color:#b71c1c;font-weight:600}.pv .ok{color:#1b5e20}
+.fld{margin:8px 0}.fld>span{display:block;font-size:12px;color:#546e7a;margin-bottom:3px}
+.toast{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);background:#263238;color:#fff;border-radius:10px;padding:9px 14px;z-index:40;display:flex;gap:12px;align-items:center;max-width:92%;box-shadow:0 4px 14px #0005}
+.toast button{background:transparent;border:1px solid #90a4ae;color:#fff;border-radius:6px;padding:3px 9px;font-weight:700}
+.toast.err{background:#b71c1c}
+.undobar{background:#263238;color:#fff;display:flex;gap:10px;align-items:center;padding:6px 14px;font-size:13px}.undobar button{background:#fff;color:#263238;border:0;border-radius:6px;padding:4px 10px;font-weight:700}
+.prob{display:flex;gap:8px;align-items:flex-start;border:1px solid #ef9a9a;background:#fff;border-radius:8px;padding:8px;margin:6px 0}
+.prob.tip{border-color:#ffe082}.prob .grow b{display:block}
+.find{position:relative}
+.res{background:#fff;border:1px solid var(--line);border-radius:10px;margin-top:6px;overflow:hidden}
+.res .h{background:#eceff1;font-size:11px;font-weight:700;letter-spacing:.04em;padding:4px 10px;color:#455a64}
+.res button{display:flex;width:100%;justify-content:space-between;gap:8px;border:0;background:#fff;padding:9px 10px;text-align:left;border-top:1px solid #eceff1}
+.res button:hover{background:var(--gl)}
+mark{background:#fff59d;padding:0}
+.cust{font-size:12.5px}
+.cust .cc{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+.cust .c{border:1px solid #ccc;border-radius:99px;padding:3px 9px;background:#fff}
+.cust .c.sp{border-color:#ffb300}.cust .c.on{background:var(--g);color:#fff;border-color:var(--g)}.cust .c.em{border-style:dashed;color:#b71c1c}
+.cust ul{margin:4px 0 0;padding-left:18px}
+.note{background:#fffde7;border:1px solid #fff59d;border-radius:8px;padding:6px 9px;font-size:12px;margin:6px 0}
+table.t{border-collapse:collapse;width:100%;font-size:12.5px}table.t td,table.t th{border-top:1px solid #eceff1;padding:3px 6px;text-align:left}
+@media(max-width:700px){.nav{width:104px}.abar small{display:none}}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>Phase 1a — admin speed tools (prototype)</h1>
+  <span class="seg" id="roleSeg"></span>
+  <span class="tiny" style="color:#b0bec5">Real logic runs here (preview → transaction-style apply → inverse-patch Undo). Data is a prod-shaped demo, nothing is saved.</span>
+</div>
+<div class="layout">
+  <div class="stage"><div class="admin" id="admin"></div></div>
+  <div class="side" id="side"></div>
+</div>
+
+<script>
+/* ============ helpers ============ */
+const RES='__chef_only__';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const clone=o=>JSON.parse(JSON.stringify(o));
+const money=p=>'₹'+(p/100).toFixed(2).replace(/\.00$/,'').replace(/(\.\d)0$/,'$1');
+const norm=s=>s.toLowerCase().replace(/\s+/g,' ').trim();
+
+/* ============ seed (prod-shaped) ============ */
+function seed(){
+  const secs=[['cs','Chef Specials',1],['combo','Combo',1],['coffee','Hot Coffee',1],['tea','Tea',1],['cold','Cold Beverages',1],['mojito','Mojito',1],['sand','Sandwich',1],['bbs','Brown Bread Sandwich',1],['pasta','Pasta',1],['para','Paratha',1],['nachos','Nachos',1],['burger','Burger',1],['fries','French Fries',1],['dips','DIPS',1],['seas','Seasonal (hidden)',0]];
+  const it=[
+   ['WHY NOT Thai Crispy','cs',22000,0],['WHY NOT Katsu Sandwich','cs',24000,0],['WHY NOT Cucumber Breeze','cs',13000,0],['Spinach And Shrooms garlic Bread','cs',18000,0],['WHY NOT Korean Spicy Ramen','cs',21000,0],
+   ['Lemon Butter garlic with peri peri','cs',19000,1],['Korean katsu paneer','cs',23000,1],['Hoisin Crispy Broccoli','cs',20000,1],['Thai Veg Crispy','cs',21000,1],['Cheese Chilli Paneer','cs',22000,1],
+   ['Pasta + Coffee Combo','combo',24900,0],['Sandwich + Shake Combo','combo',27900,0],
+   ['Cappuccino','coffee',12000,0],['Latte','coffee',13000,0],['Masala Chai','tea',4000,0],['Ginger Tea','tea',5000,0],
+   ['Cold Coffee','cold',14000,0],['Mint Mojito','mojito',11000,0],['Blue Lagoon','mojito',12000,0],
+   ['Veg Club Sandwich','sand',15000,0],['Grilled Cheese','sand',13000,0],
+   ['Alfredo Pasta','pasta',19000,0],['Arrabiata Pasta','pasta',18000,0],
+   ['Salted Fries','fries',9000,0],['Peri Peri Fries','fries',11000,0],
+   ['garlic mayonnaise','dips',2000,0],['Cheese dip','dips',2500,0],
+   ['Pumpkin Latte','seas',15000,0],['Eggnog','seas',16000,0]];
+  let n=0,sort={};
+  const items=it.map(([name,sec,pp,chef])=>({id:'i'+(++n),name,sec,pp,chef:!!chef,only:false,active:true,avail:true,note:true,sort:(sort[sec]=(sort[sec]??-1)+1),desc:'',ing:'',v:0}));
+  const sections=secs.map(([id,name,a],i)=>({id,name,active:!!a,sort:i}));
+  return {sections,items};
+}
+let S;
+function reset(){
+  const d=seed();
+  S={draft:d,pub:clone(d),biz:{chefVisible:true,popup:'none',posHeading:false,toolsOn:true},role:'owner',ver:1,
+     ui:{tab:'dash',filter:'all',q:'',sq:'',fq:'',sel:false,ids:new Set(),modal:null,toast:null,custChip:'all'},undo:null,offline:false};
+  render();
+}
+
+/* ============ pure logic (what draft_ops.dart will do) ============ */
+const secName=(d,id)=>id===RES?'🍳 Chef Special only':(d.sections.find(s=>s.id===id)||{name:'—'}).name;
+const onlyInChef=i=>i.chef&&(i.only||i.sec===RES);
+function normalizeFlags(i){const r=i.sec===RES;i.chef=i.chef||r;i.only=(i.chef&&i.only)||r;return i;}  // mirrors item_form.dart:175-177
+function searchItems(d,q){
+  const w=norm(q).split(' ').filter(Boolean); if(!w.length)return d.items.slice();
+  return d.items.filter(i=>{const h=norm([i.name,i.desc,i.ing,secName(d,i.sec)].join(' '));return w.every(x=>h.includes(x));});
+}
+function searchSections(d,q){const w=norm(q).split(' ').filter(Boolean);return d.sections.filter(s=>w.every(x=>norm(s.name).includes(x)));}
+function canDeleteSection(d,id,biz){
+  const n=d.items.filter(i=>i.sec===id).length;
+  if(n>0)return{ok:false,code:'hasItems',n};
+  if(biz.popup==='sec:'+id)return{ok:false,code:'popup'};
+  return{ok:true};
+}
+/* A plan works on a CLONE of the (fresh) draft and returns the new draft plus everything the UI needs. */
+function newPlan(d){return{draft:d,lines:[],warns:[],skipped:[],changes:[],removedSections:[],removedItems:[],moved:0,blocked:null};}
+function touch(plan,it,fields){ // fields: object of new values; records inverse
+  const before={};let changed=false;
+  for(const k in fields){if(it[k]!==fields[k]){before[k]=it[k];it[k]=fields[k];changed=true;}}
+  if(!changed)return false;
+  const after={};for(const k in before)after[k]=it[k];
+  it.v=++S.ver; plan.changes.push({id:it.id,before,after}); return true;
+}
+function planMove(d,ids,target,biz){
+  const p=newPlan(d);
+  if(!ids.length){p.blocked='Nothing selected.';return p;}
+  if(!target){p.blocked='Choose a target section.';return p;}
+  if(target!==RES&&!d.sections.some(s=>s.id===target)){p.blocked='The target section no longer exists (changed meanwhile). Nothing was changed.';return p;}
+  const tSec=d.sections.find(s=>s.id===target);
+  let max=Math.max(-1,...d.items.filter(i=>i.sec===target).map(i=>i.sort));
+  let flagGain=0,backHome=0,stillChefOnly=0;
+  for(const id of ids){
+    const it=d.items.find(i=>i.id===id);
+    if(!it){p.skipped.push({name:'(deleted item)',why:'no longer exists'});continue;}
+    if(it.sec===target){p.skipped.push({name:it.name,why:'already there'});continue;}
+    const f={sec:target,sort:++max};
+    if(target===RES){ if(!it.chef)flagGain++; f.chef=true;f.only=true; }
+    else if(it.sec===RES){ f.only=false; backHome++; }
+    else if(onlyInChef(it)) stillChefOnly++;
+    if(touch(p,it,f))p.moved++;
+  }
+  const tn=secName(d,target);
+  p.lines.push(`<b>${p.moved}</b> item${p.moved===1?'':'s'} move to <b>${esc(tn)}</b> (added at the end; nothing else is re-ordered)`);
+  if(flagGain)p.lines.push(`${flagGain} will also get the Chef Special flag (the rest already have it)`);
+  if(backHome)p.lines.push(`${backHome} leave “Chef Special only”: they will show in ${esc(tn)} again (still flagged Chef Special)`);
+  if(stillChefOnly)p.warns.push(`${stillChefOnly} are “only in Chef Special” and still won’t show in ${esc(tn)}`);
+  if(target===RES&&p.moved&&!biz.posHeading)p.warns.push('On the counter’s manual-bill screen these items lose their category heading (until the counter update 1a-P is live)');
+  const hiddenSrc=p.changes.filter(c=>{const it=d.items.find(i=>i.id===c.id);return it&&it.active&&c.before.sec&&d.sections.some(s=>s.id===c.before.sec&&!s.active);}).length;
+  if(hiddenSrc&&(!tSec||tSec.active))p.warns.push(`${hiddenSrc} come from a hidden section and will become visible after Publish`);
+  if(tSec&&!tSec.active)p.warns.push(`${esc(tn)} is hidden — these items will NOT be on the menu after Publish`);
+  if(target===RES&&!biz.chefVisible)p.warns.push('Chef Special is hidden on the menu — these items will show in All instead');
+  if(p.skipped.length)p.warns.push(`${p.skipped.length} skipped: `+p.skipped.slice(0,4).map(s=>esc(s.name)+' ('+s.why+')').join(', '));
+  if(p.moved>=5)p.tip='Tip: Dashboard → Export Menu JSON first — after Publish there is no rollback.';
+  return p;
+}
+function planMerge(d,from,into,delSource,biz){
+  const ids=d.items.filter(i=>i.sec===from).map(i=>i.id);
+  if(!into){const p=newPlan(d);p.blocked='Choose a target section.';return p;}
+  if(from===into){const p=newPlan(d);p.blocked='Pick a different section.';return p;}
+  let p;
+  if(ids.length)p=planMove(d,ids,into,biz); else {p=newPlan(d);if(into!==RES&&!d.sections.some(s=>s.id===into)){p.blocked='The target section no longer exists (changed meanwhile). Nothing was changed.';return p;}p.lines.push('The section is already empty — nothing to move');}
+  if(p.blocked)return p;
+  if(delSource){
+    const left=d.items.filter(i=>i.sec===from).length;
+    const chk=left?{ok:false,code:'hasItems'}:canDeleteSection(d,from,biz);
+    if(chk.ok){const s=d.sections.find(x=>x.id===from);p.removedSections.push(clone(s));d.sections=d.sections.filter(x=>x.id!==from);p.lines.push(`Section <b>${esc(s.name)}</b> will be deleted (it is empty)`);p.lines.push('The first-load pop-up does not use it');}
+    else if(chk.code==='popup')p.warns.push('The first-load pop-up opens this section, so it will <b>not</b> be deleted. Move is still done. Change the pop-up in Promotions &amp; pop-up, then delete it.');
+    else p.warns.push('Section not deleted: it still has items.');
+  }
+  return p;
+}
+function planSet(d,ids,label,fn){ // fn(item)->fields|null|{skip:'why'}
+  const p=newPlan(d);
+  for(const id of ids){const it=d.items.find(i=>i.id===id);if(!it){p.skipped.push({name:'(deleted item)',why:'no longer exists'});continue;}
+    const f=fn(it); if(!f)continue; if(f.skip){p.skipped.push({name:it.name,why:f.skip});continue;}
+    if(touch(p,it,f))p.moved++;}
+  p.lines.push(`<b>${p.moved}</b> item${p.moved===1?'':'s'} ${label}`);
+  if(label==='will be shown'){const n=p.changes.filter(c=>{const it=d.items.find(i=>i.id===c.id);const s=d.sections.find(x=>x.id===it.sec);return it.sec!==RES&&(!s||!s.active);}).length;if(n)p.warns.push(`${n} are in hidden sections and will still not appear on the menu`);}
+  if(p.skipped.length)p.warns.push(`${p.skipped.length} skipped: `+p.skipped.slice(0,4).map(s=>esc(s.name)+' ('+s.why+')').join(', '));
+  return p;
+}
+function planDelete(d,ids){
+  const p=newPlan(d);
+  for(const id of ids){const it=d.items.find(i=>i.id===id);if(!it){p.skipped.push({name:'(deleted item)',why:'already gone'});continue;}p.removedItems.push(clone(it));p.moved++;}
+  d.items=d.items.filter(i=>!ids.includes(i.id)||!p.removedItems.some(r=>r.id===i.id));
+  p.lines.push(`<b>${p.moved}</b> item${p.moved===1?'':'s'} will be deleted (Undo available for 60 s)`);
+  return p;
+}
+function planPrice(d,ids,o){
+  const p=newPlan(d);p.rows=[];
+  for(const id of ids){const it=d.items.find(i=>i.id===id);if(!it){p.skipped.push({name:'(deleted item)',why:'no longer exists'});continue;}
+    // integer maths only (plan A.1): percent as basis points, half-up
+    let n;
+    if(o.mode==='pct'){const b=Math.round(o.amt*100),num=it.pp*(10000+b);n=Math.floor((num+5000)/10000);}
+    else n=it.pp+Math.round(o.amt*100);
+    if(o.round>0){const s=100*o.round;n=Math.floor((n+s/2)/s)*s;}
+    if(n<=0){p.skipped.push({name:it.name,why:'would be ≤ ₹0'});continue;}
+    if(n===it.pp)continue;
+    p.rows.push({name:it.name,from:it.pp,to:n});touch(p,it,{pp:n});p.moved++;}
+  p.lines.push(`<b>${p.moved}</b> price${p.moved===1?'':'s'} change`);
+  if(p.skipped.length)p.warns.push(`${p.skipped.length} excluded: `+p.skipped.slice(0,4).map(s=>esc(s.name)+' ('+s.why+')').join(', '));
+  return p;
+}
+/* inverse patch: restore only the fields the op changed, only if nobody touched the item since */
+function undoToken(p,label){return{label,changes:clone(p.changes),removedSections:clone(p.removedSections),removedItems:clone(p.removedItems)};}
+function applyUndo(tok){
+  const d=clone(S.draft);let ok=0,skip=[];
+  for(const c of tok.changes){const it=d.items.find(i=>i.id===c.id);
+    if(!it){skip.push('an item (deleted meanwhile)');continue;}
+    const clash=Object.keys(c.after).find(k=>it[k]!==c.after[k]);   // field-level: only skip if the SAME field was changed by someone else
+    if(clash){skip.push(it.name+' ('+clash+' changed meanwhile)');continue;}
+    Object.assign(it,c.before);it.v=++S.ver;ok++;}
+  for(const s of tok.removedSections)if(!d.sections.some(x=>x.id===s.id)){d.sections.push(s);ok++;}
+  for(const i of tok.removedItems)if(!d.items.some(x=>x.id===i.id)){d.items.push(i);ok++;}
+  S.draft=d;return{ok,skip};
+}
+/* transaction: re-run the plan on the FRESH draft, never throw for business reasons */
+function commit(planFn,label){
+  if(S.offline)return{p:{blocked:"Couldn't save — check your connection. Nothing was changed.",warns:[],lines:[],changes:[],removedSections:[],removedItems:[]},done:false,net:true};
+  const fresh=clone(S.draft);const p=planFn(fresh);
+  if(p.blocked)return{p,done:false};
+  if(!p.changes.length&&!p.removedSections.length&&!p.removedItems.length)return{p,done:false,empty:true};
+  S.draft=p.draft;S.undo={tok:undoToken(p,label),label:p.undoLabel||label,until:Date.now()+60000};startUndoTimer();return{p,done:true};
+}
+/* change counting (draft_diff.dart): sortOrder counts for items, not for sections */
+function countChanges(d,pub){
+  const ij=i=>JSON.stringify({...i,v:0});
+  const A=Object.fromEntries(d.items.map(i=>[i.id,ij(i)])),B=Object.fromEntries(pub.items.map(i=>[i.id,ij(i)]));
+  let n=0;for(const k of new Set([...Object.keys(A),...Object.keys(B)]))if(A[k]!==B[k])n++;
+  const sj=s=>JSON.stringify({id:s.id,name:s.name,active:s.active});
+  const SA=Object.fromEntries(d.sections.map(s=>[s.id,sj(s)])),SB=Object.fromEntries(pub.sections.map(s=>[s.id,sj(s)]));
+  for(const k of new Set([...Object.keys(SA),...Object.keys(SB)]))if(SA[k]!==SB[k])n++;
+  const o=(x,y)=>x.sections.slice().sort((a,b)=>a.sort-b.sort).map(s=>s.id).filter(id=>y.sections.some(s=>s.id===id)).join();
+  if(o(d,pub)!==o(pub,d))n++;
+  return n;
+}
+/* Menu doctor — evaluates the draft as it would be after Publish */
+function menuProblems(d,biz){
+  const out=[];const secs=d.sections;
+  const sysNames={chef:['chef special','chef specials'],best:['best seller','best sellers','bestseller','bestsellers']};
+  for(const s of secs){const n=norm(s.name);
+    for(const k in sysNames)if(sysNames[k].includes(n)){const vis=k==='chef'?biz.chefVisible:true;
+      out.push({lvl:vis?'P':'T',title:`Section “${s.name}” looks like the built-in ${k==='chef'?'Chef Special':'Best Sellers'} chip`,detail:vis?'Customers will see two chips with the same meaning.':'The built-in chip is hidden, so this is only a tip.',fix:{t:'merge',id:s.id}});}}
+  const seen={};for(const s of secs){const n=norm(s.name);(seen[n]=seen[n]||[]).push(s);}
+  for(const n in seen)if(seen[n].length>1)out.push({lvl:'P',title:`Two sections are called “${seen[n][0].name}”`,detail:'Confusing chips.',fix:{t:'sec',id:seen[n][1].id}});
+  for(const i of d.items){
+    if(!i.active)continue;
+    const s=secs.find(x=>x.id===i.sec);
+    if(i.sec!==RES&&!s)out.push({lvl:'P',title:`“${i.name}” belongs to a section that doesn’t exist`,detail:'It will be dropped at Publish.',fix:{t:'item',id:i.id}});
+    else if(s&&!s.active)out.push({lvl:'P',title:`“${i.name}” is on but its section “${s.name}” is hidden`,detail:'It will be dropped at Publish.',fix:{t:'item',id:i.id}});
+    if(i.pp<=0)out.push({lvl:'P',title:`“${i.name}” has price ₹0`,detail:'The counter rejects ₹0 orders.',fix:{t:'item',id:i.id}});
+    if(i.name.length>40)out.push({lvl:'T',title:`“${i.name.slice(0,30)}…” is very long`,detail:'May be clipped on phones.',fix:{t:'item',id:i.id}});
+  }
+  for(const s of secs)if(s.active&&!d.items.some(i=>i.sec===s.id&&i.active))out.push({lvl:'P',title:`Section “${s.name}” has no items on the menu`,detail:'Customers see an empty chip.',fix:{t:'sec',id:s.id}});
+  if(biz.popup.startsWith('sec:')){const id=biz.popup.slice(4),s=secs.find(x=>x.id===id);
+    if(!s||!s.active||!d.items.some(i=>i.sec===id&&i.active))out.push({lvl:'P',title:'The first-load pop-up opens a section that will be hidden, missing or empty',detail:'The pop-up will silently do nothing.',fix:{t:'popup'}});}
+  return out;
+}
+/* what customers see (from published copy) */
+function customerView(){
+  const pub=S.pub,cv=S.biz.chefVisible;
+  const items=pub.items.filter(i=>i.active&&(pub.sections.some(s=>s.id===i.sec&&s.active)||i.sec===RES));
+  const secs=pub.sections.filter(s=>s.active).sort((a,b)=>a.sort-b.sort);
+  const regular=cv?items.filter(i=>!onlyInChef(i)):items;
+  const chips=[{id:'all',name:'All',items:regular}];
+  if(cv){const c=items.filter(i=>i.chef);if(c.length)chips.push({id:'chef',name:'🍳 Chef Special',sp:1,items:c});}
+  const b=regular.filter(i=>i.chef&&false);
+  for(const s of secs){const all=items.filter(i=>i.sec===s.id);
+    if(cv&&all.length&&all.every(onlyInChef))continue;
+    chips.push({id:s.id,name:s.name,items:cv?all.filter(i=>!onlyInChef(i)):all,empty:all.length===0});}
+  return chips;
+}
+
+/* ============ UI actions ============ */
+const U=()=>S.ui;
+const canEdit=()=>S.role==='owner';
+const tools=()=>S.role==='owner'&&S.biz.toolsOn!==false;   // plan 1a-F off switch
+function go(tab){U().tab=tab;U().sel=false;U().ids=new Set();render();}
+function toast(msg,err){U().toast={msg,err};render();clearTimeout(toast.t);toast.t=setTimeout(()=>{U().toast=null;render();},err?6000:3500);}
+function startUndoTimer(){clearInterval(startUndoTimer.t);startUndoTimer.t=setInterval(()=>{if(!S.undo||Date.now()>S.undo.until){S.undo=null;clearInterval(startUndoTimer.t);}render();},1000);}
+function doUndo(){if(!S.undo)return;const r=applyUndo(S.undo.tok);S.undo=null;U().toast={msg:`Undone (${r.ok} restored${r.skip.length?`; skipped: ${r.skip.join(', ')}`:''})`,err:r.skip.length>0};render();}
+function publish(){
+  const probs=menuProblems(S.draft,S.biz).filter(p=>p.lvl==='P');
+  if(probs.length&&!U().modal?.skipDoctor){U().modal={k:'doctor'};render();return;}
+  doPublish();
+}
+function doPublish(){S.pub=clone(S.draft);U().modal=null;S.undo=null;toast('Published. Customers see it now.');}
+function discard(){U().modal={k:'confirm',title:'Discard all changes?',body:'The draft goes back to exactly what customers see now. This cannot be undone.',ok:'Discard',danger:1,fn:'discardGo()'};render();}
+function discardGo(){S.draft=clone(S.pub);S.undo=null;U().modal=null;U().ids=new Set();toast('Changes discarded.');}
+function liveSold(id){ // live: draft + published together, not a draft change
+  for(const d of [S.draft,S.pub]){const it=d.items.find(i=>i.id===id);if(it)it.avail=!it.avail;}
+  const it=S.draft.items.find(i=>i.id===id);toast(`${it.name}: ${it.avail?'back on':'sold out'} — LIVE for customers now`);
+}
+function toggleActive(id){const r=commit(d=>planSet(d,[id],'changed',i=>({active:!i.active})),'Hide/show');}
+function setSecActive(id){const d=clone(S.draft);const s=d.sections.find(x=>x.id===id);s.active=!s.active;S.draft=d;render();}
+function pick(id){const s=U().ids;s.has(id)?s.delete(id):s.add(id);render();}
+function selectAllView(){for(const i of viewItems())U().ids.add(i.id);render();}
+function setFilter(f){U().filter=f;U().ids=new Set();render();}
+function setQ(v){U().q=v;U().ids=new Set();render();}
+function toggleSelect(){U().sel=!U().sel;U().ids=new Set();render();}
+function viewItems(){
+  const d=S.draft;let L=U().q.trim()?searchItems(d,U().q):d.items.slice();
+  if(!U().q.trim()&&U().filter!=='all')L=L.filter(i=>i.sec===U().filter);
+  return L.sort((a,b)=>a.sort-b.sort);
+}
+function ids(){return[...U().ids];}
+function afterCommit(r,okMsg){
+  if(r.p.blocked){if(!r.net)U().modal=null;toast(r.p.blocked,true);return;}
+  U().modal=null;
+  if(r.empty){toast('Nothing to change.');return;}
+  const w=r.p.warns.length?' — '+r.p.warns.map(x=>x.replace(/<[^>]+>/g,'')).join(' · '):'';
+  U().ids=new Set();S.undo.label=okMsg(r.p);U().toast={msg:okMsg(r.p)+w};render();clearTimeout(toast.t);toast.t=setTimeout(()=>{U().toast=null;render();},7000);
+}
+
+/* ---- dialogs ---- */
+function openMove(){U().modal={k:'move',target:''};render();}
+function firstTarget(excl){const s=S.draft.sections.find(x=>x.id!==excl);return s?s.id:RES;}
+function targetOptions(excl,sel,ph){
+  return (ph?`<option value="" disabled ${sel?'':'selected'}>Choose a section…</option>`:'')+S.draft.sections.filter(s=>s.id!==excl).map(s=>`<option value="${s.id}" ${sel===s.id?'selected':''}>${esc(s.name)}${s.active?'':' (hidden)'}</option>`).join('')
+   +`<option value="${RES}" ${sel===RES?'selected':''}>🍳 Chef Special only</option>`;
+}
+function openMerge(id,pre){U().modal={k:'merge',from:id,target:pre||'',del:true};render();}
+function mvPreview(){
+  const m=U().modal;let p;const d=clone(S.draft);
+  if(m.k==='move')p=planMove(d,ids(),m.target,S.biz); else p=planMerge(d,m.from,m.target,m.del,S.biz);
+  return p;
+}
+function previewHtml(p){
+  if(p.blocked)return `<div class="pv"><div class="e">${p.blocked}</div></div>`;
+  return `<div class="pv"><ul>${p.lines.map(l=>`<li>${l}</li>`).join('')}${p.warns.map(w=>`<li class="w">⚠ ${w}</li>`).join('')}${p.tip?`<li class="tipl">💡 ${p.tip}</li>`:''}</ul></div>`;
+}
+function mvSet(f,v){U().modal[f]=v;const p=mvPreview();const e=$('#mvprev');if(e)e.innerHTML=previewHtml(p);const b=$('#mvgo');if(b)b.disabled=!!p.blocked;}
+function mvApply(){
+  const m=U().modal;if(mvPreview().blocked)return;
+  const r=commit(d=>m.k==='move'?planMove(d,ids(),m.target,S.biz):planMerge(d,m.from,m.target,m.del,S.biz),m.k);
+  afterCommit(r,p=>m.k==='move'?`Moved ${p.moved} item${p.moved===1?'':'s'}.`:`Merged. ${p.moved} item${p.moved===1?'':'s'} moved${p.removedSections.length?', section deleted':''}.`);
+}
+function bulk(kind){
+  const L=ids();let r;
+  if(kind==='show'||kind==='hide')r=commit(d=>planSet(d,L,kind==='show'?'will be shown':'will be hidden',i=>({active:kind==='show'})),'bulk');
+  else if(kind==='note1'||kind==='note0')r=commit(d=>planSet(d,L,kind==='note1'?'allow notes':'turn notes off',i=>({note:kind==='note1'})),'bulk');
+  else if(kind==='chef1')r=commit(d=>planSet(d,L,'turned on Chef Special',i=>({chef:true})),'bulk');
+  else if(kind==='chef0')r=commit(d=>planSet(d,L,'turned off Chef Special',i=>i.sec===RES?{skip:'lives only in Chef Special — move it to a section first'}:{chef:false,only:false}),'bulk');
+  afterCommit(r,p=>`Updated ${p.moved} item${p.moved===1?'':'s'}.`);
+}
+function openDelItems(){U().modal={k:'delitems'};render();}
+function openPrice(){U().modal={k:'price',mode:'pct',amt:10,round:5};render();}
+function prPreview(){const m=U().modal;return planPrice(clone(S.draft),ids(),{mode:m.mode,amt:+m.amt||0,round:+m.round});}
+function prHtml(){const p=prPreview();
+  const rows=p.rows.slice(0,6).map(r=>`<tr><td>${esc(r.name)}</td><td>${money(r.from)}</td><td>→</td><td><b>${money(r.to)}</b></td></tr>`).join('');
+  return `<div class="pv"><ul>${p.lines.map(l=>`<li>${l}</li>`).join('')}${p.warns.map(w=>`<li class="w">⚠ ${w}</li>`).join('')}</ul>${rows?`<table class="t">${rows}</table>${p.rows.length>6?`<div class="tiny">…and ${p.rows.length-6} more</div>`:''}`:''}</div>`;}
+function prSet(f,v){U().modal[f]=v;$('#prprev').innerHTML=prHtml();}
+function prApply(){const m=U().modal;const r=commit(d=>planPrice(d,ids(),{mode:m.mode,amt:+m.amt||0,round:+m.round}),'price');afterCommit(r,p=>`Changed ${p.moved} price${p.moved===1?'':'s'}.`);}
+
+/* ---- quick edit ---- */
+function openQI(id){const it=S.draft.items.find(i=>i.id===id);if(!it){toast('That item no longer exists.',true);return;}U().modal={k:'qi',id,f:{name:it.name,price:(it.pp/100)+'',sec:it.sec,chef:it.chef,only:it.only,active:it.active,note:it.note}};render();}
+function qiWarnHtml(){
+  const m=U().modal;if(!m||m.k!=='qi')return'';const f=m.f,d=S.draft,w=[];
+  const sec=d.sections.find(x=>x.id===f.sec);
+  if(f.sec===RES&&!S.biz.chefVisible)w.push('Chef Special is hidden on the menu — this item will show in All instead');
+  if(sec&&!sec.active)w.push(`${esc(sec.name)} is hidden — this item will NOT be on the menu after Publish`);
+  if(f.sec!==RES&&f.chef&&f.only)w.push(`This item is “only in Chef Special” and still won’t show in ${esc(secName(d,f.sec))}`);
+  const tip=f.name.length>40?'<div class="tiny" style="margin-top:4px">💡 Tip: this name is long and may be clipped on phones.</div>':'';
+  return(w.length?`<div class="pv"><ul>${w.map(x=>`<li class="w">⚠ ${x}</li>`).join('')}</ul></div>`:'')+tip;
+}
+function qiSet(f,v){U().modal.f[f]=v;{const e=$('#qiw');if(e)e.innerHTML=qiWarnHtml();}if(f==='sec'||f==='chef'){const x=U().modal.f;x.chef=x.chef||x.sec===RES;if(x.sec===RES)x.only=true;}if(f==='sec'||f==='chef'||f==='only')render();}
+function qiSave(){
+  const m=U().modal,f=m.f;const price=parseFloat(f.price);
+  if(!f.name.trim()){$('#qierr').textContent='Name is required';return;}
+  if(!(price>0)){$('#qierr').textContent='Price must be more than ₹0';return;}
+  const r=commit(d=>{const p=newPlan(d);const it=d.items.find(i=>i.id===m.id);
+    if(!it){p.blocked='This item no longer exists (changed meanwhile). Nothing was changed.';return p;}
+    if(f.sec!==RES&&!d.sections.some(s=>s.id===f.sec)){p.blocked='That section no longer exists. Nothing was changed.';return p;}
+    const t=normalizeFlags({sec:f.sec,chef:f.chef,only:f.only});
+    let sort=it.sort;if(it.sec!==f.sec)sort=Math.max(-1,...d.items.filter(x=>x.sec===f.sec).map(x=>x.sort))+1;
+    if(touch(p,it,{name:f.name.trim(),pp:Math.round(price*100),sec:f.sec,sort,chef:t.chef,only:t.only,active:f.active,note:f.note}))p.moved=1;
+    p.lines.push('Saved');return p;},'edit');
+  afterCommit(r,()=>`Saved “${f.name.trim()}”.`);
+}
+function openQS(id){const s=S.draft.sections.find(x=>x.id===id);if(!s){toast('That section no longer exists.',true);return;}U().modal={k:'qs',id,name:s.name,active:s.active};render();}
+function qsSave(){
+  const m=U().modal;if(!m.name.trim()){$('#qserr').textContent='Name is required';return;}
+  const d=clone(S.draft);const s=d.sections.find(x=>x.id===m.id);if(!s){toast('That section no longer exists.',true);U().modal=null;render();return;}
+  s.name=m.name.trim();s.active=m.active;S.draft=d;U().modal=null;toast('Section saved.');
+}
+function qsDup(){const m=U().modal;const n=norm(m.name);return S.draft.sections.some(s=>s.id!==m.id&&norm(s.name)===n);}
+function delSection(id){
+  const chk=canDeleteSection(S.draft,id,S.biz),s=S.draft.sections.find(x=>x.id===id);
+  if(chk.code==='hasItems'){U().modal={k:'delblock',id,n:chk.n,why:'items'};render();return;}
+  if(chk.code==='popup'){U().modal={k:'delblock',id,why:'popup'};render();return;}
+  U().modal={k:'confirm',title:'Delete section?',body:`Delete “${esc(s.name)}”? It is empty.`,ok:'Delete',danger:1,fn:`delSecGo('${id}')`};render(); // confirm FIRST, then one delete (fixes bug-050)
+}
+function delSecGo(id){const r=commit(d=>{const p=newPlan(d);const s=d.sections.find(x=>x.id===id);if(!s){p.blocked='Already deleted.';return p;}p.removedSections.push(clone(s));d.sections=d.sections.filter(x=>x.id!==id);return p;},'delsec');afterCommit(r,()=>'Section deleted.');}
+
+/* ---- deep links & simulated other admin ---- */
+function deep(id){go('items');if(!S.draft.items.some(i=>i.id===id)){toast('That item no longer exists.',true);return;}toast('Opens the existing full Edit form for this item (the param is then removed)');}
+function other(kind){
+  const d=clone(S.draft);
+  if(kind==='sold'){const it=d.items.find(i=>i.name==='Korean katsu paneer');if(it)it.avail=!it.avail;const p=clone(S.pub);const pi=p.items.find(i=>i.name==='Korean katsu paneer');if(pi)pi.avail=!pi.avail;S.pub=p;S.draft=d;toast('Other admin toggled “Korean katsu paneer” sold-out (LIVE).');}
+  if(kind==='delitem'){const n=d.items.length;d.items=d.items.filter(i=>i.name!=='WHY NOT Thai Crispy');S.draft=d;toast(n!==d.items.length?'Other admin deleted “WHY NOT Thai Crispy”.':'Already deleted.');}
+  if(kind==='delsec'){d.sections=d.sections.filter(s=>s.id!=='combo');d.items=d.items.filter(i=>i.sec!=='combo');S.draft=d;toast('Other admin deleted the “Combo” section.');}
+  if(kind==='move'){const it=d.items.find(i=>i.name==='Hoisin Crispy Broccoli');if(it){it.sec='tea';it.v=++S.ver;}S.draft=d;toast('Other admin moved “Hoisin Crispy Broccoli” to Tea.');}
+  if(kind==='addsec'){if(!d.sections.some(x=>x.id==='dess')){d.sections.push({id:'dess',name:'Desserts',active:true,sort:Math.max(...d.sections.map(x=>x.sort))+1});}S.draft=d;toast('Other admin added a section “Desserts”.');}
+  if(kind==='edit'){const it=d.items.find(i=>i.name==='Hoisin Crispy Broccoli');if(it){it.pp+=500;it.v=++S.ver;}S.draft=d;toast('Other admin changed the price of “Hoisin Crispy Broccoli”.');}
+}
+
+/* ============ rendering ============ */
+function hl(text,q){const w=norm(q).split(' ').filter(Boolean);let t=esc(text);for(const x of w){const re=new RegExp('('+x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig');t=t.replace(re,'<mark>$1</mark>');}return t;}
+function tags(i){return(i.active?'':'<span class="tag">Hidden</span>')+(i.sec===RES?'<span class="tag chef">🍳 only in Chef Special</span>':i.chef?(i.only?'<span class="tag chef">🍳 only</span>':'<span class="tag chef">🍳 Chef</span>'):'')+(i.avail?'':'<span class="tag warn">Sold out (live)</span>');}
+function itemRow(i,q){
+  const d=S.draft,u=U(),picked=u.ids.has(i.id);
+  return `<div class="card item ${i.avail?'':'na'} ${i.active?'':'hid'} ${picked?'picked':''}"><div class="row">
+   ${u.sel?`<input type="checkbox" ${picked?'checked':''} onchange="pick('${i.id}')" aria-label="Select ${esc(i.name)}">`:''}
+   <div class="grow nm"><b>${hl(i.name,q)}</b>${tags(i)}<div class="tiny">${esc(secName(d,i.sec))} · ${money(i.pp)}</div></div>
+   ${i.active?`<label class="tiny row" title="Live: changes what customers see right now">Live sold-out <span class="sw"><input type="checkbox" ${i.avail?'':'checked'} aria-label="Live sold-out for ${esc(i.name)}" onchange="liveSold('${i.id}')"><i></i></span></label>`:''}
+   <button class="btn o sm" onclick="${canEdit()&&!tools()?`toast('Opens the existing full Edit form (tools are off)')`:`openQI('${i.id}')`}">${canEdit()?'Edit':'View'}</button>
+  </div></div>`;
+}
+function renderDash(){
+  const d=S.draft,probs=menuProblems(d,S.biz).filter(p=>p.lvl==='P').length;
+  return `<h2>Dashboard</h2>
+  <div class="find"><div class="search">🔎 <input id="fq" aria-label="Find item or section" placeholder="Find item or section…" value="${esc(U().fq)}" oninput="setFind(this.value)" autocomplete="off"></div><div id="findres">${findHtml()}</div></div>
+  <div style="height:12px"></div>
+  <div class="row wrap"><div class="card grow"><b>${d.items.length}</b><div class="tiny">Items</div></div><div class="card grow"><b>${d.sections.length}</b><div class="tiny">Sections</div></div></div>
+  <div class="card row" style="cursor:pointer" onclick="go('sections')">📂 <div class="grow"><b>Sections</b><div class="tiny">Add, reorder, hide, merge</div></div>›</div>
+  <div class="card row" style="cursor:pointer" onclick="go('items')">🍽️ <div class="grow"><b>Items</b><div class="tiny">Add, edit, select &amp; move</div></div>›</div>
+  <div class="card row" style="cursor:pointer" onclick="go('check')">✅ <div class="grow"><b>Menu check</b><div class="tiny">${probs?probs+' problem'+(probs===1?'':'s')+' found':'No problems found'}</div></div>›</div>
+  <div class="card row" style="opacity:.7">🐞 <div class="grow"><b>Bug logs</b><div class="tiny">(built earlier — not part of 1a)</div></div></div>`;
+}
+function setFind(v){U().fq=v;$('#findres').innerHTML=findHtml();}
+function findHtml(){
+  const q=U().fq;if(!q.trim())return'';
+  const d=S.draft,secs=searchSections(d,q).slice(0,8),its=searchItems(d,q).slice(0,8),allIt=searchItems(d,q).length;
+  if(!secs.length&&!its.length)return`<div class="res"><div class="h">NO MATCHES</div></div>`;
+  return`<div class="res">${secs.length?`<div class="h">SECTIONS</div>`+secs.map(s=>`<button onclick="openQS('${s.id}')"><span>${hl(s.name,q)}${s.active?'':'<span class="tag">Hidden</span>'}</span><span class="tiny">${d.items.filter(i=>i.sec===s.id).length} items</span></button>`).join(''):''}
+  ${its.length?`<div class="h">ITEMS</div>`+its.map(i=>`<button onclick="openQI('${i.id}')"><span>${hl(i.name,q)}${tags(i)}</span><span class="tiny">${esc(secName(d,i.sec))} · ${money(i.pp)}</span></button>`).join(''):''}
+  ${allIt>8?`<button onclick="U().q='${esc(q).replace(/'/g,'')}';go('items')"><b>See all ${allIt} items →</b></button>`:''}</div>`;
+}
+function renderItems(){
+  const d=S.draft,u=U(),view=viewItems(),q=u.q;
+  const resN=d.items.filter(i=>i.sec===RES).length;
+  const chips=[`<button class="chip ${u.filter==='all'&&!q?'on':''}" onclick="setFilter('all')">All (${d.items.length})</button>`,...(resN?[`<button class="chip ${u.filter===RES&&!q?'on':''}" onclick="setFilter('${RES}')">🍳 Chef Special only (${resN})</button>`]:[]),...d.sections.slice().sort((a,b)=>a.sort-b.sort).map(s=>`<button class="chip ${u.filter===s.id&&!q?'on':''}" onclick="setFilter('${s.id}')">${esc(s.name)} (${d.items.filter(i=>i.sec===s.id).length})</button>`)].join('');
+  return `<h2>Items</h2>
+  <div class="row wrap"><div class="search grow">🔎 <input id="iq" aria-label="Search items" placeholder="Search items, ingredients, sections…" value="${esc(q)}" oninput="setQ(this.value)" autocomplete="off">${q?`<button style="border:0;background:none" onclick="setQ('')" title="Clear">✕</button>`:''}</div>
+   ${tools()?`<button class="btn ${u.sel?'':'o'}" onclick="toggleSelect()">${u.sel?'Done':'☑ Select'}</button>`:''}${canEdit()?`<button class="btn" onclick="toast('Opens the existing Add item form')">＋ Add</button>`:''}</div>
+  <div class="chips">${chips}</div>
+  ${q?`<div class="tiny">${view.length} match${view.length===1?'':'es'} for “${esc(q)}” (chip filter ignored while searching; hidden items included)</div>`:''}
+  ${u.sel?`<div class="note">Select mode · <a href="#" onclick="selectAllView();return false">Select all (${view.length}) in this view</a> · changing the chip or search clears the selection</div>`:''}
+  ${view.length?view.map(i=>itemRow(i,q)).join(''):'<div class="card tiny">No items.</div>'}
+  ${u.sel&&u.ids.size?`<div class="selbar"><b>${u.ids.size} selected</b>
+    <button onclick="openMove()">Move to…</button>
+    <span class="sec"><button onclick="bulk('show')">Show</button><button onclick="bulk('hide')">Hide</button><button onclick="bulk('chef1')">Chef ✓</button><button onclick="bulk('chef0')">Chef ✗</button><button onclick="bulk('note1')">Notes on</button><button onclick="bulk('note0')">Notes off</button></span>
+    <details class="more"><summary>More ⋯</summary><div><button onclick="bulk('show')">Show</button><button onclick="bulk('hide')">Hide</button><button onclick="bulk('chef1')">Chef ✓</button><button onclick="bulk('chef0')">Chef ✗</button><button onclick="bulk('note1')">Notes on</button><button onclick="bulk('note0')">Notes off</button></div></details>
+    <button onclick="openPrice()">Price…</button><button class="d" onclick="openDelItems()">Delete</button></div>`:''}`;
+}
+function renderSections(){
+  const d=S.draft,q=U().sq,L=(q.trim()?searchSections(d,q):d.sections.slice()).sort((a,b)=>a.sort-b.sort);
+  return `<h2>Sections</h2>
+  <div class="card tiny">Special sections (built in): <b>🍳 Chef Special</b> ${S.biz.chefVisible?'visible':'<span class="tag warn">hidden</span>'} · <b>⭐ Best Sellers</b> visible. (Unchanged by 1a.)</div>
+   ${q.trim()?'<div class="note">Re-ordering is off while a search is active — clear the search to re-order.</div>':''}<div class="search">🔎 <input id="sq" aria-label="Search sections" placeholder="Search sections…" value="${esc(q)}" oninput="U().sq=this.value;render()" autocomplete="off"></div><div style="height:8px"></div>
+  ${L.map(s=>{const n=d.items.filter(i=>i.sec===s.id).length;return`<div class="card"><div class="row wrap">
+    <div class="grow"><b>${hl(s.name,q)}</b>${s.active?'':'<span class="tag">Hidden</span>'}${n===0?'<span class="tag bad">empty</span>':''}${S.biz.popup==='sec:'+s.id?'<span class="tag warn">first-load pop-up</span>':''}<div class="tiny">${n} item${n===1?'':'s'}</div></div>
+    ${canEdit()?`<label class="tiny row">Visible <span class="sw"><input type="checkbox" ${s.active?'checked':''} aria-label="Visible: ${esc(s.name)}" onchange="setSecActive('${s.id}')"><i></i></span></label>
+    <button class="btn o sm" onclick="${tools()?`openQS('${s.id}')`:`toast('Opens the existing section form (tools are off)')`}">Edit</button>${tools()?`<button class="btn o sm" onclick="openMerge('${s.id}')">Merge into…</button>`:''}<button class="btn o sm" style="color:#c62828;border-color:#c62828" onclick="delSection('${s.id}')">Delete</button>`:'<span class="tiny">view only</span>'}
+  </div></div>`;}).join('')||'<div class="card tiny">No sections.</div>'}`;
+}
+function renderCheck(){
+  const P=menuProblems(S.draft,S.biz),pr=P.filter(p=>p.lvl==='P'),tp=P.filter(p=>p.lvl==='T');
+  return `<h2>Menu check</h2><div class="tiny">Looks at the draft as it will be after Publish. Never blocks Publish.</div>
+  ${pr.length?'':'<div class="card ok" style="color:#1b5e20">✔ No problems.</div>'}
+  ${pr.map(probHtml).join('')}${tp.length?'<h2 style="font-size:14px;margin-top:14px">Tips</h2>'+tp.map(probHtml).join(''):''}`;
+}
+function probHtml(p){return`<div class="prob ${p.lvl==='T'?'tip':''}"><div>${p.lvl==='P'?'⛔':'💡'}</div><div class="grow"><b>${esc(p.title)}</b><span class="tiny">${esc(p.detail)}</span></div>${tools()?`<button class="btn o sm" onclick="fix('${p.fix.t}','${p.fix.id||''}')">Fix</button>`:''}</div>`;}
+function fix(t,id){U().modal=null;if(t==='merge')openMerge(id,RES);else if(t==='sec')openQS(id);else if(t==='item')openQI(id);else{toast('Opens Promotions & pop-up (use the “First-load pop-up” control on the right in this prototype)');render();}}
+
+function renderModal(){
+  const m=U().modal;if(!m)return'';const d=S.draft;let h='';
+  if(m.k==='confirm')h=`<h3>${m.title}</h3><p>${m.body}</p><div class="act"><button class="btn o" onclick="U().modal=null;render()">Cancel</button><button class="btn ${m.danger?'r':''}" onclick="${m.fn}">${m.ok}</button></div>`;
+  if(m.k==='move'||m.k==='merge'){
+    const src=m.k==='merge'?d.sections.find(s=>s.id===m.from):null;
+    h=`<h3>${m.k==='move'?`Move ${ids().length} item${ids().length===1?'':'s'}`:`Merge “${esc(src?src.name:'?')}” into…`}</h3>
+    <div class="fld"><span>${m.k==='move'?'Move to':'Merge into'}</span><select class="in" onchange="mvSet('target',this.value)">${targetOptions(m.from,m.target,true)}</select></div>
+    ${m.k==='merge'?`<label class="row" style="justify-content:flex-start"><input type="checkbox" ${m.del?'checked':''} onchange="mvSet('del',this.checked)"> Delete the emptied section</label>`:''}
+    <div id="mvprev">${previewHtml(mvPreview())}</div>
+    <div class="act"><button class="btn o" onclick="U().modal=null;render()">Cancel</button><button class="btn" id="mvgo" ${mvPreview().blocked?'disabled':''} onclick="mvApply()">${m.k==='move'?'Move':'Merge'}</button></div>`;
+  }
+  if(m.k==='delitems'){const L=ids().map(i=>d.items.find(x=>x.id===i)).filter(Boolean);
+    h=`<h3>Delete ${L.length} item${L.length===1?'':'s'}?</h3><div class="pv"><ul>${L.slice(0,5).map(i=>`<li>${esc(i.name)}</li>`).join('')}${L.length>5?`<li>…and ${L.length-5} more</li>`:''}</ul></div><div class="tiny">Carts that hold them are fixed at checkout (items missing are dropped). Undo available for 60 s.</div>
+    <div class="act"><button class="btn o" onclick="U().modal=null;render()">Cancel</button><button class="btn r" onclick="afterCommit(commit(d=>planDelete(d,ids()),'del'),p=>'Deleted '+p.moved+' item'+(p.moved===1?'':'s')+'.')">Delete</button></div>`;}
+  if(m.k==='delblock'){const s=d.sections.find(x=>x.id===m.id);
+    h=m.why==='items'?`<h3>“${esc(s.name)}” has ${m.n} item${m.n===1?'':'s'}</h3><p>A section can only be deleted when it is empty. Instead of editing each item:</p><div class="act"><button class="btn o" onclick="U().modal=null;render()">Close</button><button class="btn" onclick="openMerge('${m.id}')">Merge into another section…</button></div>`
+      :`<h3>The first-load pop-up opens “${esc(s.name)}”</h3><p>Deleting it would silently turn the pop-up off. Change the pop-up first.</p><div class="act"><button class="btn o" onclick="U().modal=null;render()">Close</button><button class="btn" onclick="U().modal=null;toast('Opens Promotions &amp; pop-up (use the pop-up control on the right in this prototype)')">Open Promotions &amp; pop-up</button></div>`;}
+  if(m.k==='price'){h=`<h3>Change price — ${ids().length} item${ids().length===1?'':'s'}</h3>
+    <div class="row wrap"><select class="in" style="width:auto" onchange="prSet('mode',this.value)"><option value="pct" ${m.mode==='pct'?'selected':''}>Percent (%)</option><option value="flat" ${m.mode==='flat'?'selected':''}>Flat (₹)</option></select>
+    <input class="in" style="width:100px" type="number" step="0.5" value="${m.amt}" oninput="prSet('amt',this.value)"> <span class="tiny">negative = decrease</span>
+    <select class="in" style="width:auto" onchange="prSet('round',this.value)"><option value="0" ${m.round==0?'selected':''}>No rounding</option><option value="1" ${m.round==1?'selected':''}>Round to ₹1</option><option value="5" ${m.round==5?'selected':''}>Round to ₹5</option></select></div>
+    <div id="prprev">${prHtml()}</div><div class="act"><button class="btn o" onclick="U().modal=null;render()">Cancel</button><button class="btn" onclick="prApply()">Apply</button></div>`;}
+  if(m.k==='qi'){const it=d.items.find(i=>i.id===m.id),f=m.f,ro=!tools(),res=f.sec===RES;
+    h=`<h3>${ro?'Item (view only)':'Quick edit'}</h3>
+    <div class="fld"><span>Name</span><input class="in" value="${esc(f.name)}" ${ro?'disabled':''} oninput="qiSet('name',this.value)"></div>
+    <div class="row"><div class="fld grow"><span>Price (₹)</span><input class="in" value="${esc(f.price)}" ${ro?'disabled':''} oninput="qiSet('price',this.value)"></div>
+    <div class="fld grow"><span>Section</span><select class="in" ${ro?'disabled':''} onchange="qiSet('sec',this.value)">${targetOptions(null,f.sec)}</select></div></div>
+    <label class="row" style="justify-content:space-between"><span>Chef Special ${res?'<span class="tiny">(locked on: lives only in Chef Special)</span>':''}</span><span class="sw"><input type="checkbox" ${f.chef||res?'checked':''} ${ro||res?'disabled':''} onchange="qiSet('chef',this.checked)"><i></i></span></label>
+    ${f.chef&&!res?`<label class="row" style="justify-content:space-between"><span>Show only in Chef Special (not in All or its section)</span><span class="sw"><input type="checkbox" ${f.only?'checked':''} ${ro?'disabled':''} onchange="qiSet('only',this.checked)"><i></i></span></label>`:''}
+    <label class="row" style="justify-content:space-between"><span>Visible on menu</span><span class="sw"><input type="checkbox" ${f.active?'checked':''} ${ro?'disabled':''} onchange="qiSet('active',this.checked)"><i></i></span></label>
+    <label class="row" style="justify-content:space-between"><span>Customers can add a note</span><span class="sw"><input type="checkbox" ${f.note?'checked':''} ${ro?'disabled':''} onchange="qiSet('note',this.checked)"><i></i></span></label>
+    <label class="row" style="justify-content:space-between"><span>Sold out <span class="tag warn">LIVE — not a draft change</span></span><span class="sw"><input type="checkbox" ${it.avail?'':'checked'} onchange="liveSold('${m.id}');openQI('${m.id}')"><i></i></span></label>
+    <div id="qiw">${qiWarnHtml()}</div>
+    <div id="qierr" style="color:#c62828;font-size:12px;min-height:16px"></div>
+    <div class="act"><button class="btn o" onclick="toast('Opens the existing full Edit item form')">More…</button><button class="btn o" onclick="U().modal=null;render()">${ro?'Close':'Cancel'}</button>${ro?'':'<button class="btn" onclick="qiSave()">Save</button>'}</div>`;}
+  if(m.k==='qs'){const s=d.sections.find(x=>x.id===m.id),n=d.items.filter(i=>i.sec===m.id).length,ro=!tools();
+    h=`<h3>${ro?'Section (view only)':'Quick edit section'}</h3>
+    <div class="fld"><span>Name</span><input class="in" value="${esc(m.name)}" ${ro?'disabled':''} oninput="U().modal.name=this.value;$('#dup').style.display=qsDup()?'block':'none'"></div>
+    <div id="dup" class="note" style="display:${qsDup()?'block':'none'}">Another section already has this name.</div>
+    <label class="row" style="justify-content:space-between"><span>Visible on menu</span><span class="sw"><input type="checkbox" ${m.active?'checked':''} ${ro?'disabled':''} onchange="U().modal.active=this.checked"><i></i></span></label>
+    <div class="tiny" style="margin-top:6px">${n} item${n===1?'':'s'} in this section</div><div id="qserr" style="color:#c62828;font-size:12px"></div>
+    <div class="act">${ro?'':`<button class="btn o" onclick="openMerge('${m.id}')">Merge into…</button><button class="btn o" style="color:#c62828;border-color:#c62828" onclick="delSection('${m.id}')">Delete</button>`}<button class="btn o" onclick="U().modal=null;render()">${ro?'Close':'Cancel'}</button>${ro?'':'<button class="btn" onclick="qsSave()">Save</button>'}</div>`;}
+  if(m.k==='doctor'){const P=menuProblems(d,S.biz),pr=P.filter(p=>p.lvl==='P');
+    h=`<h3>Before you publish: ${pr.length} problem${pr.length===1?'':'s'}</h3><div class="tiny">You can still publish. Fix opens the right editor.</div>${pr.map(probHtml).join('')}
+    <div class="act"><button class="btn o" onclick="U().modal=null;render()">Cancel</button><button class="btn" onclick="doPublish()">Publish anyway</button></div>`;}
+  const ttl=((h.match(/<h3>([\s\S]*?)<\/h3>/)||[,'Dialog'])[1]).replace(/<[^>]+>/g,'');
+  return `<div class="ov" onclick="if(event.target===this){U().modal=null;render()}"><div class="dlg" role="dialog" aria-modal="true" aria-label="${esc(ttl)}" tabindex="-1">${h}</div></div>`;
+}
+function renderToast(){
+  const t=U().toast;if(!t)return'';
+  return`<div class="toast ${t.err?'err':''}"><span>${t.msg}</span></div>`;
+}
+function renderUndoBar(){
+  if(!S.undo)return'';
+  return`<div class="undobar"><span class="grow">↩ ${S.undo.label||'Last change'}</span><button onclick="doUndo()">Undo (${Math.max(0,Math.ceil((S.undo.until-Date.now())/1000))}s)</button></div>`;
+}
+function render(){
+  if(!tools()){U().sel=false;U().ids=new Set();}
+  const a=document.activeElement,fid=a&&a.id,pos=a&&a.selectionStart;
+  const d=S.draft,n=countChanges(d,S.pub),u=U();
+  const probs=menuProblems(d,S.biz).filter(p=>p.lvl==='P').length;
+  const body={dash:renderDash,items:renderItems,sections:renderSections,check:renderCheck}[u.tab]();
+  const canPub=canEdit();
+  $('#admin').innerHTML=`<div class="abar">Why Not? Cafe — Admin <span class="sp"></span><small>${S.role==='owner'?'Owner':'Staff'}</small></div>
+  <div class="shell"><div class="nav">${[['dash','🏠 Dashboard'],['sections','📂 Sections'],['items','🍽️ Items'],['check','✅ Menu check']].map(([k,l])=>`<button class="${u.tab===k?'on':''}" onclick="go('${k}')">${l}${k==='check'&&probs?`<span class="bd">${probs}</span>`:''}</button>`).join('')}</div>
+  <div class="main">${n?`<div class="pub">● ${n} unpublished change${n===1?'':'s'} ${canPub?'— Publish to go live':'— a manager or owner must Publish'}<span class="sp"></span>${canPub?'<button class="b2" onclick="discard()">Discard</button><button class="b1" onclick="publish()">Publish</button>':''}</div>`:''}
+  ${renderUndoBar()}<div class="content">${body}</div></div></div>${renderModal()}${renderToast()}`;
+  renderSide();
+  if(fid){const e=document.getElementById(fid);if(e&&e.focus){e.focus();try{e.setSelectionRange(pos,pos);}catch(_){}}}
+  if(U().modal){const dl=document.querySelector('.dlg');if(dl&&!dl.contains(document.activeElement))dl.focus();}   // focus moves into the dialog
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&S&&U().modal){U().modal=null;render();}});   // Esc closes; Enter never confirms a destructive action
+function renderSide(){
+  const chips=customerView(),sel=chips.find(c=>c.id===U().custChip)||chips[0];
+  const popOpts=[['none','None'],['chef','Chef Special (built-in)'],['sec:cs','Section “Chef Specials”'],['sec:combo','Section “Combo”']];
+  $('#side').innerHTML=`
+  <div class="panel"><h3>Scenario controls</h3>
+   <label>First-load pop-up opens <select onchange="S.biz.popup=this.value;render()">${popOpts.map(([v,l])=>`<option value="${v}" ${S.biz.popup===v?'selected':''}>${l}</option>`).join('')}</select></label>
+   <label>Chef Special chip visible <span class="sw"><input type="checkbox" ${S.biz.chefVisible?'checked':''} onchange="S.biz.chefVisible=this.checked;render()"><i></i></span></label>
+   <label title="Plan step 1a-F: Settings (owner) switch. Off hides Select, Merge, bulk actions, quick-edit and the Fix buttons; search, Find, live sold-out and the old Edit stay.">Bulk &amp; merge tools enabled (1a-F) <span class="sw"><input type="checkbox" ${S.biz.toolsOn!==false?'checked':''} onchange="S.biz.toolsOn=this.checked;render()"><i></i></span></label>
+   <label title="Next save fails as if the network were down: the dialog stays open and nothing is written.">Simulate offline (saves fail) <span class="sw"><input type="checkbox" ${S.offline?'checked':''} onchange="S.offline=this.checked;render()"><i></i></span></label>
+   <label title="Plan step 1a-P: the counter app shows Chef-only items under a 'Chef Special' heading. When live, the preview notice disappears.">Counter app update 1a-P is live <span class="sw"><input type="checkbox" ${S.biz.posHeading?'checked':''} onchange="S.biz.posHeading=this.checked;render()"><i></i></span></label>
+   <div class="tiny" style="margin-top:6px"><b>Simulate another admin (race conditions)</b></div>
+   <button class="pbtn" onclick="other('sold')">Sold-out “Korean katsu paneer” (live)</button>
+   <button class="pbtn" onclick="other('delitem')">Delete “WHY NOT Thai Crispy”</button>
+   <button class="pbtn" onclick="other('edit')">Change price of “Hoisin Crispy Broccoli”</button>
+   <button class="pbtn" onclick="other('move')">Move “Hoisin Crispy Broccoli” to Tea</button>
+   <button class="pbtn" onclick="other('addsec')">Add section “Desserts”</button>
+   <button class="pbtn" onclick="other('delsec')">Delete section “Combo”</button>
+   <div class="tiny" style="margin-top:6px"><b>Deep links</b></div>
+   <button class="pbtn" onclick="deep('i7')">/admin/items?edit=&lt;id&gt; (full Edit form)</button>
+   <button class="pbtn" onclick="deep('nope')">?edit=&lt;missing id&gt;</button>
+   <div style="margin-top:6px"><button class="pbtn" onclick="reset()">↺ Reset demo data</button></div></div>
+  <div class="panel cust"><h3>What customers see now (published)</h3>
+   <div class="cc">${chips.map(c=>`<button class="c ${c.sp?'sp':''} ${c.empty?'em':''} ${c.id===sel.id?'on':''}" onclick="S.ui.custChip='${c.id}';renderSide()">${esc(c.name)} (${c.items.length})</button>`).join('')}</div>
+   <ul>${sel.items.slice(0,12).map(i=>`<li>${esc(i.name)}${i.avail?'':' <span class="tag warn">sold out</span>'}</li>`).join('')||'<li class="tiny">(empty chip — customers see this)</li>'}${sel.items.length>12?`<li class="tiny">…${sel.items.length-12} more</li>`:''}</ul>
+   <div class="tiny" style="margin-top:6px">Dashed red chip = empty section visible to customers. Changes only appear here after <b>Publish</b> (except live sold-out).</div></div>
+  <div class="panel"><h3>Try this (checks from plan §3–5)</h3><ol class="try">
+   <li><b>Merge (prod case):</b> Sections → <i>Chef Specials</i> → Merge into… → “🍳 Chef Special only”. Read the preview (10 move · 5 get the flag · section deleted). Apply → banner count, customer panel unchanged until Publish → Publish → one chip.</li>
+   <li><b>Undo is safe:</b> do a merge, then click “Sold-out Korean katsu paneer” on the right, then Undo (the bar under the banner, 60 s, on Dashboard / Sections / Items). The sold-out stays; the items go back. Publish or Discard clears Undo.</li>
+   <li><b>Race:</b> Items → Select → pick a few → Move to…; before Apply click “Delete WHY NOT Thai Crispy” or “Delete section Combo”; then Apply → skipped/“changed meanwhile”, nothing thrown.</li>
+   <li><b>Undo + other edit:</b> Move items incl. Hoisin. (a) click “Change price of Hoisin…” then Undo → section restored, the other admin’s price is kept. (b) click “Move Hoisin to Tea” then Undo → Hoisin is skipped and reported (same field changed).</li>
+   <li><b>Pop-up guard:</b> set the pop-up to “Section Chef Specials”, then merge with “delete emptied” ticked → items move, delete is skipped with instructions. Also try Delete on the section.</li>
+   <li><b>Delete bug fix:</b> Delete an <i>empty</i> section (Paratha): the confirm dialog comes first.</li>
+   <li><b>Find:</b> Dashboard → type “kor ram” → open item → change price → Save → banner says 1 change.</li>
+   <li><b>Select:</b> Items → Select → search “katsu” → Select all → Move. Change the chip: selection clears.</li>
+   <li><b>Bulk price:</b> select a section’s items → Price… +10 %, round ₹5 → read the before/after table → Apply.</li>
+   <li><b>Chef-only moves:</b> move an item into “Chef Special only” then out again to a section (flag gain / “shows in X again”). Hide the Chef Special chip on the right and move into it (warning).</li>
+   <li><b>Menu check:</b> open it (duplicate “Chef Specials”, 4 empty chips, hidden-section items). Press Publish → problems dialog → Publish anyway.</li>
+   <li><b>Old-path races (plan 1a-7):</b> Items → Edit “Korean katsu paneer”; click “Sold-out Korean katsu paneer” on the right; Save in the sheet → it stays sold out (the save never writes a stale value). Then click “Add section Desserts” and do any Move/Merge → the new section survives.</li>
+   <li><b>Counter heading (plan 1a-P):</b> merge into Chef-only and read the notice; switch “Counter app update 1a-P is live” on → the notice disappears.</li>
+   <li><b>Phone width:</b> narrow the window below 600 px, then Items → Select → pick items: the bar keeps Move / Price / Delete and tucks the rest under “More ⋯”.</li>
+   <li><b>Off switch (1a-F):</b> turn “Bulk &amp; merge tools enabled” off → Select, Merge, bulk bar, quick-edit and Fix disappear (Find, search, live sold-out and Edit stay). Back on → they return.</li>
+   <li><b>Shared warnings:</b> open a quick edit, pick “🍳 Chef Special only” with the Chef chip hidden, or a hidden section, or type a 45-letter name → same warnings as Move, plus the length tip.</li>
+   <li><b>Offline:</b> turn “Simulate offline” on, then Apply a Move → “Couldn't save — check your connection. Nothing was changed.”; the dialog stays open and nothing changes.</li>
+   <li><b>Keyboard:</b> open any dialog → focus is inside it; Esc closes it; Enter never confirms Delete/Merge.</li>
+   <li><b>Staff:</b> switch to Staff (top bar): no select/merge/delete/edit; only the live sold-out switch.</li></ol></div>`;
+}
+function renderRole(){
+  $('#roleSeg').innerHTML=['owner','staff'].map(r=>`<button class="${S.role===r?'on':''}" onclick="S.role='${r}';S.ui.sel=false;S.ui.ids=new Set();S.ui.modal=null;renderRole();render()">${r==='owner'?'Owner / manager':'Staff'}</button>`).join('');
+}
+reset();renderRole();
+</script>
+</body>
+</html>
