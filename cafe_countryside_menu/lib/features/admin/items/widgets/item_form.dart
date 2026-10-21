@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../menu/models/item_model.dart' show chefOnlySectionId;
 import '../../../shared/models/draft_item_model.dart';
+import '../../../shared/models/draft_ops.dart';
 import '../../../shared/models/draft_section_model.dart';
 import '../../../shared/services/cloudinary_service.dart';
 import '../../../shared/services/image_service.dart';
@@ -156,6 +157,8 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
     if (!_formKey.currentState!.validate()) return;
     final price = double.tryParse(_priceCtrl.text.trim()) ?? 0;
     final now = DateTime.now();
+    final flags = normalizeItemFlags(
+        sectionId: _sectionId, isChefSpecial: _isChefSpecial, chefOnly: _chefOnly);
     final result = DraftItemModel(
       id: widget.existing?.id ?? '',
       sectionId: _sectionId,
@@ -172,9 +175,9 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
       availableTill: _tillCtrl.text.trim(),
       requiresKitchen: _requiresKitchen,
       noteAllowed: _noteAllowed,
-      isChefSpecial: _isChefSpecial || _chefSpecialOnly,
-      // Only meaningful while Chef Special is on.
-      chefOnly: (_isChefSpecial && _chefOnly) || _chefSpecialOnly,
+      isChefSpecial: flags.isChefSpecial,
+      // Only meaningful while Chef Special is on (see normalizeItemFlags).
+      chefOnly: flags.chefOnly,
       sortOrder: widget.existing?.sortOrder ?? 0,
       businessId: 'default',
       createdAt: widget.existing?.createdAt ?? now,

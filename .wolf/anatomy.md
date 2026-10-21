@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-21T16:11:45.300Z
-> Files: 30 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-21T16:34:48.030Z
+> Files: 41 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
 
@@ -16,8 +16,10 @@
 
 - `edit_cl.py` — Declares logTypes (~2232 tok)
 - `edit_rules.py` — logShapeOk: boundedLogOk, adminLogOk (~1327 tok)
+- `sample_menu.json` (~195 tok)
 - `spa_server.mjs` — Declares root (~223 tok)
 - `split_logid.py` (~280 tok)
+- `verify_seed.mjs` — Declares HOST (~581 tok)
 
 ## ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/ccc67a73-2a74-44b9-aa88-c5a31253e0ed/scratchpad/
 
@@ -126,6 +128,7 @@
 
 ## cafe_countryside_menu/lib/features/admin/items/widgets/
 
+- `item_form.dart` — Stateful widget: ItemFormDialog (~4635 tok)
 
 ## cafe_countryside_menu/lib/features/admin/profile/
 
@@ -135,6 +138,7 @@
 
 ## cafe_countryside_menu/lib/features/admin/sections/
 
+- `section_delete_flow.dart` — / Deleting a section, in the only safe order (fixes the old bug where an EMPTY (~795 tok)
 
 ## cafe_countryside_menu/lib/features/admin/sections/widgets/
 
@@ -177,6 +181,7 @@
 
 ## cafe_countryside_menu/lib/features/shared/models/
 
+- `draft_ops.dart` — / Pure draft operations for the admin tools (Phase 1a). No Firebase, no (~299 tok)
 
 ## cafe_countryside_menu/lib/features/shared/permissions/
 
@@ -197,15 +202,21 @@
 
 - `client_log_bounded_test.dart` — 1a-L0: bounded anonymous logs. Pure helpers (hash, bucket, id, URL cleaning), (~2233 tok)
 - `client_log_hash_test.dart` — The slot hash must be identical on the VM and in the browser (where ints are (~314 tok)
+- `draft_ops_test.dart` — Phase 1a pure draft operations (VM, no Firebase). Grows with each step. (~344 tok)
+- `draft_update_test.dart` — 1a-0(c): the pure parts of DraftRepository.updateDraft. The transaction itself (~800 tok)
+- `item_form_flags_test.dart` — 1a-0(b)/(d) characterization test for the Chef Special flags the item form (~993 tok)
+- `section_delete_flow_test.dart` — 1a-0(e): the "Delete section?" confirm must come BEFORE any write (bug-050: (~1995 tok)
 
 ## cafe_countryside_menu/tool/
 
 - `check_log_hash_js.mjs` — Checks that fnv1a32 (lib/core/logging/log_id.dart) gives the same result when (~403 tok)
 - `log_hash_probe.dart` — Compiled to JS by tool/check_log_hash_js.mjs: prints fnv1a32 for fixed inputs (~175 tok)
+- `seed_from_prod.mjs` — Seeds the LOCAL Firestore emulator with a prod-shaped menu so the Phase 1a (~2091 tok)
 
 ## cafe_countryside_menu/tool/rules_tests/
 
 - `clientlogs_rules_test.mjs` — create-only (precondition exists:false), createdAt = request time. (~3816 tok)
+- `menudraft_tx_test.mjs` — Plan phase1a 1a-0(f): a TRANSACTION write to menuDraft/data, as (~1727 tok)
 
 ## cafe_countryside_menu/web/
 
@@ -218,3 +229,7 @@
 ## scripts/
 
 - `build-prod.ps1` (~415 tok)
+- cafe_countryside_menu/lib/features/shared/models/draft_ops.dart: pure draft ops: normalizeItemFlags, canDeleteSection (grows in 1a-1). (~500 tok)
+- cafe_countryside_menu/lib/features/admin/sections/section_delete_flow.dart: confirm-first section delete (fresh business read, fail closed). (~800 tok)
+- DraftRepository.updateDraft (draft_repository.dart): transaction on fresh draft, 4-field update, timeout status.
+- cafe_countryside_menu/tool/rules_tests/menudraft_tx_test.mjs, tool/seed_from_prod.mjs: emulator transaction test; prod-shaped emulator seed (local only).

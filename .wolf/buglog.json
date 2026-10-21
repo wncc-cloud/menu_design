@@ -968,6 +968,56 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-10-21T16:02:51.998Z"
+    },
+    {
+      "id": "bug-061",
+      "timestamp": "2026-10-21T16:22:02.076Z",
+      "error_message": "Missing import: ../../../shared/models/draft_ops.dart",
+      "file": "cafe_countryside_menu/lib/features/admin/items/widgets/item_form.dart",
+      "root_cause": "Module(s) not imported: ../../../shared/models/draft_ops.dart",
+      "fix": "Added import(s) for ../../../shared/models/draft_ops.dart",
+      "tags": [
+        "auto-detected",
+        "missing-import",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T16:22:02.076Z"
+    },
+    {
+      "id": "bug-062",
+      "timestamp": "2026-10-21T16:23:14.327Z",
+      "error_message": "Missing import: draft_data.dart",
+      "file": "cafe_countryside_menu/lib/features/shared/models/draft_ops.dart",
+      "root_cause": "Module(s) not imported: draft_data.dart",
+      "fix": "Added import(s) for draft_data.dart",
+      "tags": [
+        "auto-detected",
+        "missing-import",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T16:23:14.327Z"
+    },
+    {
+      "id": "bug-063",
+      "timestamp": "2026-10-21T16:37:43.288576Z",
+      "error_message": "Sections: deleting an EMPTY section deleted it immediately, THEN showed the 'Delete section?' dialog (plan R1 / bug-050 family)",
+      "file": "cafe_countryside_menu/lib/features/admin/sections/sections_page.dart",
+      "root_cause": "_confirmDelete called notifier.deleteSection() first (to get the 'has items' message); for an empty section that call already wrote the delete, the dialog's Delete then called it again. Also ignored the first-load pop-up (sec:<id>).",
+      "fix": "New section_delete_flow.dart: fresh business read (fail closed) -> canDeleteSection (items / pop-up) -> confirm dialog -> exactly one deleteSection. Tested in section_delete_flow_test.dart (call order asserted).",
+      "tags": [
+        "sections",
+        "delete",
+        "confirm",
+        "popup",
+        "plan-1a-0"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T16:37:43.288576Z"
     }
   ]
 }

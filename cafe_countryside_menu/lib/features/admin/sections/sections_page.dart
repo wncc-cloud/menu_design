@@ -1,10 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../shared/models/draft_section_model.dart';
+import '../../shared/repositories/business_repository.dart';
 import '../../shared/widgets/publish_banner.dart';
 import '../auth/auth_provider.dart';
 import 'widgets/special_sections_block.dart';
+import 'section_delete_flow.dart';
 import 'sections_provider.dart';
 import 'widgets/section_form.dart';
 
@@ -52,40 +55,16 @@ class _SectionsPageState extends ConsumerState<SectionsPage> {
         );
   }
 
-  Future<void> _confirmDelete(DraftSectionModel section) async {
-    final error = await ref
-        .read(draftProvider.notifier)
-        .deleteSection(section.id);
-    if (!mounted) return;
-    if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error), backgroundColor: Colors.red),
+  Future<void> _confirmDelete(DraftSectionModel section) => confirmAndDeleteSection(
+        context: context,
+        section: section,
+        currentDraft: () => ref.read(draftStreamProvider).asData?.value,
+        // A FRESH read, never the cached customer copy (the first-load pop-up
+        // may point at this section).
+        fetchFreshBusiness: () => BusinessRepository(FirebaseFirestore.instance).fetchBusiness(),
+        deleteSection: (id) => ref.read(draftProvider.notifier).deleteSection(id),
+        isMounted: () => mounted,
       );
-      return;
-    }
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Delete section?'),
-        content:
-            Text('Delete "${section.name}"? This cannot be undone.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-    if (ok != true || !mounted) return;
-    await ref
-        .read(draftProvider.notifier)
-        .deleteSection(section.id);
-  }
 
   @override
   Widget build(BuildContext context) {

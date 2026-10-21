@@ -46,6 +46,51 @@
       "count": 1,
       "tokens": 0,
       "first_read": "2026-10-21T16:11:36.207Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/admin/sections/sections_provider.dart": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-10-21T16:20:30.375Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/repositories/draft_repository.dart": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-10-21T16:20:30.397Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/admin/sections/sections_page.dart": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-10-21T16:20:36.553Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/admin/items/widgets/item_form.dart": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-10-21T16:20:37.721Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/models/draft_data.dart": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-10-21T16:20:38.180Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/repositories/business_repository.dart": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-10-21T16:20:46.542Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/test/item_form_price_test.dart": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-10-21T16:20:58.286Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/admin/shared_admin_business_provider.dart": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-10-21T16:22:57.158Z"
+    },
+    "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/admin/sections/section_delete_flow.dart": {
+      "count": 1,
+      "tokens": 795,
+      "first_read": "2026-10-21T16:24:37.013Z"
     }
   },
   "files_written": [
@@ -288,6 +333,102 @@
       "action": "create",
       "tokens": 239,
       "at": "2026-10-21T16:11:45.360Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/test/item_form_flags_test.dart",
+      "action": "create",
+      "tokens": 1064,
+      "at": "2026-10-21T16:21:16.075Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/models/draft_ops.dart",
+      "action": "create",
+      "tokens": 313,
+      "at": "2026-10-21T16:21:54.333Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/test/draft_ops_test.dart",
+      "action": "create",
+      "tokens": 369,
+      "at": "2026-10-21T16:21:56.550Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/admin/items/widgets/item_form.dart",
+      "action": "edit",
+      "tokens": 54,
+      "at": "2026-10-21T16:21:58.145Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/admin/items/widgets/item_form.dart",
+      "action": "edit",
+      "tokens": 43,
+      "at": "2026-10-21T16:21:59.546Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/admin/items/widgets/item_form.dart",
+      "action": "edit",
+      "tokens": 30,
+      "at": "2026-10-21T16:22:02.061Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/shared/models/draft_ops.dart",
+      "action": "edit",
+      "tokens": 27,
+      "at": "2026-10-21T16:23:14.319Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/admin/sections/section_delete_flow.dart",
+      "action": "create",
+      "tokens": 817,
+      "at": "2026-10-21T16:23:41.516Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/test/section_delete_flow_test.dart",
+      "action": "create",
+      "tokens": 2138,
+      "at": "2026-10-21T16:23:43.395Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/admin/sections/section_delete_flow.dart",
+      "action": "edit",
+      "tokens": 52,
+      "at": "2026-10-21T16:24:14.498Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/lib/features/admin/sections/section_delete_flow.dart",
+      "action": "edit",
+      "tokens": 52,
+      "at": "2026-10-21T16:24:41.911Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/test/draft_update_test.dart",
+      "action": "create",
+      "tokens": 857,
+      "at": "2026-10-21T16:25:27.765Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/tool/rules_tests/menudraft_tx_test.mjs",
+      "action": "create",
+      "tokens": 1850,
+      "at": "2026-10-21T16:26:23.010Z"
+    },
+    {
+      "file": "C:/Users/singh/Documents/dev/code/menu_design/cafe_countryside_menu/tool/seed_from_prod.mjs",
+      "action": "create",
+      "tokens": 2240,
+      "at": "2026-10-21T16:34:34.399Z"
+    },
+    {
+      "file": "C:/Users/singh/AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/sample_menu.json",
+      "action": "create",
+      "tokens": 195,
+      "at": "2026-10-21T16:34:36.246Z"
+    },
+    {
+      "file": "C:/Users/singh/AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/verify_seed.mjs",
+      "action": "create",
+      "tokens": 622,
+      "at": "2026-10-21T16:34:48.062Z"
     }
   ],
   "edit_counts": {
@@ -304,11 +445,22 @@
     "cafe_countryside_menu/tool/log_hash_probe.dart": 1,
     "cafe_countryside_menu/tool/check_log_hash_js.mjs": 1,
     "scripts/build-prod.ps1": 1,
-    "../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/spa_server.mjs": 1
+    "../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/spa_server.mjs": 1,
+    "cafe_countryside_menu/test/item_form_flags_test.dart": 1,
+    "cafe_countryside_menu/lib/features/shared/models/draft_ops.dart": 2,
+    "cafe_countryside_menu/test/draft_ops_test.dart": 1,
+    "cafe_countryside_menu/lib/features/admin/items/widgets/item_form.dart": 3,
+    "cafe_countryside_menu/lib/features/admin/sections/section_delete_flow.dart": 3,
+    "cafe_countryside_menu/test/section_delete_flow_test.dart": 1,
+    "cafe_countryside_menu/test/draft_update_test.dart": 1,
+    "cafe_countryside_menu/tool/rules_tests/menudraft_tx_test.mjs": 1,
+    "cafe_countryside_menu/tool/seed_from_prod.mjs": 1,
+    "../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/sample_menu.json": 1,
+    "../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/verify_seed.mjs": 1
   },
-  "anatomy_hits": 2,
-  "anatomy_misses": 7,
-  "repeated_reads_warned": 2,
+  "anatomy_hits": 3,
+  "anatomy_misses": 15,
+  "repeated_reads_warned": 4,
   "cerebrum_warnings": 0,
   "stop_count": 8
 }

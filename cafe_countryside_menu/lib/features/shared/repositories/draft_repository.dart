@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../core/constants/app_constants.dart';
@@ -8,6 +10,49 @@ import '../models/draft_data.dart';
 import '../models/draft_diff.dart';
 import '../models/draft_item_model.dart';
 import '../models/draft_section_model.dart';
+
+/// How a draft transaction ended (see [DraftRepository.updateDraft]).
+enum DraftUpdateStatus {
+  /// The new draft was written.
+  written,
+
+  /// The operation decided there was nothing to write (blocked / no change).
+  noWrite,
+
+  /// `menuDraft/data` does not exist yet.
+  noDraft,
+
+  /// Did not finish in time. The transaction may STILL commit afterwards (a
+  /// Dart timeout cannot cancel it), so callers must verify by re-reading.
+  timedOut,
+}
+
+/// The only fields a draft transaction writes. Never a whole-document `set`:
+/// `lastPublishedAt` and any field added later are never clobbered.
+Map<String, dynamic> draftUpdateFields(DraftData next, {required String adminUid, required DateTime now}) => {
+      'sections': next.sections.map((s) => s.toJson()).toList(),
+      'items': next.items.map((i) => i.toJson()).toList(),
+      'draftUpdatedAt': Timestamp.fromDate(now),
+      'updatedBy': adminUid,
+    };
+
+/// Waits for [work] at most [timeout]. On timeout the status is
+/// [DraftUpdateStatus.timedOut] and a LATE failure of [work] is swallowed (an
+/// unhandled async error would otherwise surface after the dialog is gone).
+/// Any failure that happens in time is rethrown.
+Future<DraftUpdateStatus> settleDraftUpdate(
+  Future<void> work,
+  Duration timeout,
+  DraftUpdateStatus Function() statusOf,
+) async {
+  try {
+    await work.timeout(timeout);
+  } on TimeoutException {
+    work.ignore();
+    return DraftUpdateStatus.timedOut;
+  }
+  return statusOf();
+}
 
 class DraftRepository {
   final FirebaseFirestore _firestore;
@@ -86,6 +131,41 @@ class DraftRepository {
   }
 
   Future<bool> draftExists() async => (await _draftRef.get()).exists;
+
+  /// Runs [apply] on the FRESHEST draft inside a transaction and writes the
+  /// result with a field-level `update` (see [draftUpdateFields]). Every 1a
+  /// admin operation goes through here, so a stale in-memory copy can never
+  /// overwrite a live sold-out toggle or another admin's edit.
+  ///
+  /// [apply] returns the new draft, or null for "write nothing". It runs again
+  /// if Firestore retries on contention, and MUST NOT throw for business
+  /// reasons (the web SDK wraps exceptions thrown inside a transaction); put
+  /// its own result in a variable it resets at the start of every call.
+  ///
+  /// Definite failures (offline, permission denied) are thrown. A timeout is
+  /// returned as [DraftUpdateStatus.timedOut], never thrown.
+  Future<DraftUpdateStatus> updateDraft(
+    DraftData? Function(DraftData fresh) apply, {
+    required String adminUid,
+    Duration timeout = const Duration(seconds: 15),
+    DateTime Function()? now,
+  }) {
+    var status = DraftUpdateStatus.noWrite;
+    final work = _firestore.runTransaction((tx) async {
+      status = DraftUpdateStatus.noWrite; // reset: this callback can run more than once
+      final snap = await tx.get(_draftRef);
+      final data = snap.data();
+      if (!snap.exists || data == null) {
+        status = DraftUpdateStatus.noDraft;
+        return;
+      }
+      final next = apply(DraftData.fromJson(data));
+      if (next == null) return;
+      tx.update(_draftRef, draftUpdateFields(next, adminUid: adminUid, now: (now ?? DateTime.now)()));
+      status = DraftUpdateStatus.written;
+    });
+    return settleDraftUpdate(work, timeout, () => status);
+  }
 
   Future<void> saveDraft(DraftData draft) => _draftRef.set(draft.toJson());
 
