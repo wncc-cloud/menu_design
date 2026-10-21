@@ -1050,6 +1050,73 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-10-21T16:50:01.850Z"
+    },
+    {
+      "id": "bug-066",
+      "timestamp": "2026-10-21T17:48:29.855236+00:00",
+      "error_message": "Selection bar overflowed by 149 px on a 400 px phone",
+      "file": "cafe_countryside_menu/lib/features/admin/ops/select_bar.dart",
+      "root_cause": "Row held 'N selected' + Move + More + Delete; too wide for narrow screens",
+      "fix": "Narrow layout uses a Wrap so the buttons flow onto a second line; test at 400 px",
+      "tags": [
+        "ui",
+        "overflow",
+        "select-bar",
+        "plan-1a-2"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T17:48:29.855236+00:00"
+    },
+    {
+      "id": "bug-067",
+      "timestamp": "2026-10-21T17:48:29.855236+00:00",
+      "error_message": "Undo result toast ('Undone (...)') did not appear while the 'Moved N items' toast was still showing",
+      "file": "cafe_countryside_menu/lib/features/admin/ops/undo_bar.dart",
+      "root_cause": "ScaffoldMessenger queues snackbars; the 7 s move toast blocked the Undo outcome",
+      "fix": "hideCurrentSnackBar() before showing the Undo outcome",
+      "tags": [
+        "ui",
+        "snackbar",
+        "undo",
+        "plan-1a-2"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T17:48:29.855236+00:00"
+    },
+    {
+      "id": "bug-068",
+      "timestamp": "2026-10-21T17:48:29.855236+00:00",
+      "error_message": "TargetDialog dropdown asserts (value not in items) when another admin deletes the chosen target while the dialog is open",
+      "file": "cafe_countryside_menu/lib/features/admin/ops/target_dialog.dart",
+      "root_cause": "DropdownButtonFormField initialValue kept a section id that vanished from the list",
+      "fix": "Controlled DropdownButton; value shown only if still in the list; preview says 'changed meanwhile'",
+      "tags": [
+        "ui",
+        "dropdown",
+        "race",
+        "plan-1a-2"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T17:48:29.855236+00:00"
+    },
+    {
+      "id": "bug-069",
+      "timestamp": "2026-10-21T17:48:29.855236+00:00",
+      "error_message": "Sections delete flow read the business doc straight from Firebase (untestable, bypassed the fresh-business provider)",
+      "file": "cafe_countryside_menu/lib/features/admin/sections/sections_page.dart",
+      "root_cause": "fetchFreshBusiness built BusinessRepository(FirebaseFirestore.instance) inline",
+      "fix": "Use ref.read(freshBusinessLoaderProvider)",
+      "tags": [
+        "testability",
+        "sections",
+        "plan-1a-2"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-21T17:48:29.855236+00:00"
     }
   ]
 }

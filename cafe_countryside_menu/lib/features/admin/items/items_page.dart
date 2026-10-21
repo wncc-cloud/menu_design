@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../menu/models/item_model.dart' show chefOnlySectionId;
+import '../../shared/models/admin_copy.dart';
 import '../../shared/models/draft_item_model.dart';
+import '../../shared/models/draft_ops.dart';
 import '../../shared/models/draft_section_model.dart';
 import '../../shared/widgets/publish_banner.dart';
 import '../auth/auth_provider.dart';
+import '../ops/admin_ops.dart';
+import '../ops/select_bar.dart';
+import '../ops/target_dialog.dart';
+import '../sections/sections_provider.dart';
 import 'items_provider.dart';
 import 'widgets/item_form.dart';
 
@@ -19,6 +26,109 @@ class ItemsPage extends ConsumerStatefulWidget {
 
 class _ItemsPageState extends ConsumerState<ItemsPage> {
   String? _filterSectionId; // null = show all
+
+  // Select mode (Phase 1a): an explicit button, checkboxes, a bottom bar.
+  // Changing the chip clears the selection, so nothing is ever selected out
+  // of sight.
+  bool _selecting = false;
+  final Set<String> _picked = {};
+
+  void _setFilter(String? id) => setState(() {
+        _filterSectionId = id;
+        _picked.clear();
+      });
+
+  void _toggleSelecting() => setState(() {
+        _selecting = !_selecting;
+        _picked.clear();
+      });
+
+  void _pick(String id) => setState(() => _picked.contains(id) ? _picked.remove(id) : _picked.add(id));
+
+  /// Shows what happened. Uses a messenger captured BEFORE the await.
+  void _afterOp(OpOutcome? o, ScaffoldMessengerState messenger) {
+    if (o == null) return;
+    final warnings = o.result?.warnings ?? const <String>[];
+    final text = o.status == OpStatus.nothing && o.message.isEmpty
+        ? 'Nothing to change.'
+        : [o.message, ...warnings].where((t) => t.isNotEmpty).join(' — ');
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(text),
+        duration: const Duration(seconds: 7),
+        backgroundColor: (o.status == OpStatus.failed || o.status == OpStatus.timedOut) ? Colors.red : null,
+      ));
+    if (o.ok && mounted) setState(_picked.clear);
+  }
+
+  Future<void> _openMove() async {
+    final ids = _picked.toList();
+    final notifier = ref.read(draftProvider.notifier);
+    final messenger = ScaffoldMessenger.of(context);
+    final outcome = await showDialog<OpOutcome>(
+      context: context,
+      builder: (_) => TargetDialog(
+        title: 'Move ${ids.length} item${ids.length == 1 ? '' : 's'}',
+        fieldLabel: 'Move to',
+        confirmLabel: 'Move',
+        preview: (d, target, _, c) => moveItems(d, ids, target, c),
+        apply: (target, _) => notifier.moveSelected(ids, target),
+      ),
+    );
+    _afterOp(outcome, messenger);
+  }
+
+  Future<void> _bulk(BulkAction a) async {
+    if (a == BulkAction.move) return _openMove();
+    final ids = _picked.toList();
+    final notifier = ref.read(draftProvider.notifier);
+    final messenger = ScaffoldMessenger.of(context);
+    if (a == BulkAction.delete) {
+      final draft = ref.read(draftStreamProvider).asData?.value;
+      final names = [
+        for (final id in ids)
+          if (draft?.items.where((i) => i.id == id).firstOrNull case final i?) i.name,
+      ];
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('Delete ${names.length} item${names.length == 1 ? '' : 's'}?'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final n in names.take(5)) Text('• $n'),
+              if (names.length > 5) Text('…and ${names.length - 5} more'),
+              const SizedBox(height: 8),
+              const Text('Undo is available for 60 s. Carts that hold them are fixed at checkout.',
+                  style: TextStyle(fontSize: 12)),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              style: FilledButton.styleFrom(backgroundColor: Colors.red),
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      );
+      if (ok != true) return;
+    }
+    final OpOutcome o = switch (a) {
+      BulkAction.show => await notifier.bulkActive(ids, true),
+      BulkAction.hide => await notifier.bulkActive(ids, false),
+      BulkAction.chefOn => await notifier.bulkChef(ids, true),
+      BulkAction.chefOff => await notifier.bulkChef(ids, false),
+      BulkAction.notesOn => await notifier.bulkNotes(ids, true),
+      BulkAction.notesOff => await notifier.bulkNotes(ids, false),
+      BulkAction.delete => await notifier.deleteSelected(ids),
+      BulkAction.move => const OpOutcome(OpStatus.nothing, ''),
+    };
+    _afterOp(o, messenger);
+  }
 
   @override
   void initState() {
@@ -99,7 +209,17 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
     final canManage =
         ref.watch(permissionServiceProvider)?.canManageItems ?? false;
 
-    return Scaffold(
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.escape): () {
+          if (_selecting) _toggleSelecting();
+        },
+      },
+      child: Focus(
+        autofocus: true,
+        child: Scaffold(
+      bottomNavigationBar:
+          _selecting && _picked.isNotEmpty ? SelectBar(count: _picked.length, onAction: _bulk) : null,
       appBar: AppBar(
         backgroundColor: const Color(0xFF2E7D32),
         foregroundColor: Colors.white,
@@ -107,6 +227,13 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
             const Text('Items', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           if (canManage) ...[
+            TextButton.icon(
+              key: const Key('select-toggle'),
+              onPressed: _toggleSelecting,
+              style: TextButton.styleFrom(foregroundColor: Colors.white),
+              icon: Icon(_selecting ? Icons.check : Icons.checklist, size: 18),
+              label: Text(_selecting ? 'Done' : 'Select'),
+            ),
             IconButton(
               icon: const Icon(Icons.upload_file),
               tooltip: 'Bulk Import',
@@ -139,6 +266,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
 
                 final sections = draft.sortedSections;
                 final allItems = draft.sortedItems;
+                final chefOnlyCount = allItems.where((i) => i.sectionId == chefOnlySectionId).length;
                 final visibleItems = _filterSectionId == null
                     ? allItems
                     : allItems
@@ -148,7 +276,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                 return Column(
                   children: [
                     // Section filter chips
-                    if (sections.isNotEmpty)
+                    if (sections.isNotEmpty || chefOnlyCount > 0)
                       SizedBox(
                         height: 48,
                         child: ListView(
@@ -159,15 +287,20 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                             _FilterChip(
                               label: 'All (${allItems.length})',
                               selected: _filterSectionId == null,
-                              onTap: () =>
-                                  setState(() => _filterSectionId = null),
+                              onTap: () => _setFilter(null),
                             ),
+                            // Items that live only in Chef Special have no section chip.
+                            if (chefOnlyCount > 0)
+                              _FilterChip(
+                                label: '${AdminCopy.reservedSectionLabel} ($chefOnlyCount)',
+                                selected: _filterSectionId == chefOnlySectionId,
+                                onTap: () => _setFilter(chefOnlySectionId),
+                              ),
                             ...sections.map((s) => _FilterChip(
                                   label:
                                       '${s.name} (${draft.itemsForSection(s.id).length})',
                                   selected: _filterSectionId == s.id,
-                                  onTap: () => setState(
-                                      () => _filterSectionId = s.id),
+                                  onTap: () => _setFilter(s.id),
                                 )),
                           ],
                         ),
@@ -195,6 +328,22 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                                       _filterSectionId!, false),
                               child: const Text('Turn notes off for all'),
                             ),
+                          ],
+                        ),
+                      ),
+                    if (_selecting)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            const Text('Select mode · ', style: TextStyle(fontSize: 12)),
+                            TextButton(
+                              key: const Key('select-all'),
+                              onPressed: () => setState(() => _picked.addAll(visibleItems.map((i) => i.id))),
+                              child: Text('Select all (${visibleItems.length}) in this view'),
+                            ),
+                            const Text(' · changing the chip clears the selection', style: TextStyle(fontSize: 12)),
                           ],
                         ),
                       ),
@@ -243,7 +392,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                                     .name;
                                 // Arrows only while ONE section is selected: that is
                                 // the list whose order they change.
-                                final canMove = canManage && _filterSectionId != null;
+                                final canMove = canManage && _filterSectionId != null && !_selecting;
                                 return _ItemTile(
                                   item: item,
                                   onMoveUp: canMove && index > 0
@@ -255,6 +404,9 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                                   showMoveHint: canMove,
                                   sectionName: sectionName,
                                   canManage: canManage,
+                                  selecting: _selecting,
+                                  picked: _picked.contains(item.id),
+                                  onPick: () => _pick(item.id),
                                   onEdit: () =>
                                       _showEditDialog(item, sections),
                                   onDelete: () => _confirmDelete(item),
@@ -277,6 +429,8 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
             ),
           ),
         ],
+      ),
+        ),
       ),
     );
   }
@@ -319,8 +473,14 @@ class _ItemTile extends StatelessWidget {
   final VoidCallback? onMoveUp;
   final VoidCallback? onMoveDown;
   final bool showMoveHint;
+  final bool selecting;
+  final bool picked;
+  final VoidCallback? onPick;
 
   const _ItemTile({
+    this.selecting = false,
+    this.picked = false,
+    this.onPick,
     this.onMoveUp,
     this.onMoveDown,
     this.showMoveHint = false,
@@ -337,18 +497,34 @@ class _ItemTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      color: picked ? const Color(0xFFF1F8E9) : null,
       child: ListTile(
-        leading: Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: item.isVeg ? const Color(0xFF2E7D32) : Colors.red,
-              width: 2,
+        onTap: selecting ? onPick : null,
+        leading: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (selecting)
+              Semantics(
+                label: 'Select ${item.name}',
+                child: Checkbox(
+                  key: Key('pick-${item.id}'),
+                  value: picked,
+                  onChanged: (_) => onPick?.call(),
+                ),
+              ),
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: item.isVeg ? const Color(0xFF2E7D32) : Colors.red,
+                  width: 2,
+                ),
+                color: item.isVeg ? const Color(0xFF2E7D32) : Colors.red,
+              ),
             ),
-            color: item.isVeg ? const Color(0xFF2E7D32) : Colors.red,
-          ),
+          ],
         ),
         title: Text(
           item.name,

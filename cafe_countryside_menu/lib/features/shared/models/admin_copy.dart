@@ -40,6 +40,8 @@ class AdminCopy {
   static const popupBlocksDeleteWarning =
       'The first-load pop-up opens this section, so it will not be deleted. Move is still done. '
       'Change the pop-up in Promotions & pop-up, then delete it.';
+  static const popupUnreadableWarning =
+      "Couldn't check the first-load pop-up, so the section was not deleted. The move is done — try the delete again.";
   static const sectionNotDeletedWarning = 'Section not deleted: it still has items.';
   static const exportTip = 'Tip: Dashboard → Export Menu JSON first — after Publish there is no rollback.';
   static const longNameTip = 'Tip: this name is long and may be clipped on phones.';
@@ -52,6 +54,8 @@ class AdminCopy {
   static const sourceGone = 'That section no longer exists (changed meanwhile). Nothing was changed.';
   static const itemGone = 'That item no longer exists.';
   static const couldNotSave = "Couldn't save — check your connection. Nothing was changed.";
+  static const notSaved = 'Not saved — nothing was changed.';
+  static const draftNotReady = "The draft isn't ready yet — try again in a moment.";
   static const savingTimedOut =
       'This is taking too long. It may or may not have saved — check the Publish banner count before trying again.';
 

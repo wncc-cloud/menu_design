@@ -699,3 +699,21 @@
 | 22:20 | Edited cafe_countryside_menu/lib/features/shared/models/draft_ops.dart | added 1 condition(s) | ~158 |
 | 22:20 | Created cafe_countryside_menu/test/admin_copy_test.dart | — | ~1542 |
 | 22:23 | 1a-1 pure core: moveItems, mergeSections, bulk set/delete/price (integer), applyUndo (field-level, timestamps ignored x2), search, menuProblems, AdminCopy; 75 new tests; suite 342 pass, analyze 2 infos | draft_ops.dart, admin_copy.dart, test/draft_ops_test.dart, test/admin_copy_test.dart | green | ~90000 |
+| 22:23 | Session end: 62 writes across 27 files (phase1a.md, phase1a_wireframe.html, client_log_bounded_test.dart, edit_cl.py, client_log.dart) | 23 reads | ~70276 tok |
+| 22:34 | Created cafe_countryside_menu/lib/features/admin/ops/admin_ops.dart | — | ~691 |
+| 22:35 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/edit_provider.py | — | ~2155 |
+| 22:37 | Created cafe_countryside_menu/test/support/fake_draft_repository.dart | — | ~951 |
+| 22:37 | Created cafe_countryside_menu/test/support/draft_fixtures.dart | — | ~590 |
+| 22:37 | Created cafe_countryside_menu/test/admin_ops_provider_test.dart | — | ~3433 |
+| 22:43 | Created cafe_countryside_menu/lib/features/admin/ops/undo_bar.dart | — | ~896 |
+| 22:43 | Created cafe_countryside_menu/lib/features/admin/ops/target_dialog.dart | — | ~2028 |
+| 22:45 | Created cafe_countryside_menu/lib/features/admin/ops/select_bar.dart | — | ~1035 |
+| 22:45 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/edit_items_page.py | — | ~3643 |
+| 22:47 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/edit_sections_ui.py | — | ~1663 |
+| 22:49 | Created cafe_countryside_menu/test/items_select_mode_test.dart | — | ~4563 |
+| 22:49 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/fix_items_test.py | — | ~1058 |
+| 22:54 | Created cafe_countryside_menu/test/sections_merge_ui_test.dart | — | ~3251 |
+| 23:00 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/make_prod_shaped.mjs | — | ~377 |
+| 23:03 | Created cafe_countryside_menu/firebase.e2e.json | — | ~58 |
+| 23:15 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/other_admin.mjs | — | ~306 |
+| 23:18 | 1a-2 Move/Merge UI done: admin_ops.dart (undo provider, clock, OpOutcome), DraftNotifier.applyOp/undoLastOp/moveSelected/mergeSection/bulk*, UndoBar, TargetDialog, SelectBar, Items select mode + chef-only chip, Sections merge + delete-offers-merge; 70 new tests (412 total); real-SDK browser check on emulator passed; 4 UI bugs found+fixed by tests | lib/features/admin/ops/*, items_page.dart, sections_page.dart, sections_provider.dart, publish_banner.dart | green | ~250000 |

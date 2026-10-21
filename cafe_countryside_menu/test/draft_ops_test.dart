@@ -67,7 +67,7 @@ DraftItemModel item(
 DraftData draft(List<DraftSectionModel> s, List<DraftItemModel> i) =>
     DraftData(sections: s, items: i, draftUpdatedAt: t0, updatedBy: 'u');
 
-OpContext ctx({bool chefVisible = true, bool pos = false, String popup = 'none'}) =>
+OpContext ctx({bool chefVisible = true, bool pos = false, String? popup = 'none'}) =>
     OpContext(now: t1, chefSectionVisible: chefVisible, posShowsChefHeading: pos, firstLoadChoice: popup);
 
 /// A draft's content without timestamps, for "equals the original" checks.
@@ -263,6 +263,13 @@ void main() {
       expect(r.warnings, contains(AdminCopy.popupBlocksDeleteWarning));
     });
 
+    test('FAILS CLOSED when the pop-up could not be read: the move happens, the delete does not', () {
+      final r = mergeSections(base(), from: 'cs', into: 'tea', deleteSource: true, c: ctx(popup: null));
+      expect(r.newDraft!.items.where((i) => i.sectionId == 'tea').length, 11);
+      expect(r.newDraft!.sections.any((s) => s.id == 'cs'), isTrue);
+      expect(r.warnings, contains(AdminCopy.popupUnreadableWarning));
+    });
+
     test('pop-up pointing elsewhere does not block the delete', () {
       final r = mergeSections(base(), from: 'cs', into: 'tea', deleteSource: true, c: ctx(popup: 'sec:tea'));
       expect(r.newDraft!.sections.any((s) => s.id == 'cs'), isFalse);
@@ -403,6 +410,37 @@ void main() {
       final clash = r.newDraft!.copyWith(sections: [...r.newDraft!.sections, sec('gone', 'New Gone', sort: 9)]);
       final u = applyUndo(clash, r.inverse);
       expect(u.skipped.any((s) => s.startsWith('section Gone')), isTrue);
+    });
+  });
+
+  // ───────────────────────────────────────────────────────────── patchState
+  group('patchState (verify after a timed-out save)', () {
+    DraftData base() => draft([sec('a', 'A'), sec('b', 'B', sort: 1)], [item('x', 'a'), item('y', 'a', sort: 1)]);
+
+    test('applied / notApplied / mixed for item moves', () {
+      final d = base();
+      final r = moveItems(d, ['x', 'y'], 'b', ctx());
+      expect(patchState(r.newDraft!, r.inverse), PatchState.applied);
+      expect(patchState(d, r.inverse), PatchState.notApplied);
+      final half = d.copyWith(items: [for (final i in d.items) i.id == 'x' ? byId(r.newDraft!, 'x') : i]);
+      expect(patchState(half, r.inverse), PatchState.mixed);
+    });
+
+    test('section deletes and item deletes', () {
+      final d = draft([sec('a', 'A'), sec('e', 'E', sort: 1)], [item('x', 'a')]);
+      final m = mergeSections(d, from: 'e', into: 'a', deleteSource: true, c: ctx());
+      expect(patchState(m.newDraft!, m.inverse), PatchState.applied);
+      expect(patchState(d, m.inverse), PatchState.notApplied);
+      final del = deleteItems(d, ['x'], ctx());
+      expect(patchState(del.newDraft!, del.inverse), PatchState.applied);
+      expect(patchState(d, del.inverse), PatchState.notApplied);
+    });
+
+    test('an empty patch is notApplied; an item that vanished counts as notApplied', () {
+      expect(patchState(base(), const UndoPatch()), PatchState.notApplied);
+      final r = moveItems(base(), ['x'], 'b', ctx());
+      final gone = r.newDraft!.copyWith(items: [for (final i in r.newDraft!.items) if (i.id != 'x') i]);
+      expect(patchState(gone, r.inverse), PatchState.notApplied);
     });
   });
 

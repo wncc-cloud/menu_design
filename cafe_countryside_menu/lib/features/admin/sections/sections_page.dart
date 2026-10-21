@@ -1,13 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../shared/models/draft_section_model.dart';
-import '../../shared/repositories/business_repository.dart';
 import '../../shared/widgets/publish_banner.dart';
 import '../auth/auth_provider.dart';
 import 'widgets/special_sections_block.dart';
 import 'section_delete_flow.dart';
+import '../ops/admin_ops.dart';
+import '../ops/target_dialog.dart';
+import '../../shared/models/draft_ops.dart';
 import 'sections_provider.dart';
 import 'widgets/section_form.dart';
 
@@ -55,15 +56,51 @@ class _SectionsPageState extends ConsumerState<SectionsPage> {
         );
   }
 
+  Future<void> _openMerge(DraftSectionModel section, {String? initialTarget}) async {
+    final notifier = ref.read(draftProvider.notifier);
+    final messenger = ScaffoldMessenger.of(context);
+    final outcome = await showDialog<OpOutcome>(
+      context: context,
+      builder: (_) => TargetDialog(
+        title: 'Merge “${section.name}” into…',
+        fieldLabel: 'Merge into',
+        confirmLabel: 'Merge',
+        excludeSectionId: section.id,
+        initialTarget: initialTarget,
+        showDeleteBox: true,
+        preview: (d, target, del, c) => mergeSections(d, from: section.id, into: target, deleteSource: del, c: c),
+        apply: (target, del) => notifier.mergeSection(section.id, target, deleteSource: del),
+      ),
+    );
+    if (outcome == null) return;
+    final warnings = outcome.result?.warnings ?? const <String>[];
+    final text = outcome.status == OpStatus.nothing && outcome.message.isEmpty
+        ? 'Nothing to change.'
+        : [outcome.message, ...warnings].where((t) => t.isNotEmpty).join(' — ');
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(text),
+        duration: const Duration(seconds: 7),
+        backgroundColor: (outcome.status == OpStatus.failed || outcome.status == OpStatus.timedOut) ? Colors.red : null,
+      ));
+  }
+
+  bool get _canMerge {
+    final p = ref.read(permissionServiceProvider);
+    return p != null && p.canManageItems && p.canManageSections;
+  }
+
   Future<void> _confirmDelete(DraftSectionModel section) => confirmAndDeleteSection(
         context: context,
         section: section,
         currentDraft: () => ref.read(draftStreamProvider).asData?.value,
         // A FRESH read, never the cached customer copy (the first-load pop-up
         // may point at this section).
-        fetchFreshBusiness: () => BusinessRepository(FirebaseFirestore.instance).fetchBusiness(),
+        fetchFreshBusiness: ref.read(freshBusinessLoaderProvider),
         deleteSection: (id) => ref.read(draftProvider.notifier).deleteSection(id),
         isMounted: () => mounted,
+        onOfferMerge: _canMerge ? () => _openMerge(section) : null,
       );
 
   @override
@@ -71,6 +108,7 @@ class _SectionsPageState extends ConsumerState<SectionsPage> {
     final draftAsync = ref.watch(draftStreamProvider);
     final canManage =
         ref.watch(permissionServiceProvider)?.canManageSections ?? false;
+    final canMerge = canManage && (ref.watch(permissionServiceProvider)?.canManageItems ?? false);
 
     return Scaffold(
       appBar: AppBar(
@@ -145,6 +183,7 @@ class _SectionsPageState extends ConsumerState<SectionsPage> {
                         section: s,
                         canManage: true,
                         onEdit: () => _showEditDialog(s),
+                        onMerge: canMerge ? () => _openMerge(s) : null,
                         onDelete: () => _confirmDelete(s),
                         onToggleActive: () => ref
                             .read(draftProvider.notifier)
@@ -184,9 +223,11 @@ class _SectionTile extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final VoidCallback onToggleActive;
+  final VoidCallback? onMerge;
 
   const _SectionTile({
     super.key,
+    this.onMerge,
     required this.section,
     required this.canManage,
     required this.onEdit,
@@ -234,6 +275,13 @@ class _SectionTile extends StatelessWidget {
                     tooltip: 'Edit',
                     onPressed: onEdit,
                   ),
+                  if (onMerge != null)
+                    IconButton(
+                      key: Key('merge-${section.id}'),
+                      icon: const Icon(Icons.merge_type),
+                      tooltip: 'Merge into…',
+                      onPressed: onMerge,
+                    ),
                   IconButton(
                     icon: const Icon(Icons.delete_outline, color: Colors.red),
                     tooltip: 'Delete',

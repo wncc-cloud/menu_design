@@ -133,4 +133,4 @@ if (args['fixture-out'] && args['fixture-out'] !== true) {
 
 const hiddenItems = items.filter((i) => !i.active).length;
 console.log(`Seeded ${HOST} (${PROJECT}): ${sections.length} sections (${sections.filter((s) => !s.active).length} hidden), ` +
-  `${items.length} items (${hiddenItems} hidden), snapshot written${args['admin-uid'] ? `, admin ${args['admin-uid']}` : ''}.`);
+  `${items.length} items (${hiddenItems} hidden), snapshot written${typeof args['admin-uid'] === 'string' ? `, admin ${args['admin-uid']}` : ''}.`);

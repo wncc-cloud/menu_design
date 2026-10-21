@@ -2,13 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' show Provider, StreamProvider;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../shared/models/admin_copy.dart';
 import '../../shared/models/draft_data.dart';
 import '../../shared/models/draft_diff.dart';
 import '../../shared/models/item_order.dart';
 import '../../shared/models/draft_item_model.dart';
+import '../../shared/models/draft_ops.dart';
 import '../../shared/models/draft_section_model.dart';
 import '../../shared/repositories/draft_repository.dart';
 import '../auth/auth_provider.dart';
+import '../ops/admin_ops.dart';
+import '../../menu/presentation/popup_logic.dart' show chefSectionVisible;
+import '../../shared/models/business_model.dart';
 import '../../menu/presentation/menu_provider.dart';
 import '../../../core/logging/client_log.dart';
 
@@ -231,8 +236,10 @@ class DraftNotifier extends _$DraftNotifier {
 
   /// L4: draft := what customers see now (from the publish-time snapshot).
   Future<String?> discardDraft() async {
+    final undo = ref.read(lastOpUndoProvider.notifier);
     try {
       await _repo.discardDraft(_adminUid);
+      undo.clear();
       return null;
     } catch (e, st) {
       logClientError('Sections.discardDraft', e, stackTrace: st);
@@ -293,9 +300,163 @@ class DraftNotifier extends _$DraftNotifier {
     ));
   }
 
+  // ── Phase 1a admin tools: transactional operations + Undo ─────────────────
+
+  /// Runs a pure operation (see draft_ops.dart) on the FRESHEST draft inside a
+  /// transaction. Never throws; the result says what happened.
+  ///
+  /// R3: this notifier is auto-disposed, so everything needed is captured
+  /// BEFORE the first await and `state` / `ref` are never touched afterwards.
+  /// The keep-alive undo notifier is captured up front for the same reason.
+  Future<OpOutcome> applyOp(
+    OpResult Function(DraftData fresh, OpContext ctx) op, {
+    required String Function(OpResult r) doneText,
+    bool needsBusiness = true,
+  }) async {
+    final repo = _repo;
+    final adminUid = _adminUid;
+    final undo = ref.read(lastOpUndoProvider.notifier);
+    final loadBusiness = ref.read(freshBusinessLoaderProvider);
+    final clock = ref.read(adminClockProvider);
+
+    BusinessModel? biz;
+    var readable = !needsBusiness;
+    if (needsBusiness) {
+      try {
+        biz = await loadBusiness();
+        readable = true;
+      } catch (e, st) {
+        logClientWarn('Draft.businessRead', e, stackTrace: st);
+      }
+    }
+    final ctx = OpContext(
+      now: DateTime.now(),
+      chefSectionVisible: chefSectionVisible(biz),
+      firstLoadChoice: readable ? (biz?.firstLoadPopup.choice ?? 'none') : null,
+    );
+
+    OpResult? last;
+    final DraftUpdateStatus status;
+    try {
+      status = await repo.updateDraft((fresh) {
+        last = op(fresh, ctx); // runs again on a contention retry: keep it pure
+        return last!.draftToWrite;
+      }, adminUid: adminUid);
+    } catch (e, st) {
+      logClientError('Draft.update', e, stackTrace: st);
+      return const OpOutcome(OpStatus.failed, AdminCopy.couldNotSave);
+    }
+
+    OpOutcome applied(OpResult r) {
+      final text = doneText(r);
+      undo.set(LastOp(label: text, patch: r.inverse, until: clock().add(undoWindow)));
+      return OpOutcome(OpStatus.applied, text, r);
+    }
+
+    switch (status) {
+      case DraftUpdateStatus.written:
+        return applied(last!);
+      case DraftUpdateStatus.noWrite:
+        final r = last;
+        if (r == null) return const OpOutcome(OpStatus.nothing, '');
+        if (r.isBlocked) return OpOutcome(OpStatus.blocked, r.blocked!, r);
+        return OpOutcome(OpStatus.nothing, '', r);
+      case DraftUpdateStatus.noDraft:
+        return const OpOutcome(OpStatus.failed, AdminCopy.draftNotReady);
+      case DraftUpdateStatus.timedOut:
+        // A Dart timeout cannot cancel the transaction: look at the draft.
+        final r = last;
+        try {
+          final now = await repo.fetchDraft();
+          if (now != null && r != null) {
+            switch (patchState(now, r.inverse)) {
+              case PatchState.applied:
+                return applied(r);
+              case PatchState.notApplied:
+                logClientWarn('Draft.update', 'timed out; verified not saved');
+                return const OpOutcome(OpStatus.failed, AdminCopy.notSaved);
+              case PatchState.mixed:
+                break;
+            }
+          }
+        } catch (e, st) {
+          logClientWarn('Draft.verify', e, stackTrace: st);
+        }
+        logClientWarn('Draft.update', 'timed out; outcome unknown');
+        return const OpOutcome(OpStatus.timedOut, AdminCopy.savingTimedOut);
+    }
+  }
+
+  /// Undo the last operation (inverse patch, field level) inside a transaction.
+  Future<OpOutcome> undoLastOp() async {
+    final op = ref.read(lastOpUndoProvider);
+    if (op == null) return const OpOutcome(OpStatus.nothing, '');
+    final repo = _repo;
+    final adminUid = _adminUid;
+    final undo = ref.read(lastOpUndoProvider.notifier);
+
+    UndoResult? res;
+    try {
+      await repo.updateDraft((fresh) {
+        res = applyUndo(fresh, op.patch);
+        return res!.changed ? res!.newDraft : null;
+      }, adminUid: adminUid);
+    } catch (e, st) {
+      logClientError('Draft.undo', e, stackTrace: st);
+      return const OpOutcome(OpStatus.failed, AdminCopy.couldNotSave);
+    }
+    undo.clear();
+    final r = res;
+    if (r == null) return const OpOutcome(OpStatus.failed, AdminCopy.draftNotReady);
+    return OpOutcome(
+      r.changed ? OpStatus.applied : OpStatus.nothing,
+      AdminCopy.undoOutcome(r.restored, r.skipped),
+    );
+  }
+
+  // The operations the UI uses ------------------------------------------------
+
+  static String _n(int n) => '$n item${n == 1 ? '' : 's'}';
+
+  Future<OpOutcome> moveSelected(List<String> ids, String? target) => applyOp(
+        (d, c) => moveItems(d, ids, target, c),
+        doneText: (r) => 'Moved ${_n(r.changed)}.',
+      );
+
+  Future<OpOutcome> mergeSection(String from, String? into, {required bool deleteSource}) => applyOp(
+        (d, c) => mergeSections(d, from: from, into: into, deleteSource: deleteSource, c: c),
+        doneText: (r) =>
+            'Merged. ${_n(r.changed)} moved${r.inverse.removedSections.isNotEmpty ? ', section deleted' : ''}.',
+      );
+
+  Future<OpOutcome> bulkActive(List<String> ids, bool active) => applyOp(
+        (d, c) => bulkSetActive(d, ids, active, c),
+        doneText: (r) => 'Updated ${_n(r.changed)}.',
+        needsBusiness: false,
+      );
+
+  Future<OpOutcome> bulkNotes(List<String> ids, bool allowed) => applyOp(
+        (d, c) => bulkSetNoteAllowed(d, ids, allowed, c),
+        doneText: (r) => 'Updated ${_n(r.changed)}.',
+        needsBusiness: false,
+      );
+
+  Future<OpOutcome> bulkChef(List<String> ids, bool on) => applyOp(
+        (d, c) => bulkSetChefSpecial(d, ids, on, c),
+        doneText: (r) => 'Updated ${_n(r.changed)}.',
+        needsBusiness: false,
+      );
+
+  Future<OpOutcome> deleteSelected(List<String> ids) => applyOp(
+        (d, c) => deleteItems(d, ids, c),
+        doneText: (r) => 'Deleted ${_n(r.changed)}.',
+        needsBusiness: false,
+      );
+
   // ── Publish ───────────────────────────────────────────────────────────────
 
   Future<void> publishMenu() async {
+    ref.read(lastOpUndoProvider.notifier).clear(); // nothing left to undo against
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final draft = _draft();

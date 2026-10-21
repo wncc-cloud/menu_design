@@ -25,6 +25,10 @@ Future<void> confirmAndDeleteSection({
   /// The existing notifier method; returns an error message or null.
   required Future<String?> Function(String sectionId) deleteSection,
   required bool Function() isMounted,
+
+  /// When given, a section that still has items offers "Merge into another
+  /// section…" instead of a dead-end message (plan A.2).
+  Future<void> Function()? onOfferMerge,
 }) async {
   final messenger = ScaffoldMessenger.of(context);
   void say(String text) =>
@@ -45,7 +49,26 @@ Future<void> confirmAndDeleteSection({
 
   switch (canDeleteSection(draft, section.id, firstLoadChoice: choice)) {
     case SectionHasItems(:final count):
-      say('This section has $count item${count == 1 ? '' : 's'}. Move or delete them first.');
+      if (onOfferMerge == null) {
+        say('This section has $count item${count == 1 ? '' : 's'}. Move or delete them first.');
+        return;
+      }
+      final merge = await showDialog<bool>(
+        // ignore: use_build_context_synchronously
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('“${section.name}” has $count item${count == 1 ? '' : 's'}'),
+          content: const Text('A section can only be deleted when it is empty. Instead of editing each item:'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Close')),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Merge into another section…'),
+            ),
+          ],
+        ),
+      );
+      if (merge == true && isMounted()) await onOfferMerge();
       return;
     case SectionPopupPointsHere():
       say('The first-load pop-up opens this section. Change it in Promotions & pop-up first, then delete it.');

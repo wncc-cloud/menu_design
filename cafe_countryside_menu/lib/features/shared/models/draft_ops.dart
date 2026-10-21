@@ -95,8 +95,9 @@ class OpContext {
   /// True once the counter app (1a-P) shows chef-only items under a heading.
   final bool posShowsChefHeading;
 
-  /// Fresh `firstLoadPopup.choice` (`none`, `chef`, `sec:<id>`, ...).
-  final String firstLoadChoice;
+  /// Fresh `firstLoadPopup.choice` (`none`, `chef`, `sec:<id>`, ...); null =
+  /// the business document could not be read, so a section delete fails closed.
+  final String? firstLoadChoice;
 
   const OpContext({
     required this.now,
@@ -363,8 +364,10 @@ OpResult mergeSections(
   var draft = moved.newDraft!;
   final lines = [...moved.lines], warnings = [...moved.warnings];
   final removedSections = <DraftSectionModel>[];
-  if (deleteSource) {
-    final check = canDeleteSection(draft, from, firstLoadChoice: c.firstLoadChoice);
+  if (deleteSource && c.firstLoadChoice == null) {
+    warnings.add(AdminCopy.popupUnreadableWarning);
+  } else if (deleteSource) {
+    final check = canDeleteSection(draft, from, firstLoadChoice: c.firstLoadChoice!);
     switch (check) {
       case SectionDeleteOk():
         removedSections.add(src);
@@ -626,6 +629,34 @@ UndoResult applyUndo(DraftData d, UndoPatch p) {
     restored++;
   }
   return UndoResult(d.copyWith(items: items, sections: sections), restored, skipped);
+}
+
+/// Did an operation's patch land in [d]? Used after a save TIMED OUT, when the
+/// transaction may or may not have committed: re-read the draft and ask.
+enum PatchState { applied, notApplied, mixed }
+
+PatchState patchState(DraftData d, UndoPatch p) {
+  if (p.isEmpty) return PatchState.notApplied;
+  var applied = 0, notApplied = 0;
+  for (final patch in p.itemPatches) {
+    final it = d.items.where((i) => i.id == patch.id).firstOrNull;
+    if (it == null) {
+      notApplied++;
+      continue;
+    }
+    final json = it.toJson();
+    final landed = patch.after.keys.every((k) => _timestampKeys.contains(k) || json[k] == patch.after[k]);
+    landed ? applied++ : notApplied++;
+  }
+  for (final s in p.removedSections) {
+    d.sections.any((x) => x.id == s.id) ? notApplied++ : applied++;
+  }
+  for (final i in p.removedItems) {
+    d.items.any((x) => x.id == i.id) ? notApplied++ : applied++;
+  }
+  if (notApplied == 0) return PatchState.applied;
+  if (applied == 0) return PatchState.notApplied;
+  return PatchState.mixed;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../admin/auth/auth_provider.dart';
+import '../../admin/ops/undo_bar.dart';
 import '../../admin/sections/sections_provider.dart';
 
 /// "● N unpublished changes — Publish to go live" with Discard and Publish.
@@ -41,12 +42,24 @@ class PublishBanner extends ConsumerWidget {
     final notifier = ref.watch(draftProvider);
     final canPublish = ref.watch(permissionServiceProvider)?.canPublish ?? false;
 
-    if (!pending.any) return const SizedBox.shrink();
+    // The Undo bar shows even when there is nothing pending (e.g. after an Undo
+    // or a no-net-change operation), so it is NOT hidden with the banner.
+    if (!pending.any) return const UndoBar();
 
     final n = pending.count;
     final what = n == null ? 'Unpublished changes' : '$n unpublished change${n == 1 ? '' : 's'}';
     final text = canPublish ? '$what — Publish to go live' : '$what — a manager or owner must Publish';
 
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _banner(context, ref, pending, notifier.isLoading, canPublish, text),
+        const UndoBar(),
+      ],
+    );
+  }
+
+  Widget _banner(BuildContext context, WidgetRef ref, PendingChanges pending, bool loading, bool canPublish, String text) {
     const white = Colors.white;
     return Material(
       color: const Color(0xFFE65100),
@@ -67,7 +80,7 @@ class PublishBanner extends ConsumerWidget {
               const SizedBox(width: 8),
               if (!canPublish)
                 const SizedBox.shrink()
-              else if (notifier.isLoading)
+              else if (loading)
                 const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: white, strokeWidth: 2))
               else ...[
                 Tooltip(

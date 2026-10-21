@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-21T16:50:53.831Z
-> Files: 43 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-21T17:45:24.916Z
+> Files: 59 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
 
@@ -15,7 +15,13 @@
 ## ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/
 
 - `edit_cl.py` — Declares logTypes (~2232 tok)
+- `edit_items_page.py` — _FilterChip: rep (~3643 tok)
+- `edit_provider.py` — Declares OpOutcome (~2155 tok)
 - `edit_rules.py` — logShapeOk: boundedLogOk, adminLogOk (~1327 tok)
+- `edit_sections_ui.py` — rep (~1663 tok)
+- `fix_items_test.py` — Harness: rep (~1058 tok)
+- `make_prod_shaped.mjs` — Builds a prod-shaped menu (27 sections incl. "Chef Specials" with 10 items and (~377 tok)
+- `other_admin.mjs` — Simulates "another admin / the live sold-out switch" writing the draft while (~306 tok)
 - `sample_menu.json` (~195 tok)
 - `spa_server.mjs` — Declares root (~223 tok)
 - `split_logid.py` (~280 tok)
@@ -69,6 +75,7 @@
 
 ## cafe_countryside_menu/
 
+- `firebase.e2e.json` (~58 tok)
 
 ## cafe_countryside_menu/.dart_tool/
 
@@ -129,6 +136,13 @@
 ## cafe_countryside_menu/lib/features/admin/items/widgets/
 
 - `item_form.dart` — Stateful widget: ItemFormDialog (~4635 tok)
+
+## cafe_countryside_menu/lib/features/admin/ops/
+
+- `admin_ops.dart` — / How long the Undo bar stays (plan A.1). (~691 tok)
+- `select_bar.dart` — Stateless widget: SelectBar (~1035 tok)
+- `target_dialog.dart` — / Shared "choose a section" dialog for Move (items) and Merge (a section). (~2028 tok)
+- `undo_bar.dart` — / "↩ Moved 10 items.   [Undo (42s)]" under the Publish banner. (~896 tok)
 
 ## cafe_countryside_menu/lib/features/admin/profile/
 
@@ -202,12 +216,20 @@
 ## cafe_countryside_menu/test/
 
 - `admin_copy_test.dart` — Plan B.4: the wording of the admin tools is pinned so it cannot drift (~1542 tok)
+- `admin_ops_provider_test.dart` — 1a-2: the DraftNotifier wrappers (applyOp / undoLastOp) and the keep-alive (~3433 tok)
 - `client_log_bounded_test.dart` — 1a-L0: bounded anonymous logs. Pure helpers (hash, bucket, id, URL cleaning), (~2233 tok)
 - `client_log_hash_test.dart` — The slot hash must be identical on the VM and in the browser (where ints are (~314 tok)
 - `draft_ops_test.dart` — Phase 1a pure draft operations (VM, no Firebase): flags, move, merge, undo, (~8977 tok)
 - `draft_update_test.dart` — 1a-0(c): the pure parts of DraftRepository.updateDraft. The transaction itself (~800 tok)
 - `item_form_flags_test.dart` — 1a-0(b)/(d) characterization test for the Chef Special flags the item form (~993 tok)
+- `items_select_mode_test.dart` — 1a-2: Select mode, the bulk bar, Move dialog, Undo bar on the REAL Items page, (~4563 tok)
 - `section_delete_flow_test.dart` — 1a-0(e): the "Delete section?" confirm must come BEFORE any write (bug-050: (~1995 tok)
+- `sections_merge_ui_test.dart` — 1a-2: Merge on the REAL Sections page (the prod case: "Chef Specials" -> (~3251 tok)
+
+## cafe_countryside_menu/test/support/
+
+- `draft_fixtures.dart` — Shared builders for widget / provider tests of the Phase 1a admin tools. (~590 tok)
+- `fake_draft_repository.dart` — / In-memory stand-in for [DraftRepository] with the same transaction (~951 tok)
 
 ## cafe_countryside_menu/tool/
 
@@ -231,5 +253,7 @@
 ## scripts/
 
 - `build-prod.ps1` (~415 tok)
-- cafe_countryside_menu/lib/features/shared/models/draft_ops.dart (1a-1): moveItems, mergeSections, bulkSetActive/NoteAllowed/ChefSpecial, deleteItems, bulkPrice (basis points), applyUndo, searchItems/Sections, menuProblems, targetWarnings; OpResult/UndoPatch types. Pure, VM-tested. (~6k tok)
-- cafe_countryside_menu/lib/features/shared/models/admin_copy.dart: every user-facing string of the 1a tools (pinned by test/admin_copy_test.dart). (~1.5k tok)
+- cafe_countryside_menu/lib/features/admin/ops/admin_ops.dart: LastOp + keep-alive lastOpUndoProvider (resets on sign-out), adminClockProvider, freshBusinessLoaderProvider, OpOutcome/OpStatus. (~900 tok)
+- cafe_countryside_menu/lib/features/admin/ops/undo_bar.dart, target_dialog.dart, select_bar.dart: Undo bar (own 1 s timer), Move/Merge target dialog (empty start, live preview), Items bulk bar (Wrap on phones). (~3.5k tok)
+- DraftNotifier (sections_provider.dart): applyOp/undoLastOp + moveSelected/mergeSection/bulkActive/bulkNotes/bulkChef/deleteSelected; publish/discard clear Undo.
+- cafe_countryside_menu/test/support/{fake_draft_repository,draft_fixtures}.dart + admin_ops_provider_test, items_select_mode_test, sections_merge_ui_test: in-memory repo and UI tests for 1a-2.

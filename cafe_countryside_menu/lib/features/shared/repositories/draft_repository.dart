@@ -132,6 +132,12 @@ class DraftRepository {
 
   Future<bool> draftExists() async => (await _draftRef.get()).exists;
 
+  /// One fresh read of the draft (never a cached snapshot), or null.
+  Future<DraftData?> fetchDraft() async {
+    final snap = await _draftRef.get(const GetOptions(source: Source.server));
+    return snap.exists ? DraftData.fromJson(snap.data()!) : null;
+  }
+
   /// Runs [apply] on the FRESHEST draft inside a transaction and writes the
   /// result with a field-level `update` (see [draftUpdateFields]). Every 1a
   /// admin operation goes through here, so a stale in-memory copy can never
