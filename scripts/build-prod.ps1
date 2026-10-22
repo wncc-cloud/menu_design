@@ -26,7 +26,8 @@ $buildId = "$commit$wip@$time"
 Write-Host "Building BUILD_ID=$buildId"
 Push-Location $app
 try {
-  flutter build web --release "--dart-define=BUILD_ID=$buildId"
+  # --no-wasm-dry-run: its warnings go to stderr, which PowerShell ($ErrorActionPreference='Stop') treats as a failure
+  flutter build web --release --no-wasm-dry-run "--dart-define=BUILD_ID=$buildId"
   if ($LASTEXITCODE -ne 0) { throw "flutter build failed ($LASTEXITCODE)" }
 } finally { Pop-Location }
 
