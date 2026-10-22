@@ -160,13 +160,24 @@ No login. No account. Just open and browse.
   │                                                             │
   │  Settings:    Change cafe name, logo, phone, hours          │
   │                                                             │
+  │  Since Phase 1a (admin speed tools):                        │
+  │   • Dashboard "Find item or section" + quick-edit sheet     │
+  │   • Items / Sections: search, Select mode, Move to…,        │
+  │     Price…, Show/Hide, Chef, Notes, Delete in bulk          │
+  │   • Sections: Merge into… (fixes a duplicate Chef chip)     │
+  │   • Menu check: problems before you Publish, with Fix       │
+  │   • Undo bar (60 s) after any of these                      │
   │                                                             │
   │  ┌─────────────────────────────────────────────────────┐   │
-  │  │  ● Unsaved changes — Publish to go live             │   │
+  │  │  ● 3 unpublished changes — Publish to go live       │   │
+  │  ├─────────────────────────────────────────────────────┤   │
+  │  │  ↩ Moved 10 items.                     [Undo (42s)] │   │
   │  └─────────────────────────────────────────────────────┘   │
   │                                                             │
   └─────────────────────────────────────────────────────────────┘
 ```
+
+A one-page guide to the new tools is in `plan/owner_guide_1a.md`.
 
 The orange banner at the bottom appears whenever you have made changes
 that customers have not seen yet.
@@ -485,7 +496,11 @@ Customers will only reach your menu through a QR code, Instagram, WhatsApp,
 or a direct link. You cannot rank on Google with this setup.
 That is fine since most cafe customers scan a QR code at the table anyway.
 
-**4. Two people editing at exactly the same moment can overwrite each other**
-If two admins edit different items at the exact same second, one might lose
-their change. This almost never happens in practice with 2-3 admins.
-The solution is simple: do not edit at the same time.
+**4. Two people editing at the same moment**
+Every edit now re-reads the latest draft inside a safe transaction and changes
+only what it touches, so two admins editing different items, or someone marking
+an item sold out while an edit form is open, no longer lose each other's work.
+Only if two people change the very same field of the very same item at the
+same second does the last one win (Undo reports such clashes by name).
+**After Publish there is no rollback**, and Undo lasts 60 seconds: export the
+menu (Dashboard → Export Menu JSON) before a large change.

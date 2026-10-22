@@ -185,3 +185,43 @@ extra testing. For a cafe with 2–3 admins who rarely change, the manual proces
 
 **Planned for later:** An "Admins" page in the admin panel where the owner can add/remove
 staff by entering their Gmail address and selecting a role.
+
+---
+
+## 15. Anonymous Bug Logs are bounded by construction (no App Check)
+
+**Decision:** customers (not signed in) may write error logs only into a small fixed key space:
+id `<source>~<slot 0-2>~<30-minute bucket>`, source on a 16-name allow-list, create-only.
+At most 16 x 3 x 48 = 2,304 anonymous documents a day, however many requests are sent.
+
+**Reason:** the server cannot tell a real phone from a script. An open "anyone may create" rule
+could burn the free plan's 20,000 daily writes and block the admin's saves and Publish.
+
+**Rejected:** App Check enforcement (a failed token would also block customers' menu reads);
+leaving the rule open with only a size cap.
+
+## 16. Undo is an inverse patch, not a whole-draft restore
+
+**Decision:** each bulk/merge/quick-edit records `before`/`after` for only the fields it changed;
+Undo restores them inside a transaction only if nobody changed the same field meanwhile.
+
+**Reason:** restoring a whole saved draft would silently revert a live sold-out toggle or another
+admin's edit made during the window. Timestamps never count as a clash.
+
+## 17. Every draft write is a transaction on the fresh draft
+
+**Decision:** `DraftRepository.updateDraft` is the only way the admin pages write the draft; the
+old whole-document `_save` from a stale in-memory copy was removed. New ids are generated once
+before the transaction; a save that times out is verified by re-reading the draft.
+
+**Reason:** the stale copy could overwrite a sold-out switch and drop another admin's new section.
+Rules cannot be tightened for staff because the sold-out switch must write `menuDraft`.
+
+## 18. The Menu check never blocks Publish; bulk price pauses after a timeout
+
+**Decision:** problems are shown before Publish with Fix buttons, but "Publish anyway" always works and a
+broken check is logged and ignored. After a save that timed out and could not be verified, bulk price is
+paused for 60 s.
+
+**Reason:** the owner stays in control, and a percentage change is the one operation that is not safe
+to repeat (a Dart timeout cannot cancel the transaction, so the first attempt may still land).

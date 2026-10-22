@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-22T10:20:27.918Z
-> Files: 91 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-22T10:22:00.874Z
+> Files: 93 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
 
@@ -17,6 +17,7 @@
 - `edit_17_provider.py` — idx, cut (~1942 tok)
 - `edit_banner_check.py` — edit, rep, f1, f2 (~1234 tok)
 - `edit_cl.py` — Declares logTypes (~2232 tok)
+- `edit_docs.py` — edit, rep, f1, f2 (~2137 tok)
 - `edit_flows.py` (~793 tok)
 - `edit_form_validators.py` (~274 tok)
 - `edit_items_page.py` — _FilterChip: rep (~3643 tok)
@@ -282,10 +283,10 @@
 
 ## plan/
 
+- `owner_guide_1a.md` — Admin speed tools — owner guide (one page) (~972 tok)
 - `phase1a_wireframe.html` — Phase 1a — Clickable prototype (admin speed tools) — plan v8 (~16921 tok)
 - `phase1a.md` — Phase 1a — Admin speed tools: move / merge sections, find-and-edit, menu check (~21059 tok)
 
 ## scripts/
 
 - `build-prod.ps1` (~415 tok)
-- cafe_countryside_menu/lib/features/shared/models/draft_edits.dart (1a-7): pure classic edits (addSectionTo, updateItemIn keeps live available, reorderSectionsIn, deleteSectionFrom, addItemTo, moveItemIn, appendImportTo...). lib/features/admin/ops/edit_notice.dart: editNoticeProvider (failure toast via the banner) + newIdProvider. test/draft_edits_test.dart, test/classic_edits_test.dart. (~3k tok)

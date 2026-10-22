@@ -4,7 +4,32 @@ All notable changes to the planning documents are recorded here.
 
 ---
 
-## v7.0 — Current
+## v8.0 — Phase 1a: admin speed tools (built on branch `admin-panel-optimisation`, not yet deployed)
+
+### Added
+- Merge a section into another (preview, delete-emptied-section box, pop-up guard) and a Chef-only filter chip
+- Items: Select mode with a bulk bar (Move to…, Price…, Show/Hide, Chef, Notes, Delete); bulk price with an exact before/after table and a 60 s lock after a timed-out save
+- Search on Items and Sections; Dashboard "Find item or section"; quick-edit dialogs for items and sections; `?find=` and `?edit=` deep links; row tags
+- Undo bar (60 s, field-level inverse patch, survives page changes, cleared by Publish/Discard/sign-out)
+- Menu check: Dashboard tile, page with Fix buttons, and a Publish dialog that never blocks
+- Bug Logs hardening: build id on every log, sanitised page URL, bounded anonymous log ids (at most 2,304 documents a day) with a rules test script
+- Admin tests use an in-memory draft repository; emulator scripts for the rules and the draft transaction; `tool/seed_from_prod.mjs`
+
+### Changed
+- Every draft write is now a transaction on the freshest draft (`updateDraft`); the old whole-document `_save` is removed (a sold-out toggle made while a form is open is no longer reverted; a section added by another admin survives a reorder)
+- Prices are displayed exactly (₹49.50, not ₹50)
+- Deleting a section now asks first (an empty section used to be deleted before the dialog) and checks the first-load pop-up
+
+### Fixed
+- Empty-section delete confirm order; stale item form re-enabling a sold-out item; reorder dropping a new section
+
+### Deployment notes
+- `firestore.rules` (clientLogs) must be deployed BEFORE the hosting build, and only with `--only firestore:rules` / `--only hosting`
+- No change to the customer app, `menu/current` or the publish field map
+
+---
+
+## v7.0
 
 ### Added
 - VSCode + Claude extension + Firebase extension setup (Step 3.1)
