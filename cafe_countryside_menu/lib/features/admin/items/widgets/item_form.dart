@@ -6,6 +6,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../menu/models/item_model.dart' show chefOnlySectionId;
 import '../../../shared/models/draft_item_model.dart';
 import '../../../shared/models/draft_ops.dart';
+import '../../../shared/models/item_validators.dart';
 import '../../../shared/models/draft_section_model.dart';
 import '../../../shared/services/cloudinary_service.dart';
 import '../../../shared/services/image_service.dart';
@@ -232,9 +233,7 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
                   decoration: const InputDecoration(labelText: 'Name *'),
                   textCapitalization: TextCapitalization.words,
                   autofocus: true,
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Name is required'
-                      : null,
+                  validator: validateItemName,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -245,22 +244,7 @@ class _ItemFormDialogState extends State<ItemFormDialog> {
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'[\d.]'))
                   ],
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Price is required';
-                    final parsed = double.tryParse(v.trim());
-                    if (parsed == null) {
-                      return 'Enter a valid number';
-                    }
-                    // billing_cafe phase12.md §12.4-C: a ₹0 item would show on
-                    // the menu but every order containing it is rejected at
-                    // the counter. To give something free, use a normal price
-                    // with a 100% discount so the comp leaves a paper trail.
-                    if (parsed <= 0) {
-                      return 'Price must be more than ₹0 (to give an item free, '
-                          'use a 100% discount at the counter)';
-                    }
-                    return null;
-                  },
+                  validator: validateItemPrice,
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(

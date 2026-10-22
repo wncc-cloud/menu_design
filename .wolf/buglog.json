@@ -1117,6 +1117,40 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-10-21T17:48:29.855236+00:00"
+    },
+    {
+      "id": "bug-070",
+      "timestamp": "2026-10-22T04:50:22.992644+00:00",
+      "error_message": "Dashboard Find results: ListTile ink/background assertion (DecoratedBox with a colour around ListTiles)",
+      "file": "cafe_countryside_menu/lib/features/admin/dashboard/menu_find_box.dart",
+      "root_cause": "Results panel was a Container with a BoxDecoration colour; ListTile paints ink on the nearest Material",
+      "fix": "Use a Material with a rounded border shape as the panel",
+      "tags": [
+        "ui",
+        "listtile",
+        "find-box",
+        "plan-1a-3"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-22T04:50:22.992644+00:00"
+    },
+    {
+      "id": "bug-071",
+      "timestamp": "2026-10-22T04:50:22.992644+00:00",
+      "error_message": "Find box: UnmountedRefException when initializing the draft (draftProvider auto-disposed while initializeDraftIfNeeded awaited)",
+      "file": "cafe_countryside_menu/lib/features/admin/dashboard/menu_find_box.dart",
+      "root_cause": "Nothing watched the auto-disposed draft notifier (on the real Dashboard only PublishBanner did)",
+      "fix": "ref.watch(draftProvider) in the Find box to keep it alive (R3)",
+      "tags": [
+        "riverpod",
+        "autodispose",
+        "find-box",
+        "plan-1a-3"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-22T04:50:22.992644+00:00"
     }
   ]
 }

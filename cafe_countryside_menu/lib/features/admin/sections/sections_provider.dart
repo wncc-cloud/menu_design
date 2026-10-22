@@ -447,6 +447,17 @@ class DraftNotifier extends _$DraftNotifier {
         needsBusiness: false,
       );
 
+  Future<OpOutcome> saveQuickItem(String id, QuickItemEdit edit) => applyOp(
+        (d, c) => quickEditItem(d, id, edit, c),
+        doneText: (r) => 'Saved “${edit.name.trim()}”.',
+      );
+
+  Future<OpOutcome> saveQuickSection(String id, {required String name, required bool active}) => applyOp(
+        (d, c) => quickEditSection(d, id, name: name, active: active, c: c),
+        doneText: (r) => 'Section saved.',
+        needsBusiness: false,
+      );
+
   Future<OpOutcome> deleteSelected(List<String> ids) => applyOp(
         (d, c) => deleteItems(d, ids, c),
         doneText: (r) => 'Deleted ${_n(r.changed)}.',

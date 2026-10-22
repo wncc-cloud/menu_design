@@ -3,6 +3,7 @@ import 'admin_copy.dart';
 import 'draft_data.dart';
 import 'draft_item_model.dart';
 import 'draft_section_model.dart';
+import 'item_validators.dart';
 import 'promotion_models.dart' show SystemSection, chefSpecialKey, bestSellerKey;
 
 /// Pure draft operations for the admin tools (Phase 1a). No Firebase, no
@@ -120,18 +121,30 @@ class ItemPatch {
   const ItemPatch({required this.id, required this.name, required this.before, required this.after});
 }
 
+/// The inverse of one section change (name / visibility edits).
+class SectionPatch {
+  final String id;
+  final String name;
+  final Map<String, Object?> before;
+  final Map<String, Object?> after;
+  const SectionPatch({required this.id, required this.name, required this.before, required this.after});
+}
+
 /// Everything needed to undo one operation (plan A.1 "Undo").
 class UndoPatch {
   final List<ItemPatch> itemPatches;
+  final List<SectionPatch> sectionPatches;
   final List<DraftSectionModel> removedSections;
   final List<DraftItemModel> removedItems;
   const UndoPatch({
     this.itemPatches = const [],
+    this.sectionPatches = const [],
     this.removedSections = const [],
     this.removedItems = const [],
   });
 
-  bool get isEmpty => itemPatches.isEmpty && removedSections.isEmpty && removedItems.isEmpty;
+  bool get isEmpty =>
+      itemPatches.isEmpty && sectionPatches.isEmpty && removedSections.isEmpty && removedItems.isEmpty;
 }
 
 class PriceRow {
@@ -192,6 +205,7 @@ class _Editor {
   final List<DraftItemModel> items;
   final List<DraftSectionModel> sections;
   final patches = <ItemPatch>[];
+  final sectionPatches = <SectionPatch>[];
   final removedItems = <DraftItemModel>[];
   final removedSections = <DraftSectionModel>[];
   final skipped = <({String name, String reason})>[];
@@ -233,9 +247,31 @@ class _Editor {
     return true;
   }
 
+  /// Like [touch], for a section (name / visibility).
+  bool touchSection(DraftSectionModel old, DraftSectionModel next) {
+    final a = old.toJson(), b = next.toJson();
+    final before = <String, Object?>{}, after = <String, Object?>{};
+    for (final k in b.keys) {
+      if (_timestampKeys.contains(k)) continue;
+      if (a[k] != b[k]) {
+        before[k] = a[k];
+        after[k] = b[k];
+      }
+    }
+    if (after.isEmpty) return false;
+    final idx = sections.indexWhere((x) => x.id == old.id);
+    sections[idx] = next.copyWith(updatedAt: c.now);
+    sectionPatches.add(SectionPatch(id: old.id, name: old.name, before: before, after: after));
+    return true;
+  }
+
   DraftData get draft => base.copyWith(items: items, sections: sections);
-  UndoPatch get inverse =>
-      UndoPatch(itemPatches: patches, removedSections: removedSections, removedItems: removedItems);
+  UndoPatch get inverse => UndoPatch(
+        itemPatches: patches,
+        sectionPatches: sectionPatches,
+        removedSections: removedSections,
+        removedItems: removedItems,
+      );
 }
 
 String sectionLabel(DraftData d, String id) {
@@ -568,6 +604,136 @@ OpResult bulkPrice(DraftData d, List<String> ids, PriceChange ch, OpContext c) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Quick edit (plan B.3)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// What the quick-edit sheet saves for one item.
+class QuickItemEdit {
+  final String name;
+  final double price;
+  final String sectionId;
+  final bool isChefSpecial;
+  final bool chefOnly;
+  final bool active;
+  final bool noteAllowed;
+  const QuickItemEdit({
+    required this.name,
+    required this.price,
+    required this.sectionId,
+    required this.isChefSpecial,
+    required this.chefOnly,
+    required this.active,
+    required this.noteAllowed,
+  });
+
+  /// The values an item currently has (the sheet's starting point).
+  factory QuickItemEdit.of(DraftItemModel i) => QuickItemEdit(
+        name: i.name,
+        price: i.price,
+        sectionId: i.sectionId,
+        isChefSpecial: i.isChefSpecial,
+        chefOnly: i.chefOnly,
+        active: i.active,
+        noteAllowed: i.noteAllowed,
+      );
+}
+
+/// The warnings the quick-edit sheet shows live and the save result repeats.
+/// Move uses the SAME [targetWarnings], so the two can never drift apart.
+List<String> quickEditWarnings(DraftData d, QuickItemEdit e, OpContext c) {
+  final f = normalizeItemFlags(sectionId: e.sectionId, isChefSpecial: e.isChefSpecial, chefOnly: e.chefOnly);
+  final stillChefOnly = (e.sectionId != chefOnlySectionId && f.isChefSpecial && f.chefOnly) ? 1 : 0;
+  return targetWarnings(d, e.sectionId, c, stillChefOnly: stillChefOnly);
+}
+
+/// The 40-character name tip: Quick-edit only (the full form is left unchanged).
+String? quickEditNameTip(String name) => name.trim().length > longNameLimit ? AdminCopy.longNameTip : null;
+
+OpResult quickEditItem(DraftData d, String id, QuickItemEdit e, OpContext c) {
+  final ed = _Editor(d, c);
+  final it = ed.item(id);
+  if (it == null) return OpResult.blocked(AdminCopy.itemGoneSave);
+  final nameError = validateItemName(e.name);
+  if (nameError != null) return OpResult.blocked(nameError);
+  if (e.price <= 0) return OpResult.blocked(validateItemPrice('0')!);
+  if (e.sectionId != chefOnlySectionId && ed.section(e.sectionId) == null) {
+    return OpResult.blocked(AdminCopy.sectionGoneSave);
+  }
+  final f = normalizeItemFlags(sectionId: e.sectionId, isChefSpecial: e.isChefSpecial, chefOnly: e.chefOnly);
+  var sort = it.sortOrder;
+  if (it.sectionId != e.sectionId) {
+    // Moved to another section: appended at its end (the full form keeps the old sortOrder).
+    var max = -1;
+    for (final i in d.items) {
+      if (i.id != id && i.sectionId == e.sectionId && i.sortOrder > max) max = i.sortOrder;
+    }
+    sort = max + 1;
+  }
+  final changed = ed.touch(
+    it,
+    it.copyWith(
+      name: e.name.trim(),
+      price: e.price,
+      sectionId: e.sectionId,
+      sortOrder: sort,
+      isChefSpecial: f.isChefSpecial,
+      chefOnly: f.chefOnly,
+      active: e.active,
+      noteAllowed: e.noteAllowed,
+    ),
+  );
+  return OpResult(
+    newDraft: ed.draft,
+    lines: const [AdminCopy.savedLine],
+    warnings: quickEditWarnings(d, e, c),
+    tip: quickEditNameTip(e.name),
+    changed: changed ? 1 : 0,
+    inverse: ed.inverse,
+  );
+}
+
+/// True when another section already has this name (case / spacing ignored).
+bool duplicateSectionName(DraftData d, String name, {String? exceptId}) {
+  final n = normalizeSearch(name);
+  return d.sections.any((s) => s.id != exceptId && normalizeSearch(s.name) == n);
+}
+
+OpResult quickEditSection(DraftData d, String id, {required String name, required bool active, required OpContext c}) {
+  final ed = _Editor(d, c);
+  final s = ed.section(id);
+  if (s == null) return OpResult.blocked(AdminCopy.sectionGoneSave);
+  if (name.trim().isEmpty) return OpResult.blocked('Name is required');
+  final changed = ed.touchSection(s, s.copyWith(name: name.trim(), active: active));
+  return OpResult(
+    newDraft: ed.draft,
+    lines: const [AdminCopy.savedLine],
+    warnings: [if (duplicateSectionName(d, name, exceptId: id)) AdminCopy.duplicateSectionWarning],
+    changed: changed ? 1 : 0,
+    inverse: ed.inverse,
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Row tags (plan B.4)
+// ═══════════════════════════════════════════════════════════════════════════
+
+List<String> itemRowTags(DraftItemModel i) => [
+      if (!i.active) 'Hidden',
+      if (i.sectionId == chefOnlySectionId)
+        '🍳 only in Chef Special'
+      else if (i.isChefSpecial)
+        (i.chefOnly ? '🍳 only' : '🍳 Chef'),
+      if (!i.available) 'Sold out (live)',
+    ];
+
+/// `Hidden` · `empty` (no items at all) · `first-load pop-up` (the pop-up opens it).
+List<String> sectionRowTags(DraftData d, DraftSectionModel s, {String? firstLoadChoice}) => [
+      if (!s.active) 'Hidden',
+      if (!d.items.any((i) => i.sectionId == s.id)) 'empty',
+      if (firstLoadChoice == 'sec:${s.id}') 'first-load pop-up',
+    ];
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Undo (inverse patch, field level)
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -612,6 +778,23 @@ UndoResult applyUndo(DraftData d, UndoPatch p) {
     items[idx] = DraftItemModel.fromJson(json);
     restored++;
   }
+  for (final patch in p.sectionPatches) {
+    final idx = sections.indexWhere((x) => x.id == patch.id);
+    if (idx < 0) {
+      skipped.add('section ${patch.name} (deleted meanwhile)');
+      continue;
+    }
+    final json = sections[idx].toJson();
+    bool counts(String k) => !_timestampKeys.contains(k);
+    final clash = patch.after.keys.where((k) => counts(k) && json[k] != patch.after[k]).firstOrNull;
+    if (clash != null) {
+      skipped.add('section ${patch.name} ($clash changed meanwhile)');
+      continue;
+    }
+    json.addAll({for (final e in patch.before.entries) if (counts(e.key)) e.key: e.value});
+    sections[idx] = DraftSectionModel.fromJson(json);
+    restored++;
+  }
   for (final s in p.removedSections) {
     if (sections.any((x) => x.id == s.id)) {
       skipped.add('section ${s.name} (already exists)');
@@ -645,6 +828,16 @@ PatchState patchState(DraftData d, UndoPatch p) {
       continue;
     }
     final json = it.toJson();
+    final landed = patch.after.keys.every((k) => _timestampKeys.contains(k) || json[k] == patch.after[k]);
+    landed ? applied++ : notApplied++;
+  }
+  for (final patch in p.sectionPatches) {
+    final sec = d.sections.where((x) => x.id == patch.id).firstOrNull;
+    if (sec == null) {
+      notApplied++;
+      continue;
+    }
+    final json = sec.toJson();
     final landed = patch.after.keys.every((k) => _timestampKeys.contains(k) || json[k] == patch.after[k]);
     landed ? applied++ : notApplied++;
   }
@@ -847,3 +1040,27 @@ List<MenuProblem> menuProblems(
 }
 
 int problemCount(List<MenuProblem> all) => all.where((p) => p.level == ProblemLevel.problem).length;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Dashboard "Find item or section" (plan B.2)
+// ═══════════════════════════════════════════════════════════════════════════
+
+const findGroupLimit = 8;
+
+/// Matches for the Dashboard Find box: at most [findGroupLimit] per group, with
+/// the true totals so the box can offer "See all N items →".
+({List<DraftSectionModel> sections, int sectionTotal, List<DraftItemModel> items, int itemTotal}) findResults(
+  DraftData d,
+  String q,
+) {
+  if (normalizeSearch(q).isEmpty) return (sections: const [], sectionTotal: 0, items: const [], itemTotal: 0);
+  final secs = searchSections(d, q)..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+  final ids = searchItems(d, q).map((i) => i.id).toSet();
+  final its = d.sortedItems.where((i) => ids.contains(i.id)).toList();
+  return (
+    sections: secs.take(findGroupLimit).toList(),
+    sectionTotal: secs.length,
+    items: its.take(findGroupLimit).toList(),
+    itemTotal: its.length,
+  );
+}

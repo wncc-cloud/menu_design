@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cafe_countryside_menu/features/menu/models/menu_snapshot_model.dart';
 import 'package:cafe_countryside_menu/features/shared/models/draft_data.dart';
 import 'package:cafe_countryside_menu/features/shared/models/draft_item_model.dart';
 import 'package:cafe_countryside_menu/features/shared/models/draft_section_model.dart';
@@ -85,6 +86,27 @@ class FakeDraftRepository implements DraftRepository {
   @override
   Future<void> saveDraft(DraftData d) async {
     draft = d;
+    emit();
+  }
+
+  int initCalls = 0;
+
+  /// What `initializeDraftIfNeeded` calls when there is no draft yet.
+  @override
+  Future<DraftData> initFromMenu(MenuSnapshotModel menu, String adminUid) async {
+    initCalls++;
+    final d = DraftData(sections: const [], items: const [], draftUpdatedAt: DateTime.now(), updatedBy: adminUid);
+    draft = d;
+    emit();
+    return d;
+  }
+
+  /// The live sold-out switch: draft AND snapshot move together (not a pending change).
+  @override
+  Future<void> setAvailabilityLive(String itemId, bool available) async {
+    DraftData flip(DraftData d) => d.copyWith(items: [for (final i in d.items) i.id == itemId ? i.copyWith(available: available) : i]);
+    if (draft != null) draft = flip(draft!);
+    if (snapshot != null) snapshot = flip(snapshot!);
     emit();
   }
 

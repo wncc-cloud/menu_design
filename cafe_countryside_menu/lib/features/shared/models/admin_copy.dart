@@ -7,6 +7,11 @@ class AdminCopy {
 
   static const reservedSectionLabel = '🍳 Chef Special only';
 
+  /// A price for display: whole rupees without decimals (₹120), anything else
+  /// with two (₹49.50, ₹59.75). Never silently rounds a decimal price.
+  static String rupees(double price) =>
+      '₹${price == price.truncateToDouble() ? price.toStringAsFixed(0) : price.toStringAsFixed(2)}';
+
   static String _items(int n) => '$n item${n == 1 ? '' : 's'}';
 
   // ---- preview lines ---------------------------------------------------------
@@ -53,6 +58,10 @@ class AdminCopy {
   static const targetGone = 'The target section no longer exists (changed meanwhile). Nothing was changed.';
   static const sourceGone = 'That section no longer exists (changed meanwhile). Nothing was changed.';
   static const itemGone = 'That item no longer exists.';
+  static const itemGoneSave = 'This item no longer exists (changed meanwhile). Nothing was changed.';
+  static const sectionGoneSave = 'That section no longer exists. Nothing was changed.';
+  static const duplicateSectionWarning = 'Another section already has this name.';
+  static const savedLine = 'Saved';
   static const couldNotSave = "Couldn't save — check your connection. Nothing was changed.";
   static const notSaved = 'Not saved — nothing was changed.';
   static const draftNotReady = "The draft isn't ready yet — try again in a moment.";

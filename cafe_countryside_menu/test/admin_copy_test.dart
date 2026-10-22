@@ -52,6 +52,13 @@ void main() {
         'This is taking too long. It may or may not have saved — check the Publish banner count before trying again.');
   });
 
+  test('prices are displayed without silent rounding', () {
+    expect(AdminCopy.rupees(120), '₹120');
+    expect(AdminCopy.rupees(49.5), '₹49.50');
+    expect(AdminCopy.rupees(59.75), '₹59.75');
+    expect(AdminCopy.rupees(0.5), '₹0.50');
+  });
+
   test('undo outcome', () {
     expect(AdminCopy.undoOutcome(3, const []), 'Undone (3 restored)');
     expect(AdminCopy.undoOutcome(2, ['Katsu (sectionId changed meanwhile)']),

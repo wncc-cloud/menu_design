@@ -71,7 +71,15 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/admin/items',
-      builder: (_, _) => const AdminGuard(child: ItemsPage()),
+      // ?find=<text> prefills the search; ?edit=<id> opens the full Edit form once.
+      // (A signed-out visitor is sent to the login page first and lands on the
+      // Dashboard afterwards: the parameter is dropped, by design, R11.)
+      builder: (_, state) => AdminGuard(
+        child: ItemsPage(
+          initialFind: state.uri.queryParameters['find'],
+          editId: state.uri.queryParameters['edit'],
+        ),
+      ),
     ),
     GoRoute(
       path: '/admin/items/import',

@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-21T17:45:24.916Z
-> Files: 59 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-22T04:48:45.070Z
+> Files: 73 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
 
@@ -15,9 +15,14 @@
 ## ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/
 
 - `edit_cl.py` — Declares logTypes (~2232 tok)
+- `edit_flows.py` (~793 tok)
+- `edit_form_validators.py` (~274 tok)
 - `edit_items_page.py` — _FilterChip: rep (~3643 tok)
+- `edit_items_search.py` — ItemsPage: rep (~3443 tok)
+- `edit_ops_quick.py` — UndoPatch: rep (~3116 tok)
 - `edit_provider.py` — Declares OpOutcome (~2155 tok)
 - `edit_rules.py` — logShapeOk: boundedLogOk, adminLogOk (~1327 tok)
+- `edit_sections_search.py` — _SectionsPageState: rep (~2481 tok)
 - `edit_sections_ui.py` — rep (~1663 tok)
 - `fix_items_test.py` — Harness: rep (~1058 tok)
 - `make_prod_shaped.mjs` — Builds a prod-shaped menu (27 sections incl. "Chef Specials" with 10 items and (~377 tok)
@@ -126,6 +131,7 @@
 
 ## cafe_countryside_menu/lib/features/admin/dashboard/
 
+- `menu_find_box.dart` — / Dashboard "Find item or section": type a few letters, tap a result, edit it (~1689 tok)
 
 ## cafe_countryside_menu/lib/features/admin/items/
 
@@ -140,6 +146,10 @@
 ## cafe_countryside_menu/lib/features/admin/ops/
 
 - `admin_ops.dart` — / How long the Undo bar stays (plan A.1). (~691 tok)
+- `op_toast.dart` — / Tells the admin what an operation did: the success sentence plus any (~246 tok)
+- `quick_edit.dart` — Flutter widget (~4942 tok)
+- `row_tag.dart` — / A small coloured pill for a row tag (plan B.4): `Hidden`, `🍳 Chef`, (~314 tok)
+- `section_flows.dart` — / Merge and Delete need BOTH permissions: they rewrite items AND remove a (~618 tok)
 - `select_bar.dart` — Stateless widget: SelectBar (~1035 tok)
 - `target_dialog.dart` — / Shared "choose a section" dialog for Move (items) and Merge (a section). (~2028 tok)
 - `undo_bar.dart` — / "↩ Moved 10 items.   [Undo (42s)]" under the Publish banner. (~896 tok)
@@ -197,6 +207,7 @@
 
 - `admin_copy.dart` — / Every user-facing sentence of the Phase 1a admin tools, in ONE place (plan (~1193 tok)
 - `draft_ops.dart` — / Pure draft operations for the admin tools (Phase 1a). No Firebase, no (~7843 tok)
+- `item_validators.dart` — / The item name / price rules, in ONE place: the full Edit form and the (~262 tok)
 
 ## cafe_countryside_menu/lib/features/shared/permissions/
 
@@ -223,6 +234,9 @@
 - `draft_update_test.dart` — 1a-0(c): the pure parts of DraftRepository.updateDraft. The transaction itself (~800 tok)
 - `item_form_flags_test.dart` — 1a-0(b)/(d) characterization test for the Chef Special flags the item form (~993 tok)
 - `items_select_mode_test.dart` — 1a-2: Select mode, the bulk bar, Move dialog, Undo bar on the REAL Items page, (~4563 tok)
+- `quick_edit_ops_test.dart` — 1a-3 pure layer: quick-edit operations, section patches (Undo), row tags. (~3068 tok)
+- `quick_edit_ui_test.dart` — 1a-3: the quick-edit dialogs (item and section), opened from the real Items / (~4124 tok)
+- `search_ui_test.dart` — 1a-3: search on Items and Sections, the Dashboard Find box, deep links. (~4146 tok)
 - `section_delete_flow_test.dart` — 1a-0(e): the "Delete section?" confirm must come BEFORE any write (bug-050: (~1995 tok)
 - `sections_merge_ui_test.dart` — 1a-2: Merge on the REAL Sections page (the prod case: "Chef Specials" -> (~3251 tok)
 
@@ -253,7 +267,8 @@
 ## scripts/
 
 - `build-prod.ps1` (~415 tok)
-- cafe_countryside_menu/lib/features/admin/ops/admin_ops.dart: LastOp + keep-alive lastOpUndoProvider (resets on sign-out), adminClockProvider, freshBusinessLoaderProvider, OpOutcome/OpStatus. (~900 tok)
-- cafe_countryside_menu/lib/features/admin/ops/undo_bar.dart, target_dialog.dart, select_bar.dart: Undo bar (own 1 s timer), Move/Merge target dialog (empty start, live preview), Items bulk bar (Wrap on phones). (~3.5k tok)
-- DraftNotifier (sections_provider.dart): applyOp/undoLastOp + moveSelected/mergeSection/bulkActive/bulkNotes/bulkChef/deleteSelected; publish/discard clear Undo.
-- cafe_countryside_menu/test/support/{fake_draft_repository,draft_fixtures}.dart + admin_ops_provider_test, items_select_mode_test, sections_merge_ui_test: in-memory repo and UI tests for 1a-2.
+- cafe_countryside_menu/lib/features/shared/models/item_validators.dart: validateItemName/validateItemPrice shared by the full form and quick edit. (~300 tok)
+- draft_ops.dart (1a-3): QuickItemEdit, quickEditItem/Section, quickEditWarnings (shared with Move), SectionPatch (Undo for section edits), itemRowTags/sectionRowTags, findResults.
+- cafe_countryside_menu/lib/features/admin/ops/quick_edit.dart: showQuickEditItem/Section dialogs (read-only for staff, live sold-out switch, More… deep link); op_toast.dart; section_flows.dart (shared merge/delete flows); row_tag.dart. (~5k tok)
+- cafe_countryside_menu/lib/features/admin/dashboard/menu_find_box.dart: Dashboard "Find item or section" (no dart:html). (~1.8k tok)
+- test/support/admin_harness.dart + quick_edit_ui_test.dart, search_ui_test.dart, quick_edit_ops_test.dart: 1a-3 tests.

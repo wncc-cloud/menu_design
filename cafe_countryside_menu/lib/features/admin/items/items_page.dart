@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +13,9 @@ import '../../shared/models/draft_section_model.dart';
 import '../../shared/widgets/publish_banner.dart';
 import '../auth/auth_provider.dart';
 import '../ops/admin_ops.dart';
+import '../ops/op_toast.dart';
+import '../ops/quick_edit.dart';
+import '../ops/row_tag.dart';
 import '../ops/select_bar.dart';
 import '../ops/target_dialog.dart';
 import '../sections/sections_provider.dart';
@@ -18,7 +23,13 @@ import 'items_provider.dart';
 import 'widgets/item_form.dart';
 
 class ItemsPage extends ConsumerStatefulWidget {
-  const ItemsPage({super.key});
+  /// `?find=` deep link: prefills the search box.
+  final String? initialFind;
+
+  /// `?edit=<id>` deep link: opens the existing FULL Edit form once, then the
+  /// parameter is removed from the address.
+  final String? editId;
+  const ItemsPage({super.key, this.initialFind, this.editId});
 
   @override
   ConsumerState<ItemsPage> createState() => _ItemsPageState();
@@ -32,6 +43,69 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
   // of sight.
   bool _selecting = false;
   final Set<String> _picked = {};
+
+  // Search (Phase 1a): client-side over the draft already loaded, 0 extra reads.
+  // The text is applied 150 ms after typing stops. While it is non-empty the
+  // chip filter is ignored, the reorder arrows are hidden (they act on the
+  // VISIBLE list) and the selection is cleared whenever the text changes.
+  final _searchCtrl = TextEditingController();
+  Timer? _debounce;
+  String _query = '';
+  bool _handledEdit = false;
+
+  bool get _searching => _query.trim().isNotEmpty;
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String v) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 150), () {
+      if (mounted) {
+        setState(() {
+          _query = v;
+          _picked.clear();
+        });
+      }
+    });
+  }
+
+  void _clearSearch() {
+    _debounce?.cancel();
+    _searchCtrl.clear();
+    setState(() {
+      _query = '';
+      _picked.clear();
+    });
+  }
+
+  /// `?edit=<id>`: open the full form ONCE after the draft has loaded, then
+  /// strip the parameter so a refresh or Back does not reopen it.
+  void _maybeOpenDeepLinkEdit(List<DraftItemModel> items, List<DraftSectionModel> sections) {
+    final id = widget.editId;
+    if (id == null || _handledEdit) return;
+    _handledEdit = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      GoRouter.maybeOf(context)?.go('/admin/items');
+      final item = items.where((i) => i.id == id).firstOrNull;
+      if (item == null) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(const SnackBar(content: Text(AdminCopy.itemGone), backgroundColor: Colors.red));
+        return;
+      }
+      if (ref.read(permissionServiceProvider)?.canManageItems ?? false) {
+        _showEditDialog(item, sections);
+      } else {
+        showQuickEditItem(context, ref, id);
+      }
+    });
+  }
 
   void _setFilter(String? id) => setState(() {
         _filterSectionId = id;
@@ -48,17 +122,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
   /// Shows what happened. Uses a messenger captured BEFORE the await.
   void _afterOp(OpOutcome? o, ScaffoldMessengerState messenger) {
     if (o == null) return;
-    final warnings = o.result?.warnings ?? const <String>[];
-    final text = o.status == OpStatus.nothing && o.message.isEmpty
-        ? 'Nothing to change.'
-        : [o.message, ...warnings].where((t) => t.isNotEmpty).join(' — ');
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        content: Text(text),
-        duration: const Duration(seconds: 7),
-        backgroundColor: (o.status == OpStatus.failed || o.status == OpStatus.timedOut) ? Colors.red : null,
-      ));
+    showOpOutcome(messenger, o);
     if (o.ok && mounted) setState(_picked.clear);
   }
 
@@ -133,6 +197,10 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialFind != null && widget.initialFind!.trim().isNotEmpty) {
+      _searchCtrl.text = widget.initialFind!;
+      _query = widget.initialFind!;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(draftProvider.notifier).initializeDraftIfNeeded();
     });
@@ -267,14 +335,56 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                 final sections = draft.sortedSections;
                 final allItems = draft.sortedItems;
                 final chefOnlyCount = allItems.where((i) => i.sectionId == chefOnlySectionId).length;
-                final visibleItems = _filterSectionId == null
-                    ? allItems
-                    : allItems
-                        .where((i) => i.sectionId == _filterSectionId)
-                        .toList();
+                _maybeOpenDeepLinkEdit(allItems, sections);
+                final searching = _searching;
+                final List<DraftItemModel> visibleItems;
+                if (searching) {
+                  final ids = searchItems(draft, _query).map((i) => i.id).toSet();
+                  visibleItems = allItems.where((i) => ids.contains(i.id)).toList();
+                } else if (_filterSectionId == null) {
+                  visibleItems = allItems;
+                } else {
+                  visibleItems = allItems.where((i) => i.sectionId == _filterSectionId).toList();
+                }
 
                 return Column(
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                      child: TextField(
+                        key: const Key('items-search'),
+                        controller: _searchCtrl,
+                        onChanged: _onSearchChanged,
+                        textInputAction: TextInputAction.search,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          hintText: 'Search items, ingredients, sections…',
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: _searchCtrl.text.isEmpty
+                              ? null
+                              : IconButton(
+                                  key: const Key('items-search-clear'),
+                                  icon: const Icon(Icons.close),
+                                  tooltip: 'Clear search',
+                                  onPressed: _clearSearch,
+                                ),
+                          border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(24))),
+                        ),
+                      ),
+                    ),
+                    if (searching)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(14, 6, 14, 0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            '${visibleItems.length} match${visibleItems.length == 1 ? '' : 'es'} for “${_query.trim()}” '
+                            '(chip filter ignored while searching; hidden items included)',
+                            key: const Key('items-search-count'),
+                            style: const TextStyle(fontSize: 12, color: Colors.black54),
+                          ),
+                        ),
+                      ),
                     // Section filter chips
                     if (sections.isNotEmpty || chefOnlyCount > 0)
                       SizedBox(
@@ -286,26 +396,26 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                           children: [
                             _FilterChip(
                               label: 'All (${allItems.length})',
-                              selected: _filterSectionId == null,
+                              selected: !searching && _filterSectionId == null,
                               onTap: () => _setFilter(null),
                             ),
                             // Items that live only in Chef Special have no section chip.
                             if (chefOnlyCount > 0)
                               _FilterChip(
                                 label: '${AdminCopy.reservedSectionLabel} ($chefOnlyCount)',
-                                selected: _filterSectionId == chefOnlySectionId,
+                                selected: !searching && _filterSectionId == chefOnlySectionId,
                                 onTap: () => _setFilter(chefOnlySectionId),
                               ),
                             ...sections.map((s) => _FilterChip(
                                   label:
                                       '${s.name} (${draft.itemsForSection(s.id).length})',
-                                  selected: _filterSectionId == s.id,
+                                  selected: !searching && _filterSectionId == s.id,
                                   onTap: () => _setFilter(s.id),
                                 )),
                           ],
                         ),
                       ),
-                    if (_filterSectionId != null && canManage)
+                    if (_filterSectionId != null && canManage && !searching)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Wrap(
@@ -343,7 +453,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                               onPressed: () => setState(() => _picked.addAll(visibleItems.map((i) => i.id))),
                               child: Text('Select all (${visibleItems.length}) in this view'),
                             ),
-                            const Text(' · changing the chip clears the selection', style: TextStyle(fontSize: 12)),
+                            const Text(' · changing the chip or search clears the selection', style: TextStyle(fontSize: 12)),
                           ],
                         ),
                       ),
@@ -356,9 +466,9 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                                   const Icon(Icons.set_meal,
                                       size: 64, color: Colors.grey),
                                   const SizedBox(height: 16),
-                                  const Text('No items yet.',
-                                      style: TextStyle(color: Colors.grey)),
-                                  if (canManage) ...[
+                                  Text(searching ? 'No items match “${_query.trim()}”.' : 'No items yet.',
+                                      style: const TextStyle(color: Colors.grey)),
+                                  if (canManage && !searching) ...[
                                     const SizedBox(height: 16),
                                     FilledButton.icon(
                                       onPressed: () =>
@@ -392,7 +502,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                                     .name;
                                 // Arrows only while ONE section is selected: that is
                                 // the list whose order they change.
-                                final canMove = canManage && _filterSectionId != null && !_selecting;
+                                final canMove = canManage && _filterSectionId != null && !_selecting && !searching;
                                 return _ItemTile(
                                   item: item,
                                   onMoveUp: canMove && index > 0
@@ -407,6 +517,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                                   selecting: _selecting,
                                   picked: _picked.contains(item.id),
                                   onPick: () => _pick(item.id),
+                                  onQuickEdit: () => showQuickEditItem(context, ref, item.id),
                                   onEdit: () =>
                                       _showEditDialog(item, sections),
                                   onDelete: () => _confirmDelete(item),
@@ -467,6 +578,7 @@ class _ItemTile extends StatelessWidget {
   final String sectionName;
   final bool canManage;
   final VoidCallback onEdit;
+  final VoidCallback onQuickEdit;
   final VoidCallback onDelete;
   final VoidCallback onToggleAvailable;
   final VoidCallback onToggleActive;
@@ -488,6 +600,7 @@ class _ItemTile extends StatelessWidget {
     required this.sectionName,
     required this.canManage,
     required this.onEdit,
+    required this.onQuickEdit,
     required this.onDelete,
     required this.onToggleAvailable,
     required this.onToggleActive,
@@ -499,7 +612,7 @@ class _ItemTile extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       color: picked ? const Color(0xFFF1F8E9) : null,
       child: ListTile(
-        onTap: selecting ? onPick : null,
+        onTap: selecting ? onPick : onQuickEdit,
         leading: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -537,17 +650,25 @@ class _ItemTile extends StatelessWidget {
                     : Colors.grey,
           ),
         ),
-        subtitle: Text(
-          !item.active
-              ? 'Hidden from menu'
-              : '₹${item.price.toStringAsFixed(0)}  ·  $sectionName'
-                  '${item.isBestseller ? '  ·  ⭐' : ''}'
-                  '${item.isChefSpecial && item.sectionId != chefOnlySectionId ? (item.chefOnly ? '  ·  🍳 only' : '  ·  🍳') : ''}'
-                  '${item.noteAllowed ? '' : '  ·  no note'}',
-          style: TextStyle(
-            fontSize: 12,
-            color: !item.active ? Colors.orange[700] : null,
-          ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${AdminCopy.rupees(item.price)}  ·  $sectionName'
+              '${item.isBestseller ? '  ·  ⭐' : ''}'
+              '${item.noteAllowed ? '' : '  ·  no note'}',
+              style: TextStyle(fontSize: 12, color: !item.active ? Colors.orange[700] : null),
+            ),
+            if (itemRowTags(item).isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Wrap(
+                  spacing: 4,
+                  runSpacing: 2,
+                  children: [for (final t in itemRowTags(item)) RowTag(t)],
+                ),
+              ),
+          ],
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -565,10 +686,13 @@ class _ItemTile extends StatelessWidget {
               ),
             ],
             if (item.active)
-              Switch(
-                value: item.available,
-                onChanged: (_) => onToggleAvailable(),
-                activeThumbColor: const Color(0xFF2E7D32),
+              Tooltip(
+                message: 'Live sold-out: changes what customers see right now',
+                child: Switch(
+                  value: item.available,
+                  onChanged: (_) => onToggleAvailable(),
+                  activeThumbColor: const Color(0xFF2E7D32),
+                ),
               ),
             if (canManage) ...[
               IconButton(

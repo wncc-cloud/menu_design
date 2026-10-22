@@ -13,6 +13,7 @@ import '../../shared/models/business_model.dart';
 import '../../order/providers/cafe_status_provider.dart';
 import '../sections/sections_provider.dart';
 import '../auth/auth_provider.dart';
+import 'menu_find_box.dart';
 import '../../shared/widgets/publish_banner.dart';
 
 String _formatDateTime(DateTime dt) {
@@ -184,6 +185,8 @@ class DashboardPage extends ConsumerWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    const MenuFindBox(),
                     const SizedBox(height: 20),
                     const _TodayAtAGlance(),
                     const SizedBox(height: 32),
