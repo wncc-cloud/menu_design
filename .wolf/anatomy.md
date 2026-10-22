@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-22T05:17:49.461Z
-> Files: 82 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-22T05:35:28.373Z
+> Files: 85 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
 
@@ -21,6 +21,7 @@
 - `edit_items_page.py` — _FilterChip: rep (~3643 tok)
 - `edit_items_search.py` — ItemsPage: rep (~3443 tok)
 - `edit_ops_quick.py` — UndoPatch: rep (~3116 tok)
+- `edit_price_plumbing.py` — OpOutcome: edit, rep, f1, f2 + 1 more (~1339 tok)
 - `edit_problem_key.py` — rep (~680 tok)
 - `edit_provider.py` — Declares OpOutcome (~2155 tok)
 - `edit_rules.py` — logShapeOk: boundedLogOk, adminLogOk (~1327 tok)
@@ -158,6 +159,7 @@
 
 - `admin_ops.dart` — / How long the Undo bar stays (plan A.1). (~691 tok)
 - `op_toast.dart` — / Tells the admin what an operation did: the success sentence plus any (~246 tok)
+- `price_dialog.dart` — / "Change price" for the selected items (plan A.1 "Bulk price maths"). (~2710 tok)
 - `quick_edit.dart` — Flutter widget (~4942 tok)
 - `row_tag.dart` — / A small coloured pill for a row tag (plan B.4): `Hidden`, `🍳 Chef`, (~314 tok)
 - `section_flows.dart` — / Merge and Delete need BOTH permissions: they rewrite items AND remove a (~618 tok)
@@ -239,6 +241,7 @@
 
 - `admin_copy_test.dart` — Plan B.4: the wording of the admin tools is pinned so it cannot drift (~1542 tok)
 - `admin_ops_provider_test.dart` — 1a-2: the DraftNotifier wrappers (applyOp / undoLastOp) and the keep-alive (~3433 tok)
+- `bulk_price_ui_test.dart` — 1a-5: Bulk price in Select mode: dialog, live before/after preview that equals (~3835 tok)
 - `client_log_bounded_test.dart` — 1a-L0: bounded anonymous logs. Pure helpers (hash, bucket, id, URL cleaning), (~2233 tok)
 - `client_log_hash_test.dart` — The slot hash must be identical on the VM and in the browser (where ints are (~314 tok)
 - `draft_ops_test.dart` — Phase 1a pure draft operations (VM, no Firebase): flags, move, merge, undo, (~8977 tok)
@@ -279,5 +282,4 @@
 ## scripts/
 
 - `build-prod.ps1` (~415 tok)
-- cafe_countryside_menu/lib/features/admin/menu_check/: menu_check_provider.dart (computed-once state + fresh business read), menu_check_fix.dart (Fix per problem kind), publish_check.dart (Publish -> check -> dialog, never blocking, busy guard), menu_check_page.dart, menu_check_tile.dart. Route /admin/menu-check; banner shows "⚠ N". (~6k tok)
-- test/menu_check_ui_test.dart: provider (one computation), Publish dialog, page + Fix buttons, tile, banner count.
+- cafe_countryside_menu/lib/features/admin/ops/price_dialog.dart: bulk price dialog (empty start, live integer-paise before/after table, 60 s timeout lock). admin_ops.dart: OpOutcome.afterTimeout, priceLockProvider; DraftNotifier.bulkPriceSelected. test/bulk_price_ui_test.dart. (~3k tok)

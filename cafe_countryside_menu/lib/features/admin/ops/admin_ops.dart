@@ -71,10 +71,30 @@ class OpOutcome {
 
   /// Text for the user (success sentence, or the blocked / error reason).
   final String message;
-  const OpOutcome(this.status, this.message, [this.result]);
+
+  /// The save TIMED OUT and could not be shown to have landed: the transaction
+  /// may still commit later (a Dart timeout cannot cancel it).
+  final bool afterTimeout;
+  const OpOutcome(this.status, this.message, [this.result, this.afterTimeout = false]);
 
   bool get ok => status == OpStatus.applied;
 
   /// The dialog should stay open for another try.
   bool get keepDialogOpen => status == OpStatus.blocked || status == OpStatus.failed;
 }
+
+/// How long bulk price changes stay paused after a save that timed out: a
+/// price change is the one operation that is NOT safe to repeat (a second
+/// "+10 %" would compound), and the first may still land.
+const priceLockWindow = Duration(seconds: 60);
+
+/// Until when Bulk price is locked (null = not locked). keep-alive: it must
+/// survive closing the dialog.
+class PriceLockNotifier extends Notifier<DateTime?> {
+  @override
+  DateTime? build() => null;
+  void lockUntil(DateTime t) => state = t;
+  void clear() => state = null;
+}
+
+final priceLockProvider = NotifierProvider<PriceLockNotifier, DateTime?>(PriceLockNotifier.new);

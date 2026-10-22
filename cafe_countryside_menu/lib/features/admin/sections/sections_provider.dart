@@ -374,7 +374,7 @@ class DraftNotifier extends _$DraftNotifier {
                 return applied(r);
               case PatchState.notApplied:
                 logClientWarn('Draft.update', 'timed out; verified not saved');
-                return const OpOutcome(OpStatus.failed, AdminCopy.notSaved);
+                return const OpOutcome(OpStatus.failed, AdminCopy.notSaved, null, true);
               case PatchState.mixed:
                 break;
             }
@@ -383,7 +383,7 @@ class DraftNotifier extends _$DraftNotifier {
           logClientWarn('Draft.verify', e, stackTrace: st);
         }
         logClientWarn('Draft.update', 'timed out; outcome unknown');
-        return const OpOutcome(OpStatus.timedOut, AdminCopy.savingTimedOut);
+        return const OpOutcome(OpStatus.timedOut, AdminCopy.savingTimedOut, null, true);
     }
   }
 
@@ -457,6 +457,21 @@ class DraftNotifier extends _$DraftNotifier {
         doneText: (r) => 'Section saved.',
         needsBusiness: false,
       );
+
+  /// Bulk price. After a timeout that could not be verified the price tool is
+  /// locked for [priceLockWindow]: the change may still land, and repeating a
+  /// percentage would compound it.
+  Future<OpOutcome> bulkPriceSelected(List<String> ids, PriceChange change) async {
+    final lock = ref.read(priceLockProvider.notifier);
+    final clock = ref.read(adminClockProvider);
+    final outcome = await applyOp(
+      (d, c) => bulkPrice(d, ids, change, c),
+      doneText: (r) => 'Changed ${r.changed} price${r.changed == 1 ? '' : 's'}.',
+      needsBusiness: false,
+    );
+    if (outcome.afterTimeout) lock.lockUntil(clock().add(priceLockWindow));
+    return outcome;
+  }
 
   Future<OpOutcome> deleteSelected(List<String> ids) => applyOp(
         (d, c) => deleteItems(d, ids, c),

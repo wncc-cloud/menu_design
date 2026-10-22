@@ -14,6 +14,7 @@ import '../../shared/widgets/publish_banner.dart';
 import '../auth/auth_provider.dart';
 import '../ops/admin_ops.dart';
 import '../ops/op_toast.dart';
+import '../ops/price_dialog.dart';
 import '../ops/quick_edit.dart';
 import '../ops/row_tag.dart';
 import '../ops/select_bar.dart';
@@ -143,8 +144,19 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
     _afterOp(outcome, messenger);
   }
 
+  Future<void> _openPrice() async {
+    final ids = _picked.toList();
+    final messenger = ScaffoldMessenger.of(context);
+    final outcome = await showDialog<OpOutcome>(
+      context: context,
+      builder: (_) => PriceDialog(ids: ids),
+    );
+    _afterOp(outcome, messenger);
+  }
+
   Future<void> _bulk(BulkAction a) async {
     if (a == BulkAction.move) return _openMove();
+    if (a == BulkAction.price) return _openPrice();
     final ids = _picked.toList();
     final notifier = ref.read(draftProvider.notifier);
     final messenger = ScaffoldMessenger.of(context);
@@ -189,7 +201,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
       BulkAction.notesOn => await notifier.bulkNotes(ids, true),
       BulkAction.notesOff => await notifier.bulkNotes(ids, false),
       BulkAction.delete => await notifier.deleteSelected(ids),
-      BulkAction.move => const OpOutcome(OpStatus.nothing, ''),
+      BulkAction.move || BulkAction.price => const OpOutcome(OpStatus.nothing, ''),
     };
     _afterOp(o, messenger);
   }

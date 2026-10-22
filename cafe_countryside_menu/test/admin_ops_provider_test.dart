@@ -86,6 +86,7 @@ void main() {
     final before = tShape(repo.draft!);
     final o = await notifier().moveSelected(['a1'], 'b');
     expect(o.status, OpStatus.failed);
+    expect(o.afterTimeout, isFalse, reason: 'a definite failure did not commit');
     expect(o.message, AdminCopy.couldNotSave);
     expect(o.keepDialogOpen, isTrue);
     expect(tShape(repo.draft!), before);
@@ -255,6 +256,7 @@ void main() {
       repo.timeoutButCommit = true;
       final o = await notifier().moveSelected(['a1'], 'b');
       expect(o.status, OpStatus.applied);
+      expect(o.afterTimeout, isFalse, reason: 'verified as landed: nothing uncertain left');
       expect(container.read(lastOpUndoProvider), isNotNull);
     });
 
@@ -263,6 +265,7 @@ void main() {
       repo.timeoutWithoutCommit = true;
       final o = await notifier().moveSelected(['a1'], 'b');
       expect(o.status, OpStatus.failed);
+      expect(o.afterTimeout, isTrue, reason: 'it may still commit later');
       expect(o.message, AdminCopy.notSaved);
       expect(container.read(lastOpUndoProvider), isNull);
     });

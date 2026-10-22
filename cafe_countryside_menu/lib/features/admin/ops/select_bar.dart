@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum BulkAction { move, show, hide, chefOn, chefOff, notesOn, notesOff, delete }
+enum BulkAction { move, price, show, hide, chefOn, chefOff, notesOn, notesOff, delete }
 
 /// The bar at the bottom of the Items page while items are selected.
 /// Wide screens: every action in a scrollable row, "Move to…" first. Below
@@ -37,6 +37,12 @@ class SelectBar extends StatelessWidget {
       style: style(bg: const Color(0xFF2E7D32)),
       child: const Text('Move to…', style: TextStyle(fontWeight: FontWeight.bold)),
     );
+    final price = TextButton(
+      key: const Key('bulk-price'),
+      onPressed: () => onAction(BulkAction.price),
+      style: style(),
+      child: const Text('Price…'),
+    );
     final delete = TextButton(
       key: const Key('bulk-delete'),
       onPressed: () => onAction(BulkAction.delete),
@@ -60,6 +66,7 @@ class SelectBar extends StatelessWidget {
                   children: [
                     Text('$count selected', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
                     move,
+                    price,
                     PopupMenuButton<BulkAction>(
                       key: const Key('bulk-more'),
                       tooltip: 'More actions',
@@ -83,6 +90,8 @@ class SelectBar extends StatelessWidget {
                     Text('$count selected', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
                     const SizedBox(width: 10),
                     move,
+                    const SizedBox(width: 6),
+                    price,
                     const SizedBox(width: 6),
                     Expanded(
                       child: SingleChildScrollView(
