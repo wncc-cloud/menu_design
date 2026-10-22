@@ -5,13 +5,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../shared/models/admin_copy.dart';
 import '../../shared/models/draft_data.dart';
 import '../../shared/models/draft_diff.dart';
-import '../../shared/models/item_order.dart';
 import '../../shared/models/draft_item_model.dart';
 import '../../shared/models/draft_ops.dart';
 import '../../shared/models/draft_section_model.dart';
 import '../../shared/repositories/draft_repository.dart';
 import '../auth/auth_provider.dart';
 import '../ops/admin_ops.dart';
+import '../ops/edit_notice.dart';
+import '../../shared/models/draft_edits.dart';
 import '../../menu/presentation/popup_logic.dart' show chefSectionVisible;
 import '../../shared/models/business_model.dart';
 import '../../menu/presentation/menu_provider.dart';
@@ -80,141 +81,96 @@ class DraftNotifier extends _$DraftNotifier {
 
   DraftData? _draft() => ref.read(draftStreamProvider).asData?.value;
 
-  Future<void> _save(DraftData updated) => _repo.saveDraft(updated.copyWith(
-        draftUpdatedAt: DateTime.now(),
-        updatedBy: _adminUid,
-      ));
+  /// Runs ONE classic edit on the FRESHEST draft inside a transaction (plan
+  /// 1a-7). There is no other way to write the draft from here: a stale
+  /// in-memory copy can never overwrite what someone else did meanwhile (a live
+  /// sold-out toggle, a section another admin added). A failure or timeout is
+  /// logged and shown to the admin through [editNoticeProvider]; it never hangs
+  /// silently and never throws into the page.
+  ///
+  /// R3: auto-disposed notifier, so everything needed is captured BEFORE the
+  /// first await and `state` / `ref` are not touched after it.
+  Future<void> _edit(DraftData? Function(DraftData fresh) change, {String source = 'Draft.edit'}) async {
+    final repo = _repo;
+    final adminUid = _adminUid;
+    final notice = ref.read(editNoticeProvider.notifier);
+    try {
+      final status = await repo.updateDraft(change, adminUid: adminUid);
+      switch (status) {
+        case DraftUpdateStatus.timedOut:
+          logClientWarn(source, 'timed out; outcome unknown');
+          notice.post(AdminCopy.savingTimedOut);
+        case DraftUpdateStatus.noDraft:
+          notice.post(AdminCopy.draftNotReady);
+        case DraftUpdateStatus.written:
+        case DraftUpdateStatus.noWrite:
+          break;
+      }
+    } catch (e, st) {
+      logClientError(source, e, stackTrace: st);
+      notice.post(AdminCopy.couldNotSave);
+    }
+  }
 
   // ── Sections ──────────────────────────────────────────────────────────────
 
   Future<void> addSection({required String name, required String icon}) async {
+    final id = ref.read(newIdProvider)();
+    final now = DateTime.now();
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final draft = _draft();
-      if (draft == null) return;
-      final now = DateTime.now();
-      final maxOrder = draft.sections.isEmpty
-          ? -1
-          : draft.sections
-              .map((s) => s.sortOrder)
-              .reduce((a, b) => a > b ? a : b);
-      final section = DraftSectionModel(
-        id: FirebaseFirestore.instance.collection('x').doc().id,
-        name: name.trim(),
-        icon: icon.trim(),
-        sortOrder: maxOrder + 1,
-        active: true,
-        businessId: 'default',
-        createdAt: now,
-        updatedAt: now,
-      );
-      await _save(draft.copyWith(sections: [...draft.sections, section]));
-    });
+    state = await AsyncValue.guard(() => _edit((d) => addSectionTo(d, id: id, name: name, icon: icon, now: now), source: 'Draft.addSection'));
   }
 
   Future<void> updateSection(DraftSectionModel section) async {
+    final now = DateTime.now();
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final draft = _draft();
-      if (draft == null) return;
-      final now = DateTime.now();
-      final sections = draft.sections
-          .map((s) =>
-              s.id == section.id ? section.copyWith(updatedAt: now) : s)
-          .toList();
-      await _save(draft.copyWith(sections: sections));
-    });
+    state = await AsyncValue.guard(() => _edit((d) => updateSectionIn(d, section, now), source: 'Draft.updateSection'));
   }
 
+  /// Returns a message when the section still has items (checked on the fresh
+  /// draft, inside the transaction), else null.
   Future<String?> deleteSection(String sectionId) async {
-    final draft = _draft();
-    if (draft == null) return null;
-    final count =
-        draft.items.where((i) => i.sectionId == sectionId).length;
-    if (count > 0) {
-      return 'This section has $count item${count == 1 ? '' : 's'}. '
-          'Move or delete them first.';
-    }
+    String? blocked;
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      await _save(draft.copyWith(
-        sections: draft.sections.where((s) => s.id != sectionId).toList(),
-      ));
-    });
-    return null;
+    state = await AsyncValue.guard(() => _edit((d) {
+          blocked = deleteSectionBlockedReason(d, sectionId); // reset on every run
+          return blocked != null ? null : deleteSectionFrom(d, sectionId);
+        }, source: 'Draft.deleteSection'));
+    return blocked;
   }
 
-  Future<void> reorderSections(List<DraftSectionModel> reordered) async {
-    final draft = _draft();
-    if (draft == null) return;
+  /// The admin's new ORDER (ids) is applied to the CURRENT sections.
+  Future<void> reorderSections(List<DraftSectionModel> reordered) {
+    final ids = [for (final s in reordered) s.id];
     final now = DateTime.now();
-    final updated = reordered
-        .asMap()
-        .entries
-        .map((e) => e.value.copyWith(sortOrder: e.key, updatedAt: now))
-        .toList();
-    await _save(draft.copyWith(sections: updated));
+    return _edit((d) => reorderSectionsIn(d, ids, now), source: 'Draft.reorderSections');
   }
 
-  Future<void> toggleSectionActive(String sectionId) async {
-    final draft = _draft();
-    if (draft == null) return;
+  Future<void> toggleSectionActive(String sectionId) {
     final now = DateTime.now();
-    final sections = draft.sections
-        .map((s) => s.id == sectionId
-            ? s.copyWith(active: !s.active, updatedAt: now)
-            : s)
-        .toList();
-    await _save(draft.copyWith(sections: sections));
+    return _edit((d) => toggleSectionActiveIn(d, sectionId, now), source: 'Draft.toggleSectionActive');
   }
 
   // ── Items ─────────────────────────────────────────────────────────────────
 
   Future<void> addItem(DraftItemModel item) async {
+    final id = ref.read(newIdProvider)();
+    final now = DateTime.now();
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final draft = _draft();
-      if (draft == null) return;
-      final now = DateTime.now();
-      final sectionItems =
-          draft.items.where((i) => i.sectionId == item.sectionId);
-      final maxOrder = sectionItems.isEmpty
-          ? -1
-          : sectionItems
-              .map((i) => i.sortOrder)
-              .reduce((a, b) => a > b ? a : b);
-      final newItem = item.copyWith(
-        id: FirebaseFirestore.instance.collection('x').doc().id,
-        sortOrder: maxOrder + 1,
-        createdAt: now,
-        updatedAt: now,
-      );
-      await _save(draft.copyWith(items: [...draft.items, newItem]));
-    });
+    state = await AsyncValue.guard(() => _edit((d) => addItemTo(d, item, id: id, now: now), source: 'Draft.addItem'));
   }
 
+  /// The full Edit form. `available` is the LIVE sold-out switch, so the
+  /// draft's current value always wins over the form's copy.
   Future<void> updateItem(DraftItemModel item) async {
+    final now = DateTime.now();
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final draft = _draft();
-      if (draft == null) return;
-      final now = DateTime.now();
-      final items = draft.items
-          .map((i) => i.id == item.id ? item.copyWith(updatedAt: now) : i)
-          .toList();
-      await _save(draft.copyWith(items: items));
-    });
+    state = await AsyncValue.guard(() => _edit((d) => updateItemIn(d, item, now), source: 'Draft.updateItem'));
   }
 
   Future<void> deleteItem(String itemId) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final draft = _draft();
-      if (draft == null) return;
-      await _save(draft.copyWith(
-        items: draft.items.where((i) => i.id != itemId).toList(),
-      ));
-    });
+    state = await AsyncValue.guard(() => _edit((d) => deleteItemFrom(d, itemId), source: 'Draft.deleteItem'));
   }
 
   /// L2b: the sold-out switch is LIVE for every role — it writes the published
@@ -248,56 +204,38 @@ class DraftNotifier extends _$DraftNotifier {
   }
 
   /// Phase 1 (Part E): turn notes on/off for every item of one section at once.
-  /// Draft only — needs Publish like any other item edit.
-  Future<void> setNotesAllowedForSection(String sectionId, bool allowed) async {
-    final draft = _draft();
-    if (draft == null) return;
+  /// Draft only: needs Publish like any other item edit.
+  Future<void> setNotesAllowedForSection(String sectionId, bool allowed) {
     final now = DateTime.now();
-    final items = draft.items
-        .map((i) => i.sectionId == sectionId && i.noteAllowed != allowed
-            ? i.copyWith(noteAllowed: allowed, updatedAt: now)
-            : i)
-        .toList();
-    await _save(draft.copyWith(items: items));
+    return _edit((d) => setNotesAllowedForSectionIn(d, sectionId, allowed, now), source: 'Draft.setNotesAllowedForSection');
   }
 
-  /// L8: reorder inside a section (draft — needs Publish like any item edit).
-  Future<void> moveItem(String itemId, int delta) async {
-    final draft = _draft();
-    if (draft == null) return;
-    final next = moveItemInSection(draft.items, itemId, delta);
-    if (next == null) return;
-    await _save(draft.copyWith(items: next));
-  }
+  /// L8: reorder inside a section (draft: needs Publish like any item edit).
+  Future<void> moveItem(String itemId, int delta) =>
+      _edit((d) => moveItemIn(d, itemId, delta), source: 'Draft.moveItem');
 
-  Future<void> toggleItemActive(String itemId) async {
-    final draft = _draft();
-    if (draft == null) return;
+  Future<void> toggleItemActive(String itemId) {
     final now = DateTime.now();
-    final items = draft.items
-        .map((i) => i.id == itemId
-            ? i.copyWith(active: !i.active, updatedAt: now)
-            : i)
-        .toList();
-    await _save(draft.copyWith(items: items));
+    return _edit((d) => toggleItemActiveIn(d, itemId, now), source: 'Draft.toggleItemActive');
   }
 
   // ── Bulk Import ───────────────────────────────────────────────────────────
 
+  /// Appends to the CURRENT lists inside a transaction. Unlike the other edits
+  /// this THROWS on failure: BulkImportPage catches it, logs it and tells the
+  /// admin the import did not happen.
   Future<void> appendBulkImport({
     required List<DraftSectionModel> newSections,
     required List<DraftItemModel> newItems,
   }) async {
-    // Don't touch `state` here — BulkImportPage never ref.watches draftProvider,
-    // so the notifier may be auto-disposed by the time the Firestore write
-    // returns, which would throw "Ref used after disposed".
-    // The draftStreamProvider stream picks up the Firestore change automatically.
-    final draft = _draft();
-    if (draft == null) return;
-    await _save(draft.copyWith(
-      sections: [...draft.sections, ...newSections],
-      items: [...draft.items, ...newItems],
-    ));
+    // Don't touch `state` here: BulkImportPage never ref.watches draftProvider,
+    // so the notifier may be auto-disposed by the time the write returns.
+    final status = await _repo.updateDraft(
+      (d) => appendImportTo(d, newSections: newSections, newItems: newItems),
+      adminUid: _adminUid,
+    );
+    if (status == DraftUpdateStatus.timedOut) throw StateError(AdminCopy.savingTimedOut);
+    if (status == DraftUpdateStatus.noDraft) throw StateError(AdminCopy.draftNotReady);
   }
 
   // ── Phase 1a admin tools: transactional operations + Undo ─────────────────

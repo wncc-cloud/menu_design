@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-22T05:35:28.373Z
-> Files: 85 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-22T10:20:27.918Z
+> Files: 91 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
 
@@ -14,6 +14,7 @@
 
 ## ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/
 
+- `edit_17_provider.py` — idx, cut (~1942 tok)
 - `edit_banner_check.py` — edit, rep, f1, f2 (~1234 tok)
 - `edit_cl.py` — Declares logTypes (~2232 tok)
 - `edit_flows.py` (~793 tok)
@@ -32,6 +33,7 @@
 - `make_prod_shaped.mjs` — Builds a prod-shaped menu (27 sections incl. "Chef Specials" with 10 items and (~377 tok)
 - `other_admin.mjs` — Simulates "another admin / the live sold-out switch" writing the draft while (~306 tok)
 - `sample_menu.json` (~195 tok)
+- `sold_out.mjs` — "Tab 2": marks one item sold out in the draft (what the live switch does to the draft doc). (~252 tok)
 - `spa_server.mjs` — Declares root (~223 tok)
 - `split_logid.py` (~280 tok)
 - `verify_seed.mjs` — Declares HOST (~581 tok)
@@ -158,6 +160,7 @@
 ## cafe_countryside_menu/lib/features/admin/ops/
 
 - `admin_ops.dart` — / How long the Undo bar stays (plan A.1). (~691 tok)
+- `edit_notice.dart` — / A message for the admin about an edit that could not be saved (offline, (~259 tok)
 - `op_toast.dart` — / Tells the admin what an operation did: the success sentence plus any (~246 tok)
 - `price_dialog.dart` — / "Change price" for the selected items (plan A.1 "Bulk price maths"). (~2710 tok)
 - `quick_edit.dart` — Flutter widget (~4942 tok)
@@ -219,6 +222,7 @@
 ## cafe_countryside_menu/lib/features/shared/models/
 
 - `admin_copy.dart` — / Every user-facing sentence of the Phase 1a admin tools, in ONE place (plan (~1193 tok)
+- `draft_edits.dart` — / The classic single-edit operations (add / edit / hide / delete / reorder), (~1792 tok)
 - `draft_ops.dart` — / Pure draft operations for the admin tools (Phase 1a). No Firebase, no (~7843 tok)
 - `item_validators.dart` — / The item name / price rules, in ONE place: the full Edit form and the (~262 tok)
 
@@ -242,8 +246,10 @@
 - `admin_copy_test.dart` — Plan B.4: the wording of the admin tools is pinned so it cannot drift (~1542 tok)
 - `admin_ops_provider_test.dart` — 1a-2: the DraftNotifier wrappers (applyOp / undoLastOp) and the keep-alive (~3433 tok)
 - `bulk_price_ui_test.dart` — 1a-5: Bulk price in Select mode: dialog, live before/after preview that equals (~3835 tok)
+- `classic_edits_test.dart` — 1a-7: the classic single-edit paths now run on the FRESH draft inside a (~3409 tok)
 - `client_log_bounded_test.dart` — 1a-L0: bounded anonymous logs. Pure helpers (hash, bucket, id, URL cleaning), (~2233 tok)
 - `client_log_hash_test.dart` — The slot hash must be identical on the VM and in the browser (where ints are (~314 tok)
+- `draft_edits_test.dart` — 1a-7: the classic single-edit operations as pure functions (VM, no Firebase). (~2257 tok)
 - `draft_ops_test.dart` — Phase 1a pure draft operations (VM, no Firebase): flags, move, merge, undo, (~8977 tok)
 - `draft_update_test.dart` — 1a-0(c): the pure parts of DraftRepository.updateDraft. The transaction itself (~800 tok)
 - `item_form_flags_test.dart` — 1a-0(b)/(d) characterization test for the Chef Special flags the item form (~993 tok)
@@ -282,4 +288,4 @@
 ## scripts/
 
 - `build-prod.ps1` (~415 tok)
-- cafe_countryside_menu/lib/features/admin/ops/price_dialog.dart: bulk price dialog (empty start, live integer-paise before/after table, 60 s timeout lock). admin_ops.dart: OpOutcome.afterTimeout, priceLockProvider; DraftNotifier.bulkPriceSelected. test/bulk_price_ui_test.dart. (~3k tok)
+- cafe_countryside_menu/lib/features/shared/models/draft_edits.dart (1a-7): pure classic edits (addSectionTo, updateItemIn keeps live available, reorderSectionsIn, deleteSectionFrom, addItemTo, moveItemIn, appendImportTo...). lib/features/admin/ops/edit_notice.dart: editNoticeProvider (failure toast via the banner) + newIdProvider. test/draft_edits_test.dart, test/classic_edits_test.dart. (~3k tok)

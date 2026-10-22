@@ -27,6 +27,10 @@ class FakeDraftRepository implements DraftRepository {
   bool timeoutWithoutCommit = false;
   bool timeoutButCommit = false;
 
+  /// Simulates Firestore re-running the transaction callback on contention:
+  /// `apply` runs twice (the first result is thrown away).
+  bool repeatApply = false;
+
   int updateCalls = 0;
   int discardCalls = 0;
   int publishCalls = 0;
@@ -73,20 +77,13 @@ class FakeDraftRepository implements DraftRepository {
     beforeApply?.call(this);
     final cur = draft;
     if (cur == null) return DraftUpdateStatus.noDraft;
+    if (repeatApply) apply(cur);
     final next = apply(cur);
     if (next == null) return DraftUpdateStatus.noWrite;
     if (timeoutWithoutCommit) return DraftUpdateStatus.timedOut;
     draft = next.copyWith(draftUpdatedAt: DateTime.now(), updatedBy: adminUid);
     emit();
     return timeoutButCommit ? DraftUpdateStatus.timedOut : DraftUpdateStatus.written;
-  }
-
-  /// The OLD whole-document write that the pre-1a notifier methods still use
-  /// (they move onto `updateDraft` in step 1a-7).
-  @override
-  Future<void> saveDraft(DraftData d) async {
-    draft = d;
-    emit();
   }
 
   int initCalls = 0;

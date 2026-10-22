@@ -758,3 +758,14 @@
 | 11:06 | Session end: 107 writes across 69 files (phase1a.md, phase1a_wireframe.html, client_log_bounded_test.dart, edit_cl.py, client_log.dart) | 31 reads | ~151940 tok |
 | 11:10 | Session end: 107 writes across 69 files (phase1a.md, phase1a_wireframe.html, client_log_bounded_test.dart, edit_cl.py, client_log.dart) | 31 reads | ~151940 tok |
 | 11:14 | 1a-5 bulk price done: price_dialog.dart, BulkAction.price, OpOutcome.afterTimeout + priceLockProvider (60 s), bulkPriceSelected; 17 new tests (537 total); lock mutation-verified; real-SDK browser check passed (+10% exact, Undo exact) | lib/features/admin/ops/price_dialog.dart, admin_ops.dart, sections_provider.dart, select_bar.dart, items_page.dart | green | ~480000 |
+| 11:14 | Session end: 107 writes across 69 files (phase1a.md, phase1a_wireframe.html, client_log_bounded_test.dart, edit_cl.py, client_log.dart) | 31 reads | ~151940 tok |
+| 15:32 | Session end: 107 writes across 69 files (phase1a.md, phase1a_wireframe.html, client_log_bounded_test.dart, edit_cl.py, client_log.dart) | 31 reads | ~151940 tok |
+| 15:36 | Created cafe_countryside_menu/lib/features/shared/models/draft_edits.dart | — | ~1792 |
+| 15:39 | Created cafe_countryside_menu/test/draft_edits_test.dart | — | ~2257 |
+| 15:40 | Created cafe_countryside_menu/lib/features/admin/ops/edit_notice.dart | — | ~259 |
+| 15:40 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/edit_17_provider.py | — | ~1942 |
+| 15:43 | Created cafe_countryside_menu/test/classic_edits_test.dart | — | ~3409 |
+| 15:47 | Created cafe_countryside_menu/firebase.e2e.json | — | ~58 |
+| 15:49 | Session end: 113 writes across 74 files (phase1a.md, phase1a_wireframe.html, client_log_bounded_test.dart, edit_cl.py, client_log.dart) | 31 reads | ~162208 tok |
+| 15:50 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/sold_out.mjs | — | ~252 |
+| 15:51 | 1a-7 done: draft_edits.dart (12 pure edits), DraftNotifier._edit via updateDraft (_save deleted), edit_notice.dart + banner toast, newIdProvider; 37 new tests (574 total); 2 mutations verified; real-SDK check: form save keeps sold-out | draft_edits.dart, sections_provider.dart, edit_notice.dart, publish_banner.dart | green | ~560000 |

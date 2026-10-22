@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../admin/auth/auth_provider.dart';
 import '../../admin/menu_check/menu_check_provider.dart';
 import '../../admin/menu_check/publish_check.dart';
+import '../../admin/ops/edit_notice.dart';
 import '../../admin/ops/undo_bar.dart';
 import '../../admin/sections/sections_provider.dart';
 
@@ -41,6 +42,14 @@ class PublishBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // An edit that could not be saved (offline, denied, timed out) says so.
+    ref.listen<String?>(editNoticeProvider, (_, message) {
+      if (message == null) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(message), backgroundColor: Colors.red));
+      ref.read(editNoticeProvider.notifier).clear();
+    });
     final pending = ref.watch(pendingChangesProvider);
     final notifier = ref.watch(draftProvider);
     final canPublish = ref.watch(permissionServiceProvider)?.canPublish ?? false;
