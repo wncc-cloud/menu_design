@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../admin/auth/auth_provider.dart';
+import '../../admin/menu_check/menu_check_provider.dart';
+import '../../admin/menu_check/publish_check.dart';
 import '../../admin/ops/undo_bar.dart';
 import '../../admin/sections/sections_provider.dart';
 
@@ -41,6 +44,8 @@ class PublishBanner extends ConsumerWidget {
     final pending = ref.watch(pendingChangesProvider);
     final notifier = ref.watch(draftProvider);
     final canPublish = ref.watch(permissionServiceProvider)?.canPublish ?? false;
+    // One shared computation; this widget rebuilds only when the NUMBER changes.
+    final problems = ref.watch(menuProblemCountProvider);
 
     // The Undo bar shows even when there is nothing pending (e.g. after an Undo
     // or a no-net-change operation), so it is NOT hidden with the banner.
@@ -53,13 +58,13 @@ class PublishBanner extends ConsumerWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _banner(context, ref, pending, notifier.isLoading, canPublish, text),
+        _banner(context, ref, pending, notifier.isLoading, canPublish, text, problems),
         const UndoBar(),
       ],
     );
   }
 
-  Widget _banner(BuildContext context, WidgetRef ref, PendingChanges pending, bool loading, bool canPublish, String text) {
+  Widget _banner(BuildContext context, WidgetRef ref, PendingChanges pending, bool loading, bool canPublish, String text, int problems) {
     const white = Colors.white;
     return Material(
       color: const Color(0xFFE65100),
@@ -78,6 +83,16 @@ class PublishBanner extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 8),
+              if (canPublish && problems > 0 && !loading)
+                Tooltip(
+                  message: 'Menu check: $problems problem${problems == 1 ? '' : 's'}',
+                  child: TextButton(
+                    key: const Key('banner-menu-check'),
+                    onPressed: () => GoRouter.maybeOf(context)?.push('/admin/menu-check'),
+                    style: TextButton.styleFrom(foregroundColor: white, minimumSize: const Size(0, 40), padding: const EdgeInsets.symmetric(horizontal: 8)),
+                    child: Text('⚠ $problems', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  ),
+                ),
               if (!canPublish)
                 const SizedBox.shrink()
               else if (loading)
@@ -98,7 +113,7 @@ class PublishBanner extends ConsumerWidget {
                 ),
                 const SizedBox(width: 6),
                 TextButton(
-                  onPressed: () => ref.read(draftProvider.notifier).publishMenu(),
+                  onPressed: () => publishWithMenuCheck(context, ref),
                   style: TextButton.styleFrom(
                     backgroundColor: white,
                     foregroundColor: const Color(0xFFE65100),

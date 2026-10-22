@@ -9,6 +9,7 @@ import 'features/admin/auth/login_page.dart';
 import 'features/admin/bug_logs/bug_logs_page.dart';
 import 'features/admin/dashboard/dashboard_page.dart';
 import 'features/admin/items/items_page.dart';
+import 'features/admin/menu_check/menu_check_page.dart';
 import 'features/admin/items/bulk_import/bulk_import_page.dart';
 import 'features/admin/profile/profile_page.dart';
 import 'features/admin/promotions/promotions_page.dart';
@@ -84,6 +85,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/admin/items/import',
       builder: (_, _) => const AdminGuard(child: BulkImportPage()),
+    ),
+    GoRoute(
+      path: '/admin/menu-check',
+      builder: (_, _) => const AdminGuard(child: MenuCheckPage()),
     ),
     GoRoute(
       path: '/admin/promotions',

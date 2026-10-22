@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-22T04:48:45.070Z
-> Files: 73 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-22T05:17:49.461Z
+> Files: 82 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../../../../private/tmp/claude-502/-Users-wncc-Documents-development-projects-menu-design/5b8fb5be-2a0d-47f0-8346-dc05e8e6d13d/scratchpad/
 
@@ -14,17 +14,20 @@
 
 ## ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/
 
+- `edit_banner_check.py` — edit, rep, f1, f2 (~1234 tok)
 - `edit_cl.py` — Declares logTypes (~2232 tok)
 - `edit_flows.py` (~793 tok)
 - `edit_form_validators.py` (~274 tok)
 - `edit_items_page.py` — _FilterChip: rep (~3643 tok)
 - `edit_items_search.py` — ItemsPage: rep (~3443 tok)
 - `edit_ops_quick.py` — UndoPatch: rep (~3116 tok)
+- `edit_problem_key.py` — rep (~680 tok)
 - `edit_provider.py` — Declares OpOutcome (~2155 tok)
 - `edit_rules.py` — logShapeOk: boundedLogOk, adminLogOk (~1327 tok)
 - `edit_sections_search.py` — _SectionsPageState: rep (~2481 tok)
 - `edit_sections_ui.py` — rep (~1663 tok)
 - `fix_items_test.py` — Harness: rep (~1058 tok)
+- `fix_menu_check_tests.py` — AdminHarness: rep (~1682 tok)
 - `make_prod_shaped.mjs` — Builds a prod-shaped menu (27 sections incl. "Chef Specials" with 10 items and (~377 tok)
 - `other_admin.mjs` — Simulates "another admin / the live sold-out switch" writing the draft while (~306 tok)
 - `sample_menu.json` (~195 tok)
@@ -143,6 +146,14 @@
 
 - `item_form.dart` — Stateful widget: ItemFormDialog (~4635 tok)
 
+## cafe_countryside_menu/lib/features/admin/menu_check/
+
+- `menu_check_fix.dart` — / Fix buttons open the editors that can actually repair a problem, so only (~495 tok)
+- `menu_check_page.dart` — / "Menu check": what is wrong with the draft AS IT WILL BE after Publish. (~1152 tok)
+- `menu_check_provider.dart` — / The Menu check result for the current draft. (~830 tok)
+- `menu_check_tile.dart` — / Dashboard card: "Menu check — 5 problems found" -> the Menu check page. (~346 tok)
+- `publish_check.dart` — / Stops a second Publish press while the check / dialog is still open. (~1561 tok)
+
 ## cafe_countryside_menu/lib/features/admin/ops/
 
 - `admin_ops.dart` — / How long the Undo bar stays (plan A.1). (~691 tok)
@@ -234,6 +245,7 @@
 - `draft_update_test.dart` — 1a-0(c): the pure parts of DraftRepository.updateDraft. The transaction itself (~800 tok)
 - `item_form_flags_test.dart` — 1a-0(b)/(d) characterization test for the Chef Special flags the item form (~993 tok)
 - `items_select_mode_test.dart` — 1a-2: Select mode, the bulk bar, Move dialog, Undo bar on the REAL Items page, (~4563 tok)
+- `menu_check_ui_test.dart` — 1a-4: the Menu check. The shared provider (computed ONCE), the Publish dialog (~5558 tok)
 - `quick_edit_ops_test.dart` — 1a-3 pure layer: quick-edit operations, section patches (Undo), row tags. (~3068 tok)
 - `quick_edit_ui_test.dart` — 1a-3: the quick-edit dialogs (item and section), opened from the real Items / (~4124 tok)
 - `search_ui_test.dart` — 1a-3: search on Items and Sections, the Dashboard Find box, deep links. (~4146 tok)
@@ -267,8 +279,5 @@
 ## scripts/
 
 - `build-prod.ps1` (~415 tok)
-- cafe_countryside_menu/lib/features/shared/models/item_validators.dart: validateItemName/validateItemPrice shared by the full form and quick edit. (~300 tok)
-- draft_ops.dart (1a-3): QuickItemEdit, quickEditItem/Section, quickEditWarnings (shared with Move), SectionPatch (Undo for section edits), itemRowTags/sectionRowTags, findResults.
-- cafe_countryside_menu/lib/features/admin/ops/quick_edit.dart: showQuickEditItem/Section dialogs (read-only for staff, live sold-out switch, More… deep link); op_toast.dart; section_flows.dart (shared merge/delete flows); row_tag.dart. (~5k tok)
-- cafe_countryside_menu/lib/features/admin/dashboard/menu_find_box.dart: Dashboard "Find item or section" (no dart:html). (~1.8k tok)
-- test/support/admin_harness.dart + quick_edit_ui_test.dart, search_ui_test.dart, quick_edit_ops_test.dart: 1a-3 tests.
+- cafe_countryside_menu/lib/features/admin/menu_check/: menu_check_provider.dart (computed-once state + fresh business read), menu_check_fix.dart (Fix per problem kind), publish_check.dart (Publish -> check -> dialog, never blocking, busy guard), menu_check_page.dart, menu_check_tile.dart. Route /admin/menu-check; banner shows "⚠ N". (~6k tok)
+- test/menu_check_ui_test.dart: provider (one computation), Publish dialog, page + Fix buttons, tile, banner count.

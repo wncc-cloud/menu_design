@@ -644,6 +644,18 @@ void main() {
       expect(menuProblems(d), isEmpty, reason: 'without the rename it is just a normal section');
     });
 
+    test('a clash records WHICH built-in chip it looks like (for the Fix button)', () {
+      final chef = menuProblems(draft([sec('a', 'Chef Specials')], [item('c', 'a')])).single;
+      expect(chef.systemKey, chefSpecialKey);
+      final best = menuProblems(draft([sec('a', 'Best Sellers')], [item('c', 'a')])).single;
+      expect(best.systemKey, bestSellerKey);
+      final renamed = menuProblems(
+        draft([sec('a', 'Our Specials')], [item('c', 'a')]),
+        systemSections: [const SystemSection(key: chefSpecialKey, name: 'Our Specials', icon: '🍳')],
+      ).single;
+      expect(renamed.systemKey, chefSpecialKey);
+    });
+
     test('best sellers spellings', () {
       for (final n in ['Best Sellers', 'bestseller', 'BEST SELLER']) {
         final d = draft([sec('a', n)], [item('c', 'a')]);

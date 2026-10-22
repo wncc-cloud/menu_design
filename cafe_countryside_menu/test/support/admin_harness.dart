@@ -10,6 +10,7 @@ import 'package:cafe_countryside_menu/features/shared/models/admin_model.dart';
 import 'package:cafe_countryside_menu/features/shared/models/business_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 
 import 'draft_fixtures.dart';
@@ -31,9 +32,29 @@ class AdminHarness {
   final FakeDraftRepository repo;
   DateTime now = DateTime(2026, 10, 22, 12);
   BusinessModel business;
+
+  /// While true the (fresh) business document cannot be read.
+  bool businessUnreadable = false;
   late final ProviderContainer container;
   AdminHarness(this.repo, this.business);
 }
+
+/// The overrides every admin test needs, for a plain ProviderContainer.
+List<Override> adminOverrides(
+  FakeDraftRepository repo,
+  Future<BusinessModel?> Function() business, {
+  AdminRole role = AdminRole.owner,
+  DateTime Function()? clock,
+  BusinessModel? adminBusiness,
+}) =>
+    [
+      draftRepositoryProvider.overrideWithValue(repo),
+      currentAdminProvider.overrideWith((ref) async => tAdmin(role)),
+      freshBusinessLoaderProvider.overrideWithValue(business),
+      adminClockProvider.overrideWithValue(clock ?? DateTime.now),
+      adminBusinessProvider.overrideWith(() => FakeAdminBusiness(adminBusiness ?? BusinessModel.empty())),
+      mp.menuControllerProvider.overrideWith(FakeMenu.new),
+    ];
 
 /// Pumps [home] (an admin page or a widget) inside a MaterialApp, or inside
 /// [router] when navigation matters.
@@ -46,6 +67,7 @@ Future<AdminHarness> pumpAdmin(
   BusinessModel? business,
   Size size = const Size(1400, 1400),
   bool snapshotEqualsDraft = true,
+  bool businessUnreadable = false,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -65,14 +87,18 @@ Future<AdminHarness> pumpAdmin(
         ),
       );
   if (snapshotEqualsDraft) r.snapshot ??= r.draft;
-  final h = AdminHarness(r, business ?? BusinessModel.empty());
+  final h = AdminHarness(r, business ?? BusinessModel.empty())..businessUnreadable = businessUnreadable;
   h.container = ProviderContainer(overrides: [
-    draftRepositoryProvider.overrideWithValue(r),
-    currentAdminProvider.overrideWith((ref) async => tAdmin(role)),
-    freshBusinessLoaderProvider.overrideWithValue(() async => h.business),
-    adminClockProvider.overrideWithValue(() => h.now),
-    adminBusinessProvider.overrideWith(() => FakeAdminBusiness(h.business)),
-    mp.menuControllerProvider.overrideWith(FakeMenu.new),
+    ...adminOverrides(
+      r,
+      () async {
+        if (h.businessUnreadable) throw Exception('offline');
+        return h.business;
+      },
+      role: role,
+      clock: () => h.now,
+      adminBusiness: h.business,
+    ),
   ]);
   addTearDown(h.container.dispose);
   await tester.pumpWidget(UncontrolledProviderScope(

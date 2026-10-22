@@ -1151,6 +1151,23 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-10-22T04:50:22.992644+00:00"
+    },
+    {
+      "id": "bug-072",
+      "timestamp": "2026-10-22T05:25:31.797471+00:00",
+      "error_message": "Menu check: the double-press guard test passed even with the guard removed (mutation survived)",
+      "file": "cafe_countryside_menu/test/menu_check_ui_test.dart",
+      "root_cause": "Two tester.tap calls cannot fire two presses before a frame, so the flow only ever started once; the test proved nothing",
+      "fix": "Call publishWithMenuCheck twice without awaiting (what a double-click does); mutation now fails the test",
+      "tags": [
+        "tests",
+        "mutation",
+        "publish",
+        "plan-1a-4"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-22T05:25:31.797471+00:00"
     }
   ]
 }

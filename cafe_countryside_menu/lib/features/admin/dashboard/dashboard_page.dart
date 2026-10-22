@@ -13,6 +13,7 @@ import '../../shared/models/business_model.dart';
 import '../../order/providers/cafe_status_provider.dart';
 import '../sections/sections_provider.dart';
 import '../auth/auth_provider.dart';
+import '../menu_check/menu_check_tile.dart';
 import 'menu_find_box.dart';
 import '../../shared/widgets/publish_banner.dart';
 
@@ -255,6 +256,8 @@ class DashboardPage extends ConsumerWidget {
                     subtitle: 'Add and edit menu items with pricing',
                     onTap: () => context.push('/admin/items'),
                   ),
+                  const SizedBox(height: 8),
+                  const MenuCheckTile(),
                   const SizedBox(height: 8),
                   _NavCard(
                     icon: Icons.campaign_outlined,

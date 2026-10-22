@@ -898,6 +898,10 @@ class MenuProblem {
   final String detail;
   final String? sectionId;
   final String? itemId;
+
+  /// For [ProblemKind.systemNameClash]: which built-in chip the section looks
+  /// like (`chefSpecial` / `bestSeller`), so Fix can preselect the obvious target.
+  final String? systemKey;
   const MenuProblem({
     required this.level,
     required this.kind,
@@ -905,6 +909,7 @@ class MenuProblem {
     required this.detail,
     this.sectionId,
     this.itemId,
+    this.systemKey,
   });
 }
 
@@ -923,17 +928,18 @@ List<MenuProblem> menuProblems(
   final out = <MenuProblem>[];
 
   // Built-in chip names (as renamed by the owner AND the defaults).
-  final sys = <String, ({bool visible, String label})>{};
-  void addSys(String name, bool visible, String label) => sys[normalizeSearch(name)] = (visible: visible, label: label);
+  final sys = <String, ({bool visible, String label, String key})>{};
+  void addSys(String name, bool visible, String label, String key) =>
+      sys[normalizeSearch(name)] = (visible: visible, label: label, key: key);
   bool visOf(String key) => systemSections.where((s) => s.key == key).firstOrNull?.visible ?? true;
   for (final s in systemSections) {
-    addSys(s.displayName, s.visible, s.key == chefSpecialKey ? 'Chef Special' : 'Best Sellers');
+    addSys(s.displayName, s.visible, s.key == chefSpecialKey ? 'Chef Special' : 'Best Sellers', s.key);
   }
   for (final n in ['chef special', 'chef specials']) {
-    sys.putIfAbsent(normalizeSearch(n), () => (visible: visOf(chefSpecialKey), label: 'Chef Special'));
+    sys.putIfAbsent(normalizeSearch(n), () => (visible: visOf(chefSpecialKey), label: 'Chef Special', key: chefSpecialKey));
   }
   for (final n in ['best seller', 'best sellers', 'bestseller', 'bestsellers']) {
-    sys.putIfAbsent(normalizeSearch(n), () => (visible: visOf(bestSellerKey), label: 'Best Sellers'));
+    sys.putIfAbsent(normalizeSearch(n), () => (visible: visOf(bestSellerKey), label: 'Best Sellers', key: bestSellerKey));
   }
 
   for (final s in d.sections) {
@@ -947,6 +953,7 @@ List<MenuProblem> menuProblems(
           ? 'Customers will see two chips with the same meaning.'
           : 'The built-in chip is hidden, so this is only a tip.',
       sectionId: s.id,
+      systemKey: hit.key,
     ));
   }
 
