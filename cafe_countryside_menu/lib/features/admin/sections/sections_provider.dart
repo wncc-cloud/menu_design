@@ -182,13 +182,26 @@ class DraftNotifier extends _$DraftNotifier {
     final item = draft.items.where((i) => i.id == itemId).firstOrNull;
     if (item == null) return null;
     final next = !item.available;
-    await _repo.setAvailabilityLive(itemId, next);
-    return next;
+    final ok = await _setLive(itemId, next, source: 'Draft.toggleAvailable');
+    return ok ? next : null;
   }
 
   /// Sets availability live (used by the item form's "Available now" switch).
   Future<void> setItemAvailableLive(String itemId, bool available) =>
-      _repo.setAvailabilityLive(itemId, available);
+      _setLive(itemId, available, source: 'Draft.setAvailableLive');
+
+  /// Never throws: a failure is logged and shown as a notice (nothing changed).
+  Future<bool> _setLive(String itemId, bool available, {required String source}) async {
+    final notice = ref.read(editNoticeProvider.notifier);
+    try {
+      await _repo.setAvailabilityLive(itemId, available);
+      return true;
+    } catch (e, st) {
+      logClientError(source, e, stackTrace: st);
+      notice.post(AdminCopy.couldNotSave);
+      return false;
+    }
+  }
 
   /// L4: draft := what customers see now (from the publish-time snapshot).
   Future<String?> discardDraft() async {
@@ -334,14 +347,22 @@ class DraftNotifier extends _$DraftNotifier {
     final undo = ref.read(lastOpUndoProvider.notifier);
 
     UndoResult? res;
+    final DraftUpdateStatus status;
     try {
-      await repo.updateDraft((fresh) {
+      status = await repo.updateDraft((fresh) {
         res = applyUndo(fresh, op.patch);
         return res!.changed ? res!.newDraft : null;
       }, adminUid: adminUid);
     } catch (e, st) {
       logClientError('Draft.undo', e, stackTrace: st);
       return const OpOutcome(OpStatus.failed, AdminCopy.couldNotSave);
+    }
+    // Keep the Undo bar when nothing happened for sure, so it can be retried.
+    if (status == DraftUpdateStatus.timedOut) {
+      return const OpOutcome(OpStatus.timedOut, AdminCopy.savingTimedOut);
+    }
+    if (status == DraftUpdateStatus.noDraft) {
+      return const OpOutcome(OpStatus.failed, AdminCopy.draftNotReady);
     }
     undo.clear();
     final r = res;
@@ -420,12 +441,20 @@ class DraftNotifier extends _$DraftNotifier {
   // ── Publish ───────────────────────────────────────────────────────────────
 
   Future<void> publishMenu() async {
-    ref.read(lastOpUndoProvider.notifier).clear(); // nothing left to undo against
+    final undo = ref.read(lastOpUndoProvider.notifier);
+    final notice = ref.read(editNoticeProvider.notifier);
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final draft = _draft();
       if (draft == null) return;
-      await _repo.publishMenu(draft: draft, publishedBy: _adminUid);
+      try {
+        await _repo.publishMenu(draft: draft, publishedBy: _adminUid);
+      } catch (e, st) {
+        logClientError('Draft.publish', e, stackTrace: st);
+        notice.post(AdminCopy.couldNotPublish);
+        return; // Undo stays: nothing was published
+      }
+      undo.clear(); // published: nothing left to undo against
       ref.invalidate(menuControllerProvider);
     });
   }

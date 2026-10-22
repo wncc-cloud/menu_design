@@ -31,6 +31,10 @@ class FakeDraftRepository implements DraftRepository {
   /// `apply` runs twice (the first result is thrown away).
   bool repeatApply = false;
 
+  /// Throw this from setAvailabilityLive / publishMenu (offline, denied...).
+  Object? throwOnLive;
+  Object? throwOnPublish;
+
   int updateCalls = 0;
   int discardCalls = 0;
   int publishCalls = 0;
@@ -101,6 +105,7 @@ class FakeDraftRepository implements DraftRepository {
   /// The live sold-out switch: draft AND snapshot move together (not a pending change).
   @override
   Future<void> setAvailabilityLive(String itemId, bool available) async {
+    if (throwOnLive != null) throw throwOnLive!;
     DraftData flip(DraftData d) => d.copyWith(items: [for (final i in d.items) i.id == itemId ? i.copyWith(available: available) : i]);
     if (draft != null) draft = flip(draft!);
     if (snapshot != null) snapshot = flip(snapshot!);
@@ -119,6 +124,7 @@ class FakeDraftRepository implements DraftRepository {
   @override
   Future<void> publishMenu({required DraftData draft, required String publishedBy}) async {
     publishCalls++;
+    if (throwOnPublish != null) throw throwOnPublish!;
     snapshot = draft;
     emit();
   }

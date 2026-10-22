@@ -3,6 +3,7 @@
 // semantics (test/support/fake_draft_repository.dart). No Firebase.
 import 'package:cafe_countryside_menu/features/admin/auth/auth_provider.dart';
 import 'package:cafe_countryside_menu/features/admin/ops/admin_ops.dart';
+import 'package:cafe_countryside_menu/features/admin/ops/edit_notice.dart';
 import 'package:cafe_countryside_menu/features/admin/sections/sections_provider.dart';
 import 'package:cafe_countryside_menu/features/menu/models/item_model.dart' show chefOnlySectionId;
 import 'package:cafe_countryside_menu/features/shared/models/admin_copy.dart';
@@ -200,6 +201,32 @@ void main() {
       expect(tShape(repo.draft!), before);
     });
 
+    test('undo that times out does not claim success and keeps the Undo bar', () async {
+      await ready();
+      await notifier().moveSelected(['a1'], 'b');
+      repo.timeoutWithoutCommit = true;
+      final o = await notifier().undoLastOp();
+      expect(o.status, OpStatus.timedOut);
+      expect(container.read(lastOpUndoProvider), isNotNull);
+    });
+
+    test('undo with no draft fails and keeps the Undo bar', () async {
+      await ready();
+      await notifier().moveSelected(['a1'], 'b');
+      repo.draft = null;
+      final o = await notifier().undoLastOp();
+      expect(o.status, OpStatus.failed);
+      expect(container.read(lastOpUndoProvider), isNotNull);
+    });
+
+    test('live sold-out toggle that fails: no throw, notice, returns null', () async {
+      await ready();
+      repo.throwOnLive = Exception('offline');
+      expect(await notifier().toggleItemAvailable('a1'), isNull);
+      await notifier().setItemAvailableLive('a1', false); // must not throw
+      expect(container.read(editNoticeProvider), AdminCopy.couldNotSave);
+    });
+
     test('undo with nothing to undo is a no-op', () async {
       await ready();
       expect((await notifier().undoLastOp()).status, OpStatus.nothing);
@@ -232,6 +259,17 @@ void main() {
       await notifier().publishMenu();
       expect(repo.publishCalls, 1);
       expect(container.read(lastOpUndoProvider), isNull);
+    });
+
+    test('Publish that fails keeps Undo, posts a notice and does not throw', () async {
+      await ready();
+      await notifier().moveSelected(['a1'], 'b');
+      container.listen(draftStreamProvider, (_, _) {});
+      await container.read(draftStreamProvider.future);
+      repo.throwOnPublish = Exception('offline');
+      await notifier().publishMenu();
+      expect(container.read(lastOpUndoProvider), isNotNull, reason: 'nothing was published');
+      expect(container.read(editNoticeProvider), AdminCopy.couldNotPublish);
     });
 
     test('signing out (or another admin signing in) resets it', () async {

@@ -233,6 +233,12 @@ class DraftRepository {
       final menuSnap = await tx.get(_menuRef);
       final currentVersion =
           menuSnap.exists ? (menuSnap.data()?['menuVersion'] as int? ?? 0) : 0;
+      // Publish what the draft holds NOW, not the in-memory copy: an edit by
+      // another admin or the live sold-out switch may have landed since.
+      final draftSnap = await tx.get(_draftRef);
+      if (draftSnap.exists && draftSnap.data() != null) {
+        draft = DraftData.fromJson(draftSnap.data()!);
+      }
 
       final now = DateTime.now();
       final activeSections =

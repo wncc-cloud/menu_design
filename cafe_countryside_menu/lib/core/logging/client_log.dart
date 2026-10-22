@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -155,17 +154,15 @@ class LogGate {
 
 /// Cuts [s] to at most [maxBytes] UTF-8 bytes without splitting a character.
 String capUtf8(String s, int maxBytes) {
-  if (utf8.encode(s).length <= maxBytes) return s;
-  var end = s.length;
-  while (end > 0 && utf8.encode(s.substring(0, end)).length > maxBytes) {
-    end -= 1;
+  var bytes = 0;
+  var end = 0; // UTF-16 index after the last whole character that fits
+  for (final r in s.runes) {
+    final w = r < 0x80 ? 1 : r < 0x800 ? 2 : r < 0x10000 ? 3 : 4;
+    if (bytes + w > maxBytes) return s.substring(0, end);
+    bytes += w;
+    end += r > 0xFFFF ? 2 : 1;
   }
-  // Do not stop between the two halves of an emoji.
-  if (end > 0) {
-    final last = s.codeUnitAt(end - 1);
-    if (last >= 0xD800 && last <= 0xDBFF) end -= 1;
-  }
-  return s.substring(0, end);
+  return s;
 }
 
 class ClientLogRepository {

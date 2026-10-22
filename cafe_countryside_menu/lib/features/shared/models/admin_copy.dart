@@ -63,7 +63,8 @@ class AdminCopy {
   static const duplicateSectionWarning = 'Another section already has this name.';
   static const savedLine = 'Saved';
   static const couldNotSave = "Couldn't save — check your connection. Nothing was changed.";
-  static const notSaved = 'Not saved — nothing was changed.';
+  static const couldNotPublish = "Couldn't publish — check your connection. Customers still see the old menu.";
+  static const notSaved ='Not saved — nothing was changed.';
   static const draftNotReady = "The draft isn't ready yet — try again in a moment.";
   static const savingTimedOut =
       'This is taking too long. It may or may not have saved — check the Publish banner count before trying again.';

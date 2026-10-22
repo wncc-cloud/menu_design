@@ -251,10 +251,13 @@ class _QuickEditItemDialogState extends ConsumerState<QuickEditItemDialog> {
                             onChanged: (readOnly || _busy)
                                 ? null
                                 : (v) => setState(() {
+                                      final wasReserved = _sectionId == chefOnlySectionId;
                                       _sectionId = v!;
                                       if (v == chefOnlySectionId) {
                                         _chef = true;
                                         _only = true;
+                                      } else if (wasReserved) {
+                                        _only = false; // like Move: leaving the Chef-only list
                                       }
                                     }),
                           ),

@@ -31,6 +31,12 @@ void main() {
 
   group('capUtf8', () {
     test('short text is untouched', () => expect(capUtf8('hello', 10), 'hello'));
+    test('a huge message is cut in linear time', () {
+      final sw = Stopwatch()..start();
+      final out = capUtf8('é' * 500000, 2000);
+      expect(out.length, 1000);
+      expect(sw.elapsedMilliseconds, lessThan(500));
+    });
 
     test('cuts to the byte budget', () {
       expect(capUtf8('a' * 50, 10), 'a' * 10);
