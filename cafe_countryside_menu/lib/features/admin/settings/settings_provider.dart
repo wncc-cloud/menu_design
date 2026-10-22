@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../menu/presentation/menu_provider.dart';
 import '../../shared/models/business_model.dart';
 import '../../shared/repositories/business_repository.dart';
 import '../../../core/logging/client_log.dart';
@@ -24,6 +25,9 @@ class SettingsNotifier extends _$SettingsNotifier {
           .read(settingsBusinessRepositoryProvider)
           .saveSettings(business);
       state = AsyncValue.data(business);
+      // The Dashboard and the customer pages read the cached businessProvider:
+      // refresh it so "Self-ordering: Off" does not linger after a save.
+      ref.invalidate(businessProvider);
       return null;
     } catch (e, st) {
       logClientError('Settings.save', e, stackTrace: st);

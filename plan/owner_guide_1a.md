@@ -30,6 +30,11 @@ After a merge, move, bulk change or quick edit, the **Undo (60s)** bar appears u
 ## 6. What Publish does
 Publish copies the draft to the live menu. Customers with the page already open see it within about 20 minutes (new visitors immediately). Items hidden or in hidden sections are not published. Items in **🍳 Chef Special only** appear only in the Chef Special chip.
 
+## 7. Make the table number compulsory (Settings)
+**Settings → Customers must enter a table number.** It is **off** by default, so nothing changes until you switch it on. It only works while **Ask for a table number at checkout** is on (the switch is greyed out otherwise). When it is on, the checkout field reads "Table number" (no "(optional)") and a customer cannot place an order until it is filled in. Turn it off again any time: it applies from the customer's next **Place Order**. This is a live setting (no Publish).
+
+**Also check:** the customer **ADD** buttons and the Chef Special first-load pop-up only appear while **Enable self-ordering** is on in Settings.
+
 ## If something looks wrong
 - A message "Couldn't save — check your connection" means nothing was changed; try again.
 - "May or may not have saved" means check the orange bar's change count first. The price tool pauses for a minute after this so a percentage is never applied twice.

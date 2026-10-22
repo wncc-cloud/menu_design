@@ -13,6 +13,7 @@ All notable changes to the planning documents are recorded here.
 - Undo bar (60 s, field-level inverse patch, survives page changes, cleared by Publish/Discard/sign-out)
 - Menu check: Dashboard tile, page with Fix buttons, and a Publish dialog that never blocks
 - Bug Logs hardening: build id on every log, sanitised page URL, bounded anonymous log ids (at most 2,304 documents a day) with a rules test script
+- Settings: "Customers must enter a table number" switch (default OFF, only works while "Ask for a table number" is ON). Checked at Place Order against a fresh read of the setting, so switching it on or off takes effect on the customer's next Place Order
 - Admin tests use an in-memory draft repository; emulator scripts for the rules and the draft transaction; `tool/seed_from_prod.mjs`
 
 ### Changed
@@ -21,6 +22,8 @@ All notable changes to the planning documents are recorded here.
 - Deleting a section now asks first (an empty section used to be deleted before the dialog) and checks the first-load pop-up
 
 ### Fixed
+- Dashboard no longer shows a stale "Self-ordering: Off / Not opening" after saving Settings, Promotions or Sections (the cached business copy is refreshed after each save)
+- Publish: a failed publish now says so (and keeps Undo); it publishes the freshest draft, not the on-screen copy; the live sold-out switch and Undo no longer fail silently
 - Empty-section delete confirm order; stale item form re-enabling a sold-out item; reorder dropping a new section
 
 ### Deployment notes

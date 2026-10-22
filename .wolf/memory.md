@@ -794,3 +794,44 @@
 | 16:11 | Edited cafe_countryside_menu/test/admin_ops_provider_test.dart | added 1 import(s) | ~40 |
 | 16:11 | Edited cafe_countryside_menu/test/bug_logging_test.dart | modified test() | ~84 |
 | 16:40 | code-review fixes 1,2,3,5,9,10 (publish error/fresh draft, live toggle guard, undo status, quick-edit _only, capUtf8 O(n)) | sections_provider, draft_repository, quick_edit, client_log | 579 tests pass, 2 infos | ~6000 |
+| 16:14 | Session end: 15 writes across 8 files (client_log.dart, draft_repository.dart, sections_provider.dart, admin_copy.dart, quick_edit.dart) | 5 reads | ~9840 tok |
+| 16:37 | Session end: 15 writes across 8 files (client_log.dart, draft_repository.dart, sections_provider.dart, admin_copy.dart, quick_edit.dart) | 5 reads | ~9840 tok |
+| 16:45 | Edited scripts/build-prod.ps1 | 1→2 lines | ~54 |
+| 16:45 | Session end: 16 writes across 9 files (client_log.dart, draft_repository.dart, sections_provider.dart, admin_copy.dart, quick_edit.dart) | 5 reads | ~9898 tok |
+| 17:07 | Session end: 16 writes across 9 files (client_log.dart, draft_repository.dart, sections_provider.dart, admin_copy.dart, quick_edit.dart) | 5 reads | ~9898 tok |
+| 17:08 | Created cafe_countryside_menu/firebase.e2e.json | — | ~57 |
+| 17:09 | Created ../../../../AppData/Local/Temp/claude/c--Users-singh-Documents-dev-code-menu-design/c39de5fd-fb26-4063-8889-69e5fc504280/scratchpad/make_owner.mjs | — | ~168 |
+| 17:11 | Session end: 18 writes across 11 files (client_log.dart, draft_repository.dart, sections_provider.dart, admin_copy.dart, quick_edit.dart) | 6 reads | ~10135 tok |
+| 17:11 | Session end: 18 writes across 11 files (client_log.dart, draft_repository.dart, sections_provider.dart, admin_copy.dart, quick_edit.dart) | 6 reads | ~10135 tok |
+| 17:40 | full browser QA on emulator (find, quick edit, move, price, undo, add item, publish dialog, sold-out live, merge, discard, customer popup/cart) | emulator build web_e2e | all pass; no Bug Logs written | ~40000 |
+| 17:29 | Session end: 18 writes across 11 files (client_log.dart, draft_repository.dart, sections_provider.dart, admin_copy.dart, quick_edit.dart) | 13 reads | ~10135 tok |
+| 17:35 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | expanded (+9 lines) | ~142 |
+| 17:35 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | 3→4 lines | ~39 |
+| 17:35 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | 3→4 lines | ~73 |
+| 17:35 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | 3→4 lines | ~59 |
+| 17:35 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | 3→4 lines | ~35 |
+| 17:35 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | 2→3 lines | ~59 |
+| 17:35 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | 4→5 lines | ~43 |
+| 17:35 | Edited cafe_countryside_menu/lib/features/admin/settings/settings_page.dart | 2→3 lines | ~28 |
+| 17:35 | Edited cafe_countryside_menu/lib/features/admin/settings/settings_page.dart | 2→3 lines | ~38 |
+| 17:36 | Edited cafe_countryside_menu/lib/features/admin/settings/settings_page.dart | 3→4 lines | ~39 |
+| 17:36 | Edited cafe_countryside_menu/lib/features/admin/settings/settings_page.dart | expanded (+14 lines) | ~266 |
+| 17:36 | Edited cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart | expanded (+6 lines) | ~48 |
+| 17:36 | Edited cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart | added 2 condition(s) | ~198 |
+| 17:36 | Edited cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart | 2→3 lines | ~45 |
+| 17:36 | Edited cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart | inline fix | ~34 |
+| 17:36 | Edited cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart | added nullish coalescing | ~102 |
+| 17:36 | Edited cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart | 1→3 lines | ~27 |
+| 17:36 | Edited cafe_countryside_menu/lib/features/admin/settings/settings_provider.dart | 2→5 lines | ~68 |
+| 17:36 | Edited cafe_countryside_menu/lib/features/admin/settings/settings_provider.dart | added 1 import(s) | ~28 |
+| 17:36 | Edited cafe_countryside_menu/lib/features/admin/shared_admin_business_provider.dart | 2→3 lines | ~38 |
+| 17:36 | Edited cafe_countryside_menu/lib/features/admin/shared_admin_business_provider.dart | added 1 import(s) | ~26 |
+| 17:37 | Created cafe_countryside_menu/test/table_required_test.dart | — | ~2638 |
+| 17:47 | Edited cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart | added 1 condition(s) | ~65 |
+| 17:47 | Edited cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart | 4→5 lines | ~44 |
+| 17:47 | Edited cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart | added 1 condition(s) | ~84 |
+| 17:47 | Edited cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart | 3→4 lines | ~51 |
+| 17:52 | Edited CHANGELOG.md | 1→2 lines | ~81 |
+| 17:52 | Edited CHANGELOG.md | 2→4 lines | ~105 |
+| 17:52 | Edited plan/owner_guide_1a.md | 1→6 lines | ~187 |
+| 17:58 | feature: Settings 'Customers must enter a table number' (default off) + checkout enforcement (fresh read) + Dashboard stale-card fix (invalidate businessProvider after settings/promotions/sections saves) | business_model, settings_page/provider, shared_admin_business_provider, checkout_page, table_required_test | 589 tests pass; browser-verified on emulator | ~30000 |

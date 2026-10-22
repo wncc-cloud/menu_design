@@ -67,6 +67,16 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     super.dispose();
   }
 
+  static const _tableRequiredMessage = 'Please enter your table number.';
+  final _tableFieldKey = GlobalKey();
+
+  void _showTableField() {
+    final c = _tableFieldKey.currentContext;
+    if (c != null) {
+      Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 250), alignment: 0.3);
+    }
+  }
+
   void _prefillTableOnce(BuildContext context, bool tableNumberEnabled) {
     if (_prefilledTable) return;
     _prefilledTable = true;
@@ -77,14 +87,24 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     }
   }
 
-  Future<void> _submit(List<OrderCartLine> cart, int expiryMinutes, bool tableNumberEnabled, bool orderNoteEnabled) async {
+  Future<void> _submit(
+    List<OrderCartLine> cart,
+    int expiryMinutes,
+    bool tableNumberEnabled,
+    bool orderNoteEnabled, {
+    bool tableRequired = false,
+  }) async {
     if (_submitting) return;
     // phase_plan/phase11_6.md — dropped client-side, before any
     // network call at all, cheaper than even a rejected write and
     // invisible to a genuine customer.
     if (_honeypotController.text.isNotEmpty) return;
     if (cart.isEmpty) return;
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      // On a small phone the empty table field may be off-screen: bring it in.
+      if (tableRequired && _tableController.text.trim().isEmpty) _showTableField();
+      return;
+    }
 
     setState(() {
       _submitting = true;
@@ -118,10 +138,25 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
       final BusinessModel? freshBiz = await ref.read(freshBusinessFetchProvider)();
       if (freshBiz != null) {
         tableNumberEnabled = freshBiz.tableNumberEnabled;
+        tableRequired = freshBiz.tableNumberMustBeEntered;
         orderNoteEnabled = freshBiz.orderNoteEnabled;
       }
     } catch (e, st) {
       logClientWarn('Checkout.freshBusiness', e, stackTrace: st);
+    }
+
+    // The café may have made the table number compulsory after this page
+    // loaded: the fresh read above decides, not the cached copy.
+    if (tableNumberEnabled && tableRequired && _tableController.text.trim().isEmpty) {
+      ref.invalidate(businessProvider); // so the field shows as required now
+      if (mounted) {
+        setState(() {
+          _submitting = false;
+          _errorMessage = _tableRequiredMessage;
+        });
+        WidgetsBinding.instance.addPostFrameCallback((_) => _showTableField());
+      }
+      return;
     }
 
     var effectiveCart = cart;
@@ -315,6 +350,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     final business = ref.watch(businessProvider).asData?.value;
     final expiryMinutes = business?.orderRequestExpiryMinutes ?? 3;
     final tableNumberEnabled = business?.tableNumberEnabled ?? true;
+    final tableRequired = business?.tableNumberMustBeEntered ?? false;
     final orderNoteEnabled = business?.orderNoteEnabled ?? true;
     // Per-item notes: look the item up in the loaded menu instead of adding a
     // field to OrderCartLine (its hand-copied constructors would silently reset
@@ -352,7 +388,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                 child: FilledButton(
                   onPressed: (_submitting || cafeClosed)
                       ? null
-                      : () => _submit(cart, expiryMinutes, tableNumberEnabled, orderNoteEnabled),
+                      : () => _submit(cart, expiryMinutes, tableNumberEnabled, orderNoteEnabled, tableRequired: tableRequired),
                   style: FilledButton.styleFrom(
                     backgroundColor: const Color(0xFF2E7D32),
                     minimumSize: const Size.fromHeight(52),
@@ -536,8 +572,14 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                     if (tableNumberEnabled) ...[
                       const SizedBox(height: 12),
                       TextFormField(
+                        key: _tableFieldKey,
                         controller: _tableController,
-                        decoration: const InputDecoration(labelText: 'Table number (optional)'),
+                        decoration: InputDecoration(
+                          labelText: tableRequired ? 'Table number' : 'Table number (optional)',
+                        ),
+                        validator: tableRequired
+                            ? (v) => (v ?? '').trim().isEmpty ? _tableRequiredMessage : null
+                            : null,
                       ),
                     ],
                     if (orderNoteEnabled) ...[

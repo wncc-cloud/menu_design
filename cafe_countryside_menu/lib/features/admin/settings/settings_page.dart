@@ -30,6 +30,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool _showBestsellersTab = true;
   bool _selfOrderEnabled = false;
   bool _tableNumberEnabled = true;
+  bool _tableNumberRequired = false;
   bool _orderNoteEnabled = true;
   bool _saving = false;
   bool _logoUploading = false;
@@ -72,6 +73,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     _showBestsellersTab = b.showBestsellersTab;
     _selfOrderEnabled = b.selfOrderEnabled;
     _tableNumberEnabled = b.tableNumberEnabled;
+    _tableNumberRequired = b.tableNumberRequired;
     _orderNoteEnabled = b.orderNoteEnabled;
   }
 
@@ -87,6 +89,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       showBestsellersTab: _showBestsellersTab,
       selfOrderEnabled: _selfOrderEnabled,
       tableNumberEnabled: _tableNumberEnabled,
+      tableNumberRequired: _tableNumberRequired,
       orderNoteEnabled: _orderNoteEnabled,
     );
   }
@@ -362,6 +365,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ),
                     value: _tableNumberEnabled,
                     onChanged: (v) => setState(() => _tableNumberEnabled = v),
+                  ),
+                  SwitchListTile(
+                    key: const Key('settings-table-required'),
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Customers must enter a table number'),
+                    subtitle: Text(
+                      _tableNumberEnabled
+                          ? 'When on, a customer cannot place an order until the '
+                              'table number is filled in. Turn it off again any '
+                              'time — it takes effect on their next Place Order.'
+                          : 'Turn on "Ask for a table number" above to use this.',
+                    ),
+                    value: _tableNumberEnabled && _tableNumberRequired,
+                    onChanged: _tableNumberEnabled ? (v) => setState(() => _tableNumberRequired = v) : null,
                   ),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,

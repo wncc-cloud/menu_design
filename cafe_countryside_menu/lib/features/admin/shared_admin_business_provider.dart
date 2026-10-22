@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../menu/presentation/menu_provider.dart';
 import '../shared/models/business_model.dart';
 import '../shared/models/promotion_models.dart';
 import '../shared/repositories/business_repository.dart';
@@ -25,6 +26,7 @@ class AdminBusinessNotifier extends AsyncNotifier<BusinessModel> {
     if (cur == null) return 'Still loading — try again in a moment.';
     try {
       state = AsyncData(await op(cur));
+      ref.invalidate(businessProvider); // Dashboard / customer pages re-read it
       return null;
     } catch (e, st) {
       // The web SDK wraps exceptions thrown inside a transaction callback, so
