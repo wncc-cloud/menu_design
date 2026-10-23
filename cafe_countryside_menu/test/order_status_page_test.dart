@@ -81,8 +81,8 @@ void main() {
     expect(fake.callCount, 1);
     expect(find.text('Go to the counter to place your order'), findsOneWidget);
 
-    // A 3-minute window polls roughly every 10 seconds — advance past that.
-    await tester.pump(const Duration(seconds: 12));
+    // A 3-minute window polls at the 15-second floor (phase12a 12a-B) — advance past that.
+    await tester.pump(const Duration(seconds: 16));
     expect(fake.callCount, 2);
     expect(find.text('Order confirmed!'), findsOneWidget);
 
@@ -322,7 +322,7 @@ void main() {
       ]);
       await pumpPage(tester, fake);
       expect(find.text('Cashier has your order — finishing up'), findsOneWidget);
-      await tester.pump(const Duration(seconds: 11));
+      await tester.pump(const Duration(seconds: 16));
       await tester.pump();
       expect(find.text('The counter no longer has this request.'), findsOneWidget);
     });
@@ -333,7 +333,7 @@ void main() {
         req(expiresIn: const Duration(minutes: 3)),
       ]);
       await pumpPage(tester, fake);
-      await tester.pump(const Duration(seconds: 11));
+      await tester.pump(const Duration(seconds: 16));
       await tester.pump();
       expect(find.text('Go to the counter to place your order'), findsOneWidget);
     });

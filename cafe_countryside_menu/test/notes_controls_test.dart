@@ -102,7 +102,7 @@ Future<(ProviderContainer, _FakeOrders)> _open(
 
 Future<void> _place(WidgetTester tester) async {
   await tester.enterText(find.widgetWithText(TextFormField, 'Your name'), 'Rahul');
-  await tester.enterText(find.widgetWithText(TextFormField, 'Phone'), '9876543210');
+  await tester.enterText(find.widgetWithText(TextFormField, kCheckoutPhoneLabel), '9876543210');
   await tester.tap(find.text('Place Order'));
   for (var i = 0; i < 12; i++) {
     await tester.pump(const Duration(milliseconds: 100));

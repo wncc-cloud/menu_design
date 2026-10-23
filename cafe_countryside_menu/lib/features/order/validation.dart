@@ -16,8 +16,9 @@ bool isValidPhone(String value) {
 /// interval with the remaining window so every customer session polls
 /// roughly the same ~18 times regardless of how long the café owner
 /// has configured `orderRequestExpiryMinutes` to be, clamped to a
-/// sane 8-30 second range.
+/// 15-30 second range (billing_cafe phase12a.md 12a-B: floor raised from
+/// 8 s to 15 s — every poll is a billed Firestore read on the POS project).
 int calculatePollIntervalSeconds({required DateTime expiresAt, required DateTime now}) {
   final remainingSeconds = expiresAt.difference(now).inSeconds;
-  return (remainingSeconds / 18).clamp(8, 30).round();
+  return (remainingSeconds / 18).clamp(15, 30).round();
 }

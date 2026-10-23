@@ -19,6 +19,17 @@ import '../logging/client_log.dart';
 class PosAppCheckService {
   PosAppCheckService._();
 
+  /// Local-testing-only escape hatch, same flag/spirit as
+  /// `order_request_repository.dart`'s `useLocalEmulator` and
+  /// `main.dart`'s `_useLocalEmulator` — routes this app's POS App
+  /// Check activation (and, via `order_request_provider.dart`'s own
+  /// matching flag, its REST calls) at the real `why-not-cafe-dev`
+  /// cloud project instead of `why-not-cafe-prod`, so checkout can be
+  /// exercised against dev's already-seeded data without ever touching
+  /// prod. Defaults to `false` — omitting the flag (every real build)
+  /// is byte-for-byte the same behavior as before this existed.
+  static const _useDevPos = bool.fromEnvironment('USE_DEV_POS');
+
   // Registered via `firebase apps:create WEB "Cafe Countryside Menu
   // (self-order)" --project why-not-cafe-prod` (2026-08-29, mirrors the
   // dev registration this app used before — confirmed real via
@@ -62,6 +73,23 @@ class PosAppCheckService {
     storageBucket: 'why-not-cafe-prod.firebasestorage.app',
   );
 
+  // The pre-2026-08-29 `why-not-cafe-dev` values this project used
+  // before the hardcoded prod swap above (recovered from git history,
+  // commit 56a8aaa) — restored here behind `_useDevPos` rather than
+  // just for one-off local testing against dev's seeded data.
+  static const String _devWebAppId = '1:809047549798:web:14b73a92d58a232d864aa7';
+
+  static const String _devRecaptchaSiteKey = '6LdTxpwtAAAAAJpIs6BSZeyK1JoeaNjwcjC2D3ap';
+
+  static const FirebaseOptions _devOptions = FirebaseOptions(
+    apiKey: 'AIzaSyDaSu24dx-KnSQ7GDtuCtKQVrhwiLSOya0',
+    appId: _devWebAppId,
+    messagingSenderId: '809047549798',
+    projectId: 'why-not-cafe-dev',
+    authDomain: 'why-not-cafe-dev.firebaseapp.com',
+    storageBucket: 'why-not-cafe-dev.firebasestorage.app',
+  );
+
   static FirebaseApp? _posApp;
 
   /// Never throws — a blocked reCAPTCHA script, restrictive wifi, or a
@@ -77,13 +105,17 @@ class PosAppCheckService {
   /// defensive timeout, since a different real network condition than
   /// the one tested could plausibly hang this specific call too.
   static Future<void> activate() async {
-    if (_recaptchaSiteKey.isEmpty) {
+    final siteKey = _useDevPos ? _devRecaptchaSiteKey : _recaptchaSiteKey;
+    if (siteKey.isEmpty) {
       return;
     }
     try {
-      final posApp = await Firebase.initializeApp(name: 'appCheckOnly', options: _posOptions);
+      final posApp = await Firebase.initializeApp(
+        name: 'appCheckOnly',
+        options: _useDevPos ? _devOptions : _posOptions,
+      );
       await FirebaseAppCheck.instanceFor(app: posApp)
-          .activate(providerWeb: ReCaptchaEnterpriseProvider(_recaptchaSiteKey))
+          .activate(providerWeb: ReCaptchaEnterpriseProvider(siteKey))
           .timeout(const Duration(seconds: 8));
       _posApp = posApp;
     } catch (e, st) {

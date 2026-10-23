@@ -144,7 +144,7 @@ void main() {
       final store = MemoryStore();
       final orders = (await openCheckout(tester, store)) as _Orders;
       await tester.enterText(find.widgetWithText(TextFormField, 'Your name'), 'Asha');
-      await tester.enterText(find.widgetWithText(TextFormField, 'Phone'), '9123456780');
+      await tester.enterText(find.widgetWithText(TextFormField, kCheckoutPhoneLabel), '9123456780');
       await tester.tap(find.byKey(const Key('remember-me')));
       await tester.pump();
       await place(tester);
@@ -157,7 +157,7 @@ void main() {
       final store = MemoryStore();
       await openCheckout(tester, store);
       await tester.enterText(find.widgetWithText(TextFormField, 'Your name'), 'Asha');
-      await tester.enterText(find.widgetWithText(TextFormField, 'Phone'), '9123456780');
+      await tester.enterText(find.widgetWithText(TextFormField, kCheckoutPhoneLabel), '9123456780');
       await place(tester);
       expect(readSavedCustomer(store), isNull);
     });
@@ -181,7 +181,9 @@ void main() {
       ));
       await tester.pump();
       expect(alert.vibrations, 0, reason: 'still pending');
-      await tester.pump(const Duration(seconds: 12));
+      // The status page polls every 15 s since phase 12a-B (it used to be 8 s).
+      await tester.pump(const Duration(seconds: 16));
+      await tester.pump(const Duration(milliseconds: 100)); // let the poll result paint
       expect(find.text('Order confirmed!'), findsOneWidget);
       expect(alert.lastTabTitle, '✔ Order #42 confirmed');
       expect(alert.vibrations, 1);

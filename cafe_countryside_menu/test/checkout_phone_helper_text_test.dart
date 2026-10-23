@@ -14,7 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
-  testWidgets('checkout shows a plain reason for the phone field, with no WhatsApp mention anywhere', (tester) async {
+  testWidgets('checkout: the phone label carries the WhatsApp wording; nothing else on the page mentions it', (tester) async {
     final container = ProviderContainer(
       overrides: [
         businessProvider.overrideWith(
@@ -52,14 +52,17 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(TextFormField, 'Phone'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, kCheckoutPhoneLabel), findsOneWidget);
     expect(find.text('So we can reach you about your order if needed.'), findsOneWidget);
 
-    // The actual point of this test: nothing rendered on the checkout page
-    // (including the helper text above, which renders as its own Text)
-    // mentions WhatsApp, anywhere.
-    for (final widget in tester.widgetList<Text>(find.byType(Text))) {
-      expect((widget.data ?? '').toLowerCase(), isNot(contains('whatsapp')));
-    }
+    // WhatsApp is mentioned in the phone label ONLY (the owner's wording, 27 Sep),
+    // never anywhere else on the page.
+    final mentions = tester
+        .widgetList<Text>(find.byType(Text))
+        .where((w) => (w.data ?? '').toLowerCase().contains('whatsapp'))
+        .map((w) => w.data)
+        .toList();
+    expect(mentions, [kCheckoutPhoneLabel]);
+
   });
 }

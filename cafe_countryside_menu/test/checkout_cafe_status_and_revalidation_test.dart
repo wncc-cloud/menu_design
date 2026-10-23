@@ -102,7 +102,7 @@ Future<ProviderContainer> _open(
 
 Future<void> _fillAndPlace(WidgetTester tester) async {
   await tester.enterText(find.widgetWithText(TextFormField, 'Your name'), 'Rahul');
-  await tester.enterText(find.widgetWithText(TextFormField, 'Phone'), '9876543210');
+  await tester.enterText(find.widgetWithText(TextFormField, kCheckoutPhoneLabel), '9876543210');
   await tester.tap(find.text('Place Order'));
   await _settle(tester);
 }
@@ -226,6 +226,15 @@ void main() {
     await _fillAndPlace(tester);
     expect(find.text('Your cart has changed'), findsNothing);
     expect(orders.created, hasLength(1));
+    expect(orders.cafeChecks, 2, reason: 'phase12a 12a-A: one read on arrival + one re-check at submit, no more');
+  });
+
+  testWidgets('phase12a 12a-A: an empty cart at /checkout does not read the café status at all', (tester) async {
+    final orders = _FakeOrders(open: false);
+    await _open(tester, orders: orders, menu: _FakeMenu(const []), cart: const []);
+    expect(find.text('Your cart is empty.'), findsOneWidget);
+    expect(find.byKey(const Key('cafe-closed-banner')), findsNothing);
+    expect(orders.cafeChecks, 0);
   });
 
   testWidgets('§12.3-C: the menu re-fetch FAILING fails open — the order still goes through unchanged', (tester) async {
@@ -240,7 +249,8 @@ void main() {
     final orders = _FakeOrders(open: false);
     await _open(tester, orders: orders, menu: _FakeMenu(const []));
     expect(find.byKey(const Key('cafe-closed-banner')), findsOneWidget);
-    expect(orders.cafeChecks, greaterThanOrEqualTo(2), reason: 'checked on arrival as well as on first build');
+    expect(orders.cafeChecks, 1,
+        reason: 'phase12a 12a-A: exactly one fetch on arrival — the provider is autoDispose, so no extra invalidate is needed');
 
     orders.open = true; // the café opened meanwhile
     await tester.tap(find.text('Check again'));

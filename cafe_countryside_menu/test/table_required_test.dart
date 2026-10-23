@@ -97,7 +97,7 @@ Future<void> _settle(WidgetTester tester) async {
 
 Future<void> _fillBasics(WidgetTester tester) async {
   await tester.enterText(find.widgetWithText(TextFormField, 'Your name'), 'Rahul');
-  await tester.enterText(find.widgetWithText(TextFormField, 'Phone'), '9876543210');
+  await tester.enterText(find.widgetWithText(TextFormField, kCheckoutPhoneLabel), '9876543210');
 }
 
 Future<void> _place(WidgetTester tester) async {

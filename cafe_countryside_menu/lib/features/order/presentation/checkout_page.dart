@@ -21,6 +21,10 @@ import '../validation.dart';
 import 'widgets/honeypot_field.dart';
 import '../../../core/logging/client_log.dart';
 
+/// Owner-requested wording (2026-09-27, deployed that day): says WhatsApp is
+/// preferred because the order number is sent there, but any number works.
+const kCheckoutPhoneLabel = 'Phone (We prefer Whatsapp as we send order number there, but any number is fine)';
+
 class CheckoutPage extends ConsumerStatefulWidget {
   const CheckoutPage({super.key});
 
@@ -372,7 +376,14 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     // even though the menu page already hides every entry point to it.
     final selfOrderEnabled = business?.selfOrderEnabled ?? false;
     // phase12.md §12.3-B — only an explicit `false` counts as closed.
-    final cafeClosed = ref.watch(cafeOpenProvider).asData?.value == false;
+    // phase12a.md 12a-A — this is the ONLY place the café status is read
+    // before submit (the menu page no longer reads it), and it is watched
+    // only when the order form is actually shown, so an empty-cart or
+    // kill-switched visit costs no POS read. `cafeOpenProvider` is
+    // autoDispose, so every arrival here is already a fresh fetch.
+    final cafeClosed = selfOrderEnabled &&
+        cart.isNotEmpty &&
+        ref.watch(cafeOpenProvider).asData?.value == false;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F8E9),
@@ -525,7 +536,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                     TextFormField(
                       controller: _phoneController,
                       decoration: const InputDecoration(
-                        labelText: 'Phone',
+                        labelText: kCheckoutPhoneLabel,
                         hintText: '10 digit number',
                         // Café owner's instruction, 2026-09-25: no WhatsApp
                         // mention anywhere on the customer-facing menu site.
