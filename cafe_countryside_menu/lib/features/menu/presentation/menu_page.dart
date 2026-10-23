@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/app_constants.dart';
+
 import 'package:go_router/go_router.dart';
 
 import '../models/item_model.dart';
@@ -58,7 +60,7 @@ class _MenuPageState extends ConsumerState<MenuPage> {
 
     final cafeName = (business?.cafeName.isNotEmpty == true)
         ? business!.cafeName
-        : 'Cafe Countryside Menu';
+        : kDefaultCafeName; // same words as the loading splash, so the header does not change while loading
     final logoUrl = business?.logoUrl ?? '';
 
     return Scaffold(
