@@ -35,6 +35,12 @@ Publish copies the draft to the live menu. Customers with the page already open 
 
 **Also check:** the customer **ADD** buttons and the Chef Special first-load pop-up only appear while **Enable self-ordering** is on in Settings.
 
+## 8. The emergency off switch (Settings → Bulk & merge tools)
+If a bulk tool ever misbehaves, the owner can turn **Bulk & merge tools** off in **Settings** and press **Save**. Select mode, bulk actions, Merge and the quick-edit sheet disappear (the quick sheet becomes view-only). Search, Find, Menu check, the live **Sold out** switch and the normal **Edit / Delete / Hide** buttons keep working, and **no menu data is changed**. Turn it on again the same way. Only the owner sees this setting.
+
+## 9. Checking for errors (for the developer, not the owner)
+Ask Claude to **check bug logs**: it reads the live app's error log (read-only) and reports what went wrong, in plain words. It needs a one-time permission setup that Claude will ask you about first.
+
 ## If something looks wrong
 - A message "Couldn't save — check your connection" means nothing was changed; try again.
 - "May or may not have saved" means check the orange bar's change count first. The price tool pauses for a minute after this so a percentage is never applied twice.

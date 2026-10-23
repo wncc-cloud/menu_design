@@ -835,3 +835,76 @@
 | 17:52 | Edited CHANGELOG.md | 2→4 lines | ~105 |
 | 17:52 | Edited plan/owner_guide_1a.md | 1→6 lines | ~187 |
 | 17:58 | feature: Settings 'Customers must enter a table number' (default off) + checkout enforcement (fresh read) + Dashboard stale-card fix (invalidate businessProvider after settings/promotions/sections saves) | business_model, settings_page/provider, shared_admin_business_provider, checkout_page, table_required_test | 589 tests pass; browser-verified on emulator | ~30000 |
+| 17:54 | Session end: 47 writes across 19 files (client_log.dart, draft_repository.dart, sections_provider.dart, admin_copy.dart, quick_edit.dart) | 18 reads | ~20008 tok |
+| 10:32 | Edited cafe_countryside_menu/lib/features/shared/models/admin_copy.dart | "On the counter’s manual-b" → "Heads-up: on the counter’" | ~36 |
+| 10:32 | Edited cafe_countryside_menu/test/admin_copy_test.dart | "On the counter’s manual-b" → "Heads-up: on the counter’" | ~37 |
+| 10:36 | Edited cafe_countryside_menu/test/items_select_mode_test.dart | "lose their category headi" → "without a category headin" | ~14 |
+| 10:40 | Session end: 50 writes across 21 files (client_log.dart, draft_repository.dart, sections_provider.dart, admin_copy.dart, quick_edit.dart) | 20 reads | ~42625 tok |
+| 10:50 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | modified 1a() | ~116 |
+| 10:50 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | 2→3 lines | ~29 |
+| 10:50 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | 2→3 lines | ~40 |
+| 10:50 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | 3→4 lines | ~46 |
+| 10:50 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | 2→3 lines | ~24 |
+| 10:50 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | 2→3 lines | ~40 |
+| 10:50 | Edited cafe_countryside_menu/lib/features/shared/models/business_model.dart | 3→4 lines | ~42 |
+| 10:50 | Created cafe_countryside_menu/lib/features/admin/ops/admin_tools_switch.dart | — | ~220 |
+| 10:51 | Edited cafe_countryside_menu/lib/features/admin/items/items_page.dart | 4→8 lines | ~100 |
+| 10:51 | Edited cafe_countryside_menu/lib/features/admin/items/items_page.dart | inline fix | ~27 |
+| 10:51 | Edited cafe_countryside_menu/lib/features/admin/items/items_page.dart | added 1 condition(s) | ~116 |
+| 10:51 | Edited cafe_countryside_menu/lib/features/admin/items/items_page.dart | inline fix | ~10 |
+| 10:51 | Edited cafe_countryside_menu/lib/features/admin/items/items_page.dart | inline fix | ~15 |
+| 10:51 | Edited cafe_countryside_menu/lib/features/admin/items/items_page.dart | inline fix | ~15 |
+| 10:51 | Edited cafe_countryside_menu/lib/features/admin/items/items_page.dart | added 1 import(s) | ~28 |
+| 10:51 | Edited cafe_countryside_menu/lib/features/admin/ops/section_flows.dart | 3→3 lines | ~40 |
+| 10:51 | Edited cafe_countryside_menu/lib/features/admin/ops/section_flows.dart | added 1 import(s) | ~22 |
+| 10:51 | Edited cafe_countryside_menu/lib/features/admin/sections/sections_page.dart | 3→6 lines | ~63 |
+| 10:51 | Edited cafe_countryside_menu/lib/features/admin/sections/sections_page.dart | added 1 import(s) | ~20 |
+| 10:51 | Edited cafe_countryside_menu/lib/features/admin/ops/quick_edit.dart | 3→4 lines | ~84 |
+| 10:51 | Edited cafe_countryside_menu/lib/features/admin/ops/quick_edit.dart | 2→3 lines | ~63 |
+| 10:52 | Edited cafe_countryside_menu/lib/features/admin/ops/quick_edit.dart | added 1 condition(s) | ~96 |
+| 10:52 | Edited cafe_countryside_menu/lib/features/admin/ops/quick_edit.dart | added 1 condition(s) | ~84 |
+| 10:52 | Edited cafe_countryside_menu/lib/features/admin/ops/quick_edit.dart | added 1 import(s) | ~22 |
+| 10:52 | Edited cafe_countryside_menu/lib/features/shared/models/admin_copy.dart | 1→3 lines | ~48 |
+| 10:52 | Edited cafe_countryside_menu/lib/features/admin/menu_check/menu_check_fix.dart | modified off() | ~73 |
+| 10:52 | Edited cafe_countryside_menu/lib/features/admin/menu_check/menu_check_fix.dart | added 1 import(s) | ~20 |
+| 10:52 | Edited cafe_countryside_menu/lib/features/admin/settings/settings_page.dart | 2→3 lines | ~28 |
+| 10:52 | Edited cafe_countryside_menu/lib/features/admin/settings/settings_page.dart | 2→3 lines | ~38 |
+| 10:52 | Edited cafe_countryside_menu/lib/features/admin/settings/settings_page.dart | 3→4 lines | ~39 |
+| 10:52 | Edited cafe_countryside_menu/lib/features/admin/settings/settings_page.dart | expanded (+18 lines) | ~291 |
+| 10:52 | Created cafe_countryside_menu/test/admin_tools_switch_test.dart | — | ~1357 |
+| 10:55 | Edited cafe_countryside_menu/test/admin_tools_switch_test.dart | 4→5 lines | ~95 |
+| 10:55 | Edited cafe_countryside_menu/test/admin_tools_switch_test.dart | expanded (+6 lines) | ~97 |
+| 10:55 | Edited cafe_countryside_menu/test/admin_tools_switch_test.dart | expanded (+8 lines) | ~85 |
+| 10:55 | Edited cafe_countryside_menu/test/admin_tools_switch_test.dart | added 2 import(s) | ~32 |
+| 10:58 | Created scripts/lib/firestore-readonly.ps1 | — | ~1519 |
+| 10:58 | Created scripts/setup-bug-log-reader.ps1 | — | ~929 |
+| 10:58 | Created scripts/fetch-bug-logs.ps1 | — | ~1266 |
+| 10:58 | Created scripts/read-firestore-doc.ps1 | — | ~496 |
+| 10:58 | Created scripts/summarize-bug-logs.mjs | — | ~1066 |
+| 10:58 | Created scripts/test/fixture-logs.mjs | — | ~623 |
+| 10:58 | Created scripts/test/summarize.test.mjs | — | ~712 |
+| 10:58 | Created scripts/test/seed-logs.mjs | — | ~347 |
+| 10:59 | Created .claude/skills/check-bug-logs/SKILL.md | — | ~2116 |
+| 11:00 | Created .claude/skills/check-bug-logs/references/sources.md | — | ~1499 |
+| 11:14 | Edited cafe_countryside_menu/test/items_select_mode_test.dart | 2→4 lines | ~63 |
+| 11:14 | Edited cafe_countryside_menu/test/items_select_mode_test.dart | added 1 import(s) | ~38 |
+| 11:14 | Edited cafe_countryside_menu/test/items_select_mode_test.dart | added 1 import(s) | ~48 |
+| 11:24 | Created cafe_countryside_menu/lib/features/admin/ops/admin_tools_switch.dart | — | ~363 |
+| 11:24 | Edited cafe_countryside_menu/lib/features/admin/ops/quick_edit.dart | 2→3 lines | ~51 |
+| 11:24 | Edited cafe_countryside_menu/lib/features/admin/settings/settings_provider.dart | 2→3 lines | ~39 |
+| 11:25 | Edited cafe_countryside_menu/lib/features/admin/settings/settings_provider.dart | added 1 import(s) | ~27 |
+| 11:25 | Edited cafe_countryside_menu/lib/features/shared/models/draft_ops.dart | 5→7 lines | ~97 |
+| 11:25 | Edited cafe_countryside_menu/lib/features/shared/models/draft_ops.dart | 2→2 lines | ~20 |
+| 11:25 | Edited cafe_countryside_menu/lib/features/shared/models/draft_ops.dart | inline fix | ~25 |
+| 11:25 | Edited cafe_countryside_menu/lib/features/shared/models/item_validators.dart | modified if() | ~43 |
+| 11:25 | Edited cafe_countryside_menu/lib/features/shared/models/draft_ops.dart | added 1 condition(s) | ~93 |
+| 11:25 | Edited cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart | added 1 condition(s) | ~54 |
+| 11:25 | Edited cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart | added 1 condition(s) | ~63 |
+| 11:25 | Edited scripts/summarize-bug-logs.mjs | modified parseArgs() | ~124 |
+| 11:25 | Edited scripts/test/summarize.test.mjs | inline fix | ~23 |
+| 11:27 | Created cafe_countryside_menu/test/review_fixes_test.dart | — | ~1677 |
+| 11:28 | Edited cafe_countryside_menu/lib/features/admin/ops/admin_tools_switch.dart | added 1 condition(s) | ~56 |
+| 11:40 | Edited CHANGELOG.md | modified switch() | ~161 |
+| 11:40 | Edited CHANGELOG.md | 2→3 lines | ~79 |
+| 11:40 | Edited plan/owner_guide_1a.md | expanded (+6 lines) | ~210 |
+| 11:40 | 1a-F off switch + 1a-L skill/scripts + code-review fixes (switch loading=off, NaN price, tip, mounted guards, summarize args); browser-verified switch on/off on emulator | admin_tools_switch, settings, quick_edit, items/sections pages, scripts/*, .claude/skills | 610 flutter tests + 7 node tests pass | ~60000
