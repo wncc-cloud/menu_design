@@ -6,6 +6,12 @@ All notable changes to the planning documents are recorded here.
 
 ## v8.0 — Phase 1a: admin speed tools (built on branch `admin-panel-optimisation`, not yet deployed)
 
+### Restored (was deployed 2026-09-27, then lost when Phase 1 was built from a branch that never contained it)
+- Order-status page: the pay-at-the-counter instruction slides between English and Hindi (every 5 s, swipe to switch, pauses while swiped), sized to its text; 3-step tracker (Show code / Pay at counter / Order confirmed) on the pending and confirmed screens; status polling every 15 s instead of 8 s
+- Checkout: café status is read only when the order form is shown; the phone question says WhatsApp is preferred but any number is fine (in the helper text so it is not cut off)
+- NOT restored on purpose: the menu page no longer reading the café status (Phase 1's closed strip and closed-café pop-up need it)
+- Checkout also re-checks the ordering switch from a fresh read at Place Order
+
 ### Added
 - Merge a section into another (preview, delete-emptied-section box, pop-up guard) and a Chef-only filter chip
 - Items: Select mode with a bulk bar (Move to…, Price…, Show/Hide, Chef, Notes, Delete); bulk price with an exact before/after table and a 60 s lock after a timed-out save

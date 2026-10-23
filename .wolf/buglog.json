@@ -1168,6 +1168,598 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-10-22T05:25:31.797471+00:00"
+    },
+    {
+      "id": "bug-073",
+      "timestamp": "2026-10-22T10:40:14.223Z",
+      "error_message": "Missing guard clause",
+      "file": "cafe_countryside_menu/lib/core/logging/client_log.dart",
+      "root_cause": "No early return/throw for edge case: bytes + w > maxBytes",
+      "fix": "Added guard clause: if (bytes + w > maxBytes)",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-22T10:40:14.224Z"
+    },
+    {
+      "id": "bug-074",
+      "timestamp": "2026-10-22T10:40:15.548Z",
+      "error_message": "Null/undefined access in ",
+      "file": "cafe_countryside_menu/lib/features/shared/repositories/draft_repository.dart",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-22T10:40:15.548Z"
+    },
+    {
+      "id": "bug-075",
+      "timestamp": "2026-10-22T10:40:35.422Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "cafe_countryside_menu/lib/features/admin/sections/sections_provider.dart",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block | Also: final undo = ref.read(lastOpUndoProvider.notifier);; final notice = ref.read(editNoticeProvider.notifier);",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-10-22T10:40:38.640Z"
+    },
+    {
+      "id": "bug-076",
+      "timestamp": "2026-10-22T10:40:43.850Z",
+      "error_message": "Wrong reference: notSaved should be couldNotPublish",
+      "file": "cafe_countryside_menu/lib/features/shared/models/admin_copy.dart",
+      "root_cause": "Used \"notSaved\" instead of \"couldNotPublish\"",
+      "fix": "Changed notSaved → couldNotPublish",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-22T10:40:43.850Z"
+    },
+    {
+      "id": "bug-077",
+      "timestamp": "2026-10-22T10:41:22.515Z",
+      "error_message": "Null/undefined access in ",
+      "file": "cafe_countryside_menu/test/support/fake_draft_repository.dart",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: if (throwOnPublish != null) throw throwOnPublish!;",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-10-22T10:41:23.766Z"
+    },
+    {
+      "id": "bug-078",
+      "timestamp": "2026-10-22T10:41:25.195Z",
+      "error_message": "Missing await",
+      "file": "cafe_countryside_menu/test/admin_ops_provider_test.dart",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call | Also: test('undo that times out does not claim success and keeps t; await ready();",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-10-22T10:41:26.909Z"
+    },
+    {
+      "id": "bug-079",
+      "timestamp": "2026-10-22T10:41:28.222Z",
+      "error_message": "Missing import: package:cafe_countryside_menu/features/admin/ops/edit_notice.dart",
+      "file": "cafe_countryside_menu/test/admin_ops_provider_test.dart",
+      "root_cause": "Module(s) not imported: package:cafe_countryside_menu/features/admin/ops/edit_notice.dart",
+      "fix": "Added import(s) for package:cafe_countryside_menu/features/admin/ops/edit_notice.dart",
+      "tags": [
+        "auto-detected",
+        "missing-import",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-22T10:41:28.222Z"
+    },
+    {
+      "id": "bug-080",
+      "timestamp": "2026-10-22T11:15:29.096Z",
+      "error_message": "Incorrect value in code",
+      "file": "scripts/build-prod.ps1",
+      "root_cause": "Had \"--dart-define=BUILD_ID=$buildId\"",
+      "fix": "Changed to 'Stop'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "ps1"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-22T11:15:29.096Z"
+    },
+    {
+      "id": "bug-081",
+      "timestamp": "2026-10-22T12:06:17.397Z",
+      "error_message": "Wrong reference: orderNoteEnabled should be tableRequired",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart",
+      "root_cause": "Used \"orderNoteEnabled\" instead of \"tableRequired\"",
+      "fix": "Changed orderNoteEnabled → tableRequired",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-22T12:06:17.397Z"
+    },
+    {
+      "id": "bug-082",
+      "timestamp": "2026-10-22T12:06:20.348Z",
+      "error_message": "Null/undefined access in ",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-22T12:06:20.348Z"
+    },
+    {
+      "id": "bug-083",
+      "timestamp": "2026-10-22T12:06:33.514Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/lib/features/admin/settings/settings_provider.dart",
+      "root_cause": "Had '../../shared/models/business_model.dart'",
+      "fix": "Changed to '../../menu/presentation/menu_provider.dart'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-22T12:06:33.515Z"
+    },
+    {
+      "id": "bug-084",
+      "timestamp": "2026-10-22T12:06:38.892Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/lib/features/admin/shared_admin_business_provider.dart",
+      "root_cause": "Had '../shared/models/business_model.dart'",
+      "fix": "Changed to '../menu/presentation/menu_provider.dart'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-22T12:06:38.892Z"
+    },
+    {
+      "id": "bug-085",
+      "timestamp": "2026-10-22T12:17:21.745Z",
+      "error_message": "Null/undefined access in ",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-22T12:17:21.745Z"
+    },
+    {
+      "id": "bug-086",
+      "timestamp": "2026-10-23T05:02:35.924Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/lib/features/shared/models/admin_copy.dart",
+      "root_cause": "Had 'On the counter’s manual-bill screen these items l",
+      "fix": "Changed to 'Heads-up: on the counter’s manual-bill screen the",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:02:35.924Z"
+    },
+    {
+      "id": "bug-087",
+      "timestamp": "2026-10-23T05:02:37.426Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/test/admin_copy_test.dart",
+      "root_cause": "Had 'On the counter’s manual-bill screen these items l",
+      "fix": "Changed to 'Heads-up: on the counter’s manual-bill screen the",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:02:37.426Z"
+    },
+    {
+      "id": "bug-088",
+      "timestamp": "2026-10-23T05:06:28.095Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/test/items_select_mode_test.dart",
+      "root_cause": "Had 'lose their category heading'",
+      "fix": "Changed to 'without a category heading'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:06:28.095Z"
+    },
+    {
+      "id": "bug-089",
+      "timestamp": "2026-10-23T05:20:31.610Z",
+      "error_message": "Wrong reference: orderNoteEnabled should be adminToolsEnabled",
+      "file": "cafe_countryside_menu/lib/features/shared/models/business_model.dart",
+      "root_cause": "Used \"orderNoteEnabled\" instead of \"adminToolsEnabled\"",
+      "fix": "Changed orderNoteEnabled → adminToolsEnabled",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-10-23T05:20:37.390Z"
+    },
+    {
+      "id": "bug-090",
+      "timestamp": "2026-10-23T05:21:06.102Z",
+      "error_message": "Wrong reference: _selecting should be selecting",
+      "file": "cafe_countryside_menu/lib/features/admin/items/items_page.dart",
+      "root_cause": "Used \"_selecting\" instead of \"selecting\"",
+      "fix": "Changed _selecting → selecting",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 4,
+      "last_seen": "2026-10-23T05:21:17.385Z"
+    },
+    {
+      "id": "bug-091",
+      "timestamp": "2026-10-23T05:21:24.949Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/lib/features/admin/items/items_page.dart",
+      "root_cause": "Had '../ops/op_toast.dart'",
+      "fix": "Changed to '../ops/admin_tools_switch.dart'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:21:24.949Z"
+    },
+    {
+      "id": "bug-092",
+      "timestamp": "2026-10-23T05:21:37.663Z",
+      "error_message": "Wrong return value",
+      "file": "cafe_countryside_menu/lib/features/admin/ops/section_flows.dart",
+      "root_cause": "Was returning: p != null && p.canManageItems && p.canManageSectio",
+      "fix": "Now returns: p != null && p.canManageItems && p.canManageSectio",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:21:37.663Z"
+    },
+    {
+      "id": "bug-093",
+      "timestamp": "2026-10-23T05:21:38.863Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/lib/features/admin/ops/section_flows.dart",
+      "root_cause": "Had 'op_toast.dart'",
+      "fix": "Changed to 'admin_tools_switch.dart'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:21:38.863Z"
+    },
+    {
+      "id": "bug-094",
+      "timestamp": "2026-10-23T05:21:41.619Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/lib/features/admin/sections/sections_page.dart",
+      "root_cause": "Had '../ops/quick_edit.dart'",
+      "fix": "Changed to '../ops/admin_tools_switch.dart'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:21:41.619Z"
+    },
+    {
+      "id": "bug-095",
+      "timestamp": "2026-10-23T05:22:12.274Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/lib/features/admin/ops/quick_edit.dart",
+      "root_cause": "Had 'op_toast.dart'",
+      "fix": "Changed to 'admin_tools_switch.dart'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:22:12.274Z"
+    },
+    {
+      "id": "bug-096",
+      "timestamp": "2026-10-23T05:22:14.358Z",
+      "error_message": "Wrong reference: couldNotPublish should be toolsOffNote",
+      "file": "cafe_countryside_menu/lib/features/shared/models/admin_copy.dart",
+      "root_cause": "Used \"couldNotPublish\" instead of \"toolsOffNote\"",
+      "fix": "Changed couldNotPublish → toolsOffNote",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:22:14.358Z"
+    },
+    {
+      "id": "bug-097",
+      "timestamp": "2026-10-23T05:22:17.925Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/lib/features/admin/menu_check/menu_check_fix.dart",
+      "root_cause": "Had '../ops/quick_edit.dart'",
+      "fix": "Changed to '../ops/admin_tools_switch.dart'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:22:17.925Z"
+    },
+    {
+      "id": "bug-098",
+      "timestamp": "2026-10-23T05:22:28.979Z",
+      "error_message": "Wrong reference: _orderNoteEnabled should be _adminToolsEnabled",
+      "file": "cafe_countryside_menu/lib/features/admin/settings/settings_page.dart",
+      "root_cause": "Used \"_orderNoteEnabled\" instead of \"_adminToolsEnabled\"",
+      "fix": "Changed _orderNoteEnabled → _adminToolsEnabled",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:22:28.979Z"
+    },
+    {
+      "id": "bug-099",
+      "timestamp": "2026-10-23T05:25:51.222Z",
+      "error_message": "Missing await",
+      "file": "cafe_countryside_menu/test/admin_tools_switch_test.dart",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:25:51.222Z"
+    },
+    {
+      "id": "bug-100",
+      "timestamp": "2026-10-23T05:25:53.770Z",
+      "error_message": "Missing import: support/draft_fixtures.dart, support/fake_draft_repository.dart",
+      "file": "cafe_countryside_menu/test/admin_tools_switch_test.dart",
+      "root_cause": "Module(s) not imported: support/draft_fixtures.dart, support/fake_draft_repository.dart",
+      "fix": "Added import(s) for support/draft_fixtures.dart, support/fake_draft_repository.dart",
+      "tags": [
+        "auto-detected",
+        "missing-import",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:25:53.770Z"
+    },
+    {
+      "id": "bug-101",
+      "timestamp": "2026-10-23T05:44:49.812Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/test/items_select_mode_test.dart",
+      "root_cause": "Had 'support/draft_fixtures.dart'",
+      "fix": "Changed to 'support/admin_harness.dart'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:44:49.812Z"
+    },
+    {
+      "id": "bug-102",
+      "timestamp": "2026-10-23T05:44:51.037Z",
+      "error_message": "Missing import: package:cafe_countryside_menu/features/admin/shared_admin_business_provider.dart",
+      "file": "cafe_countryside_menu/test/items_select_mode_test.dart",
+      "root_cause": "Module(s) not imported: package:cafe_countryside_menu/features/admin/shared_admin_business_provider.dart",
+      "fix": "Added import(s) for package:cafe_countryside_menu/features/admin/shared_admin_business_provider.dart",
+      "tags": [
+        "auto-detected",
+        "missing-import",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:44:51.037Z"
+    },
+    {
+      "id": "bug-103",
+      "timestamp": "2026-10-23T05:55:00.097Z",
+      "error_message": "Missing import: ../shared_admin_business_provider.dart",
+      "file": "cafe_countryside_menu/lib/features/admin/settings/settings_provider.dart",
+      "root_cause": "Module(s) not imported: ../shared_admin_business_provider.dart",
+      "fix": "Added import(s) for ../shared_admin_business_provider.dart",
+      "tags": [
+        "auto-detected",
+        "missing-import",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:55:00.097Z"
+    },
+    {
+      "id": "bug-104",
+      "timestamp": "2026-10-23T05:55:17.875Z",
+      "error_message": "Wrong condition in logic",
+      "file": "cafe_countryside_menu/lib/features/shared/models/draft_ops.dart",
+      "root_cause": "Condition was: if (i.name.length > longNameLimit)",
+      "fix": "Changed to: if (i.name.trim()",
+      "tags": [
+        "auto-detected",
+        "logic-fix",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-10-23T05:55:20.759Z"
+    },
+    {
+      "id": "bug-105",
+      "timestamp": "2026-10-23T05:55:22.675Z",
+      "error_message": "Wrong condition in logic",
+      "file": "cafe_countryside_menu/lib/features/shared/models/item_validators.dart",
+      "root_cause": "Condition was: if (parsed == null)",
+      "fix": "Changed to: if (parsed == null || !parsed.isFinite)",
+      "tags": [
+        "auto-detected",
+        "logic-fix",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:55:22.675Z"
+    },
+    {
+      "id": "bug-106",
+      "timestamp": "2026-10-23T05:55:42.309Z",
+      "error_message": "Missing guard clause",
+      "file": "cafe_countryside_menu/lib/features/order/presentation/checkout_page.dart",
+      "root_cause": "No early return/throw for edge case: !mounted",
+      "fix": "Added guard clause: if (!mounted)",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-10-23T05:55:43.435Z"
+    },
+    {
+      "id": "bug-107",
+      "timestamp": "2026-10-23T05:55:54.430Z",
+      "error_message": "Significant refactor of ",
+      "file": "scripts/summarize-bug-logs.mjs",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 5→10 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "mjs"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:55:54.430Z"
+    },
+    {
+      "id": "bug-108",
+      "timestamp": "2026-10-23T05:58:44.778Z",
+      "error_message": "Wrong condition in logic",
+      "file": "cafe_countryside_menu/lib/features/admin/ops/admin_tools_switch.dart",
+      "root_cause": "Condition was: if (b.isLoading && !b.hasValue)",
+      "fix": "Changed to: if (b.hasError)",
+      "tags": [
+        "auto-detected",
+        "logic-fix",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T05:58:44.778Z"
+    },
+    {
+      "id": "bug-109",
+      "timestamp": "2026-10-23T06:10:26.758Z",
+      "error_message": "Incorrect value in code",
+      "file": "CHANGELOG.md",
+      "root_cause": "Had \"Customers must enter a table number\"",
+      "fix": "Changed to `/check-bug-logs`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-23T06:10:26.758Z"
     }
   ]
 }
