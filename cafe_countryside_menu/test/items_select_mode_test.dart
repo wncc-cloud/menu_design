@@ -233,7 +233,7 @@ void main() {
       await openMoveFor(tester, ['a1']);
       await chooseTarget(tester, '🍳 Chef Special only');
       expect(find.textContaining('will also get the Chef Special flag'), findsOneWidget);
-      expect(find.textContaining('lose their category heading'), findsOneWidget);
+      expect(find.textContaining('without a category heading'), findsOneWidget);
     });
 
     testWidgets('Undo puts the items back and the bar disappears', (tester) async {

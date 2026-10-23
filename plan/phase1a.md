@@ -1,6 +1,6 @@
 # Phase 1a — Admin speed tools: move / merge sections, find-and-edit, menu check
 
-Status: **PLAN v8 — three review passes done (code, POS app, internal consistency) + `/check-bug-logs` track + fifth review pass (§6e) + owner decision on risk 8: **bounded anonymous logs** (§E.3c, §6f), 2026-10-21; ready to build.** Nothing built yet. Branch: `phase1-planning` now; all building happens on a new branch **`phase1a`** created in step 1a-B. Wireframe: `plan/phase1a_wireframe.html` (kept in step with this file).
+Status: **BUILT on branch `admin-panel-optimisation` (see the build-progress line below); not yet deployed. Remaining: 1a-F (optional off switch), 1a-L (`/check-bug-logs` skill), 1a-P (counter-app heading, other repo), deploy.** Plan v8 below is the original design. Wireframe: `plan/phase1a_wireframe.html`.
 
 Builds on `phase1.md` / `phase1.2.md`.
 

@@ -34,7 +34,7 @@ void main() {
     expect(AdminCopy.fromHiddenWarning(2), '2 come from a hidden section and will become visible after Publish');
     expect(AdminCopy.stillHiddenWarning(2), '2 are in hidden sections and will still not appear on the menu');
     expect(AdminCopy.posHeadingWarning,
-        'On the counter’s manual-bill screen these items lose their category heading (until the counter update 1a-P is live)');
+        'Heads-up: on the counter’s manual-bill screen these items will appear without a category heading. Customers are not affected.');
     expect(AdminCopy.popupBlocksDeleteWarning,
         'The first-load pop-up opens this section, so it will not be deleted. Move is still done. Change the pop-up in Promotions & pop-up, then delete it.');
     expect(AdminCopy.exportTip, 'Tip: Dashboard → Export Menu JSON first — after Publish there is no rollback.');

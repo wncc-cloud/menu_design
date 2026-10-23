@@ -41,7 +41,7 @@ class AdminCopy {
   static String stillHiddenWarning(int n) =>
       '$n ${n == 1 ? 'is' : 'are'} in hidden sections and will still not appear on the menu';
   static const posHeadingWarning =
-      'On the counter’s manual-bill screen these items lose their category heading (until the counter update 1a-P is live)';
+      'Heads-up: on the counter’s manual-bill screen these items will appear without a category heading. Customers are not affected.';
   static const popupBlocksDeleteWarning =
       'The first-load pop-up opens this section, so it will not be deleted. Move is still done. '
       'Change the pop-up in Promotions & pop-up, then delete it.';
