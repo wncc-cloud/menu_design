@@ -46,13 +46,14 @@ List<Override> adminOverrides(
   AdminRole role = AdminRole.owner,
   DateTime Function()? clock,
   BusinessModel? adminBusiness,
+  AdminBusinessNotifier Function()? adminBusinessFactory,
 }) =>
     [
       draftRepositoryProvider.overrideWithValue(repo),
       currentAdminProvider.overrideWith((ref) async => tAdmin(role)),
       freshBusinessLoaderProvider.overrideWithValue(business),
       adminClockProvider.overrideWithValue(clock ?? DateTime.now),
-      adminBusinessProvider.overrideWith(() => FakeAdminBusiness(adminBusiness ?? BusinessModel.empty())),
+      adminBusinessProvider.overrideWith(adminBusinessFactory ?? () => FakeAdminBusiness(adminBusiness ?? BusinessModel.empty())),
       mp.menuControllerProvider.overrideWith(FakeMenu.new),
     ];
 
@@ -68,6 +69,7 @@ Future<AdminHarness> pumpAdmin(
   Size size = const Size(1400, 1400),
   bool snapshotEqualsDraft = true,
   bool businessUnreadable = false,
+  AdminBusinessNotifier Function()? adminBusinessFactory,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -98,6 +100,7 @@ Future<AdminHarness> pumpAdmin(
       role: role,
       clock: () => h.now,
       adminBusiness: h.business,
+      adminBusinessFactory: adminBusinessFactory,
     ),
   ]);
   addTearDown(h.container.dispose);

@@ -7,7 +7,8 @@ String? validateItemName(String? v) => (v == null || v.trim().isEmpty) ? 'Name i
 String? validateItemPrice(String? v) {
   if (v == null || v.trim().isEmpty) return 'Price is required';
   final parsed = double.tryParse(v.trim());
-  if (parsed == null) {
+  // double.tryParse also accepts "NaN" and "Infinity": neither is a price.
+  if (parsed == null || !parsed.isFinite) {
     return 'Enter a valid number';
   }
   // billing_cafe phase12.md §12.4-C: a ₹0 item would show on the menu but every

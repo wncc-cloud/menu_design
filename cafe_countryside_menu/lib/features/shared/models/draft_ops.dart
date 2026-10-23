@@ -583,6 +583,12 @@ OpResult bulkPrice(DraftData d, List<String> ids, PriceChange ch, OpContext c) {
       e.skipped.add((name: '(deleted item)', reason: AdminCopy.reasonGone));
       continue;
     }
+    if (!it.price.isFinite) {
+      // Defensive: a stored NaN/Infinity would make .round() throw inside the
+      // transaction callback (which must never throw). Leave it for the owner.
+      e.skipped.add((name: it.name, reason: AdminCopy.reasonZeroPrice));
+      continue;
+    }
     final p = paiseOf(it.price);
     final n = newPaise(p, ch);
     if (n <= 0) {
@@ -655,7 +661,7 @@ OpResult quickEditItem(DraftData d, String id, QuickItemEdit e, OpContext c) {
   if (it == null) return OpResult.blocked(AdminCopy.itemGoneSave);
   final nameError = validateItemName(e.name);
   if (nameError != null) return OpResult.blocked(nameError);
-  if (e.price <= 0) return OpResult.blocked(validateItemPrice('0')!);
+  if (!(e.price > 0 && e.price.isFinite)) return OpResult.blocked(validateItemPrice('0')!);
   if (e.sectionId != chefOnlySectionId && ed.section(e.sectionId) == null) {
     return OpResult.blocked(AdminCopy.sectionGoneSave);
   }
@@ -994,7 +1000,7 @@ List<MenuProblem> menuProblems(
         itemId: i.id,
       ));
     }
-    if (i.price <= 0) {
+    if (!(i.price > 0 && i.price.isFinite)) {
       out.add(MenuProblem(
         level: ProblemLevel.problem,
         kind: ProblemKind.zeroPrice,
@@ -1003,11 +1009,13 @@ List<MenuProblem> menuProblems(
         itemId: i.id,
       ));
     }
-    if (i.name.length > longNameLimit) {
+    // Same rule as the quick-edit tip (trimmed length); cut on whole characters,
+    // never between the two halves of an emoji.
+    if (i.name.trim().length > longNameLimit) {
       out.add(MenuProblem(
         level: ProblemLevel.tip,
         kind: ProblemKind.longName,
-        title: '“${i.name.substring(0, 30)}…” is very long',
+        title: '“${String.fromCharCodes(i.name.trim().runes.take(30))}…” is very long',
         detail: 'May be clipped on phones.',
         itemId: i.id,
       ));

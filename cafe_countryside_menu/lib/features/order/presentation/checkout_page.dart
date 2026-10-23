@@ -115,7 +115,9 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     // load: the café may have closed while the customer was typing. Unknown
     // (null) is treated as OPEN — this read failing must never block ordering.
     final repo = ref.read(orderRequestRepositoryProvider);
-    if (await repo.fetchCafeOpen() == false) {
+    final cafeOpen = await repo.fetchCafeOpen();
+    if (!mounted) return; // the customer left while the status call was in flight
+    if (cafeOpen == false) {
       ref.invalidate(cafeOpenProvider);
       if (mounted) {
         setState(() {
@@ -147,6 +149,7 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
 
     // The café may have made the table number compulsory after this page
     // loaded: the fresh read above decides, not the cached copy.
+    if (!mounted) return;
     if (tableNumberEnabled && tableRequired && _tableController.text.trim().isEmpty) {
       ref.invalidate(businessProvider); // so the field shows as required now
       if (mounted) {

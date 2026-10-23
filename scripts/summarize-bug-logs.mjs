@@ -55,11 +55,16 @@ export function summarize(logs) {
   );
 }
 
-function main() {
-  const args = process.argv.slice(2);
-  const target = args.find((a) => !a.startsWith("--")) ?? "prod";
+/** argv (without node + script) -> { target, samples }; the value after --samples is not the target. */
+export function parseArgs(args) {
   const samplesAt = args.indexOf("--samples");
   const samples = samplesAt >= 0 ? Number(args[samplesAt + 1]) || 2 : 2;
+  const target = args.find((a, i) => !a.startsWith("--") && i !== samplesAt + 1) ?? "prod";
+  return { target, samples };
+}
+
+function main() {
+  const { target, samples } = parseArgs(process.argv.slice(2));
   const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
   const file = /\.json$/i.test(target) ? target : path.join(root, "client-logs", `${target}-latest.json`);
   if (!fs.existsSync(file)) {

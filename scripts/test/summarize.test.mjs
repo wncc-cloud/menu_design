@@ -1,7 +1,7 @@
 // node --test "scripts/test/*.test.mjs"
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { deviceClass, shape, summarize } from '../summarize-bug-logs.mjs';
+import { deviceClass, parseArgs, shape, summarize } from '../summarize-bug-logs.mjs';
 import { FIXTURE } from './fixture-logs.mjs';
 
 test('shape blanks ids and numbers so the same failure groups together', () => {
@@ -55,4 +55,11 @@ test('summarize keeps the first/last time and log ids', () => {
 
 test('an empty export is fine', () => {
   assert.deepEqual(summarize([]), []);
+});
+
+test('parseArgs: the number after --samples is not taken as the export name', () => {
+  assert.deepEqual(parseArgs(['--samples', '3']), { target: 'prod', samples: 3 });
+  assert.deepEqual(parseArgs(['emu', '--samples', '5']), { target: 'emu', samples: 5 });
+  assert.deepEqual(parseArgs(['--samples', '4', 'emu']), { target: 'emu', samples: 4 });
+  assert.deepEqual(parseArgs([]), { target: 'prod', samples: 2 });
 });

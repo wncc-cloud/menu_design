@@ -191,7 +191,8 @@ class _QuickEditItemDialogState extends ConsumerState<QuickEditItemDialog> {
   Widget build(BuildContext context) {
     final draft = ref.watch(draftStreamProvider).asData?.value;
     final item = draft?.items.where((i) => i.id == widget.itemId).firstOrNull;
-    final toolsOn = ref.watch(adminToolsOnProvider); // 1a-F: owner's off switch
+    final toolsOn = ref.watch(adminToolsOnProvider); // 1a-F: owner's off switch (loading counts as off)
+    final toolsState = ref.watch(adminToolsStateProvider);
     final readOnly = !((ref.watch(permissionServiceProvider)?.canManageItems ?? false) && toolsOn);
     final reserved = _sectionId == chefOnlySectionId;
     final ctx = _ctx;
@@ -217,7 +218,7 @@ class _QuickEditItemDialogState extends ConsumerState<QuickEditItemDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (!toolsOn)
+                if (toolsState == false)
                   const Padding(
                     padding: EdgeInsets.only(bottom: 10),
                     child: Text(AdminCopy.toolsOffNote, style: TextStyle(fontSize: 12, color: Color(0xFF8A5300))),
@@ -426,7 +427,8 @@ class _QuickEditSectionDialogState extends ConsumerState<QuickEditSectionDialog>
   @override
   Widget build(BuildContext context) {
     final draft = ref.watch(draftStreamProvider).asData?.value;
-    final toolsOn = ref.watch(adminToolsOnProvider); // 1a-F: owner's off switch
+    final toolsOn = ref.watch(adminToolsOnProvider); // 1a-F: owner's off switch (loading counts as off)
+    final toolsState = ref.watch(adminToolsStateProvider);
     final canManage = (ref.watch(permissionServiceProvider)?.canManageSections ?? false) && toolsOn;
     final canMerge = canManage && (ref.watch(permissionServiceProvider)?.canManageItems ?? false);
     final readOnly = !canManage;
@@ -442,7 +444,7 @@ class _QuickEditSectionDialogState extends ConsumerState<QuickEditSectionDialog>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (!toolsOn)
+              if (toolsState == false)
                 const Padding(
                   padding: EdgeInsets.only(bottom: 10),
                   child: Text(AdminCopy.toolsOffNote, style: TextStyle(fontSize: 12, color: Color(0xFF8A5300))),

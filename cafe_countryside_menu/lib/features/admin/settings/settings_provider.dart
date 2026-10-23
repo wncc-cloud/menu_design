@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../menu/presentation/menu_provider.dart';
 import '../../shared/models/business_model.dart';
+import '../shared_admin_business_provider.dart';
 import '../../shared/repositories/business_repository.dart';
 import '../../../core/logging/client_log.dart';
 
@@ -28,6 +29,7 @@ class SettingsNotifier extends _$SettingsNotifier {
       // The Dashboard and the customer pages read the cached businessProvider:
       // refresh it so "Self-ordering: Off" does not linger after a save.
       ref.invalidate(businessProvider);
+      ref.invalidate(adminBusinessProvider); // the owner's tools switch lives there
       return null;
     } catch (e, st) {
       logClientError('Settings.save', e, stackTrace: st);
