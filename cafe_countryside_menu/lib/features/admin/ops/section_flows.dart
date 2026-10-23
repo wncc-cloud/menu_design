@@ -7,6 +7,7 @@ import '../auth/auth_provider.dart';
 import '../sections/section_delete_flow.dart';
 import '../sections/sections_provider.dart';
 import 'admin_ops.dart';
+import 'admin_tools_switch.dart';
 import 'op_toast.dart';
 import 'target_dialog.dart';
 
@@ -14,7 +15,7 @@ import 'target_dialog.dart';
 /// section (plan S12).
 bool canMergeSections(WidgetRef ref) {
   final p = ref.read(permissionServiceProvider);
-  return p != null && p.canManageItems && p.canManageSections;
+  return p != null && p.canManageItems && p.canManageSections && ref.read(adminToolsOnProvider);
 }
 
 /// The Merge dialog, shared by the Sections page, the quick-edit sheet and the

@@ -13,6 +13,7 @@ import '../../shared/models/draft_section_model.dart';
 import '../../shared/widgets/publish_banner.dart';
 import '../auth/auth_provider.dart';
 import '../ops/admin_ops.dart';
+import '../ops/admin_tools_switch.dart';
 import '../ops/op_toast.dart';
 import '../ops/price_dialog.dart';
 import '../ops/quick_edit.dart';
@@ -288,6 +289,10 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
     final draftAsync = ref.watch(draftStreamProvider);
     final canManage =
         ref.watch(permissionServiceProvider)?.canManageItems ?? false;
+    // 1a-F: the owner's off switch hides Select mode (and with it every bulk
+    // action); the old Edit / Delete / Hide / arrows stay.
+    final toolsOn = ref.watch(adminToolsOnProvider);
+    final selecting = _selecting && canManage && toolsOn;
 
     return CallbackShortcuts(
       bindings: {
@@ -299,21 +304,22 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
         autofocus: true,
         child: Scaffold(
       bottomNavigationBar:
-          _selecting && _picked.isNotEmpty ? SelectBar(count: _picked.length, onAction: _bulk) : null,
+          selecting && _picked.isNotEmpty ? SelectBar(count: _picked.length, onAction: _bulk) : null,
       appBar: AppBar(
         backgroundColor: const Color(0xFF2E7D32),
         foregroundColor: Colors.white,
         title:
             const Text('Items', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
-          if (canManage) ...[
+          if (canManage && toolsOn)
             TextButton.icon(
               key: const Key('select-toggle'),
               onPressed: _toggleSelecting,
               style: TextButton.styleFrom(foregroundColor: Colors.white),
-              icon: Icon(_selecting ? Icons.check : Icons.checklist, size: 18),
-              label: Text(_selecting ? 'Done' : 'Select'),
+              icon: Icon(selecting ? Icons.check : Icons.checklist, size: 18),
+              label: Text(selecting ? 'Done' : 'Select'),
             ),
+          if (canManage) ...[
             IconButton(
               icon: const Icon(Icons.upload_file),
               tooltip: 'Bulk Import',
@@ -453,7 +459,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                           ],
                         ),
                       ),
-                    if (_selecting)
+                    if (selecting)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Wrap(
@@ -514,7 +520,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                                     .name;
                                 // Arrows only while ONE section is selected: that is
                                 // the list whose order they change.
-                                final canMove = canManage && _filterSectionId != null && !_selecting && !searching;
+                                final canMove = canManage && _filterSectionId != null && !selecting && !searching;
                                 return _ItemTile(
                                   item: item,
                                   onMoveUp: canMove && index > 0
@@ -526,7 +532,7 @@ class _ItemsPageState extends ConsumerState<ItemsPage> {
                                   showMoveHint: canMove,
                                   sectionName: sectionName,
                                   canManage: canManage,
-                                  selecting: _selecting,
+                                  selecting: selecting,
                                   picked: _picked.contains(item.id),
                                   onPick: () => _pick(item.id),
                                   onQuickEdit: () => showQuickEditItem(context, ref, item.id),

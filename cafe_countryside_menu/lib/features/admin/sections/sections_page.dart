@@ -9,6 +9,7 @@ import '../../shared/widgets/publish_banner.dart';
 import '../auth/auth_provider.dart';
 import 'widgets/special_sections_block.dart';
 import 'sections_provider.dart';
+import '../ops/admin_tools_switch.dart';
 import '../ops/quick_edit.dart';
 import '../ops/row_tag.dart';
 import '../ops/section_flows.dart';
@@ -92,7 +93,10 @@ class _SectionsPageState extends ConsumerState<SectionsPage> {
     final draftAsync = ref.watch(draftStreamProvider);
     final canManage =
         ref.watch(permissionServiceProvider)?.canManageSections ?? false;
-    final canMerge = canManage && (ref.watch(permissionServiceProvider)?.canManageItems ?? false);
+    // 1a-F: Merge is one of the tools the owner can switch off.
+    final canMerge = canManage &&
+        (ref.watch(permissionServiceProvider)?.canManageItems ?? false) &&
+        ref.watch(adminToolsOnProvider);
 
     return Scaffold(
       appBar: AppBar(

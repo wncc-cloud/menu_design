@@ -4,6 +4,7 @@ import 'package:cafe_countryside_menu/features/admin/auth/auth_provider.dart';
 import 'package:cafe_countryside_menu/features/admin/items/items_page.dart';
 import 'package:cafe_countryside_menu/features/admin/ops/admin_ops.dart';
 import 'package:cafe_countryside_menu/features/admin/sections/sections_provider.dart';
+import 'package:cafe_countryside_menu/features/admin/shared_admin_business_provider.dart';
 import 'package:cafe_countryside_menu/features/menu/models/item_model.dart' show chefOnlySectionId;
 import 'package:cafe_countryside_menu/features/shared/models/admin_model.dart';
 import 'package:cafe_countryside_menu/features/shared/models/business_model.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'support/admin_harness.dart' show FakeAdminBusiness;
 import 'support/draft_fixtures.dart';
 import 'support/fake_draft_repository.dart';
 
@@ -56,6 +58,8 @@ Future<Harness> pumpItems(
     currentAdminProvider.overrideWith((ref) async => tAdmin(role)),
     freshBusinessLoaderProvider.overrideWithValue(() async => BusinessModel.empty()),
     adminClockProvider.overrideWithValue(() => h.now),
+    // 1a-F: the pages read the owner's tools switch from the fresh admin business doc.
+    adminBusinessProvider.overrideWith(() => FakeAdminBusiness(BusinessModel.empty())),
   ]);
   addTearDown(h.container.dispose);
   await tester.pumpWidget(UncontrolledProviderScope(

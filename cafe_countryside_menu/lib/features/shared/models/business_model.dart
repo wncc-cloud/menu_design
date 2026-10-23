@@ -57,6 +57,12 @@ class BusinessModel {
   /// True when checkout must refuse an empty table number.
   bool get tableNumberMustBeEntered => tableNumberEnabled && tableNumberRequired;
 
+  /// Phase 1a (1a-F): owner's off switch for the bulk / merge / quick-edit tools.
+  /// Missing = true, so nothing changes until the owner turns it off. When off,
+  /// Select mode, Merge, bulk actions and quick EDIT are hidden; search, Find,
+  /// Menu check, the live sold-out switch and the old Edit / Delete / Hide stay.
+  final bool adminToolsEnabled;
+
   /// Phase 1 (Part E): admin switch for the whole-order note on checkout.
   /// Defaults to `true` (today's behavior — the note field is always shown),
   /// so deploying never silently removes the feature.
@@ -98,6 +104,7 @@ class BusinessModel {
     this.selfOrderEnabled = false,
     this.tableNumberEnabled = true,
     this.tableNumberRequired = false,
+    this.adminToolsEnabled = true,
     this.orderNoteEnabled = true,
     this.systemSections = const [],
     this.promotions = const [],
@@ -139,6 +146,7 @@ class BusinessModel {
         selfOrderEnabled: json['selfOrderEnabled'] as bool? ?? false,
         tableNumberEnabled: json['tableNumberEnabled'] as bool? ?? true,
         tableNumberRequired: json['tableNumberRequired'] as bool? ?? false,
+        adminToolsEnabled: json['adminToolsEnabled'] as bool? ?? true,
         orderNoteEnabled: json['orderNoteEnabled'] as bool? ?? true,
         systemSections: json['systemSections'] == null
             ? const []
@@ -166,6 +174,7 @@ class BusinessModel {
         'selfOrderEnabled': selfOrderEnabled,
         'tableNumberEnabled': tableNumberEnabled,
         'tableNumberRequired': tableNumberRequired,
+        'adminToolsEnabled': adminToolsEnabled,
         'orderNoteEnabled': orderNoteEnabled,
         'systemSections': systemSections.map((s) => s.toJson()).toList(),
         'promotions': promotions.map((p) => p.toJson()).toList(),
@@ -191,6 +200,7 @@ class BusinessModel {
     bool? selfOrderEnabled,
     bool? tableNumberEnabled,
     bool? tableNumberRequired,
+    bool? adminToolsEnabled,
     bool? orderNoteEnabled,
     List<SystemSection>? systemSections,
     List<Promotion>? promotions,
@@ -215,6 +225,7 @@ class BusinessModel {
         selfOrderEnabled: selfOrderEnabled ?? this.selfOrderEnabled,
         tableNumberEnabled: tableNumberEnabled ?? this.tableNumberEnabled,
         tableNumberRequired: tableNumberRequired ?? this.tableNumberRequired,
+        adminToolsEnabled: adminToolsEnabled ?? this.adminToolsEnabled,
         orderNoteEnabled: orderNoteEnabled ?? this.orderNoteEnabled,
         systemSections: systemSections ?? this.systemSections,
         promotions: promotions ?? this.promotions,
@@ -241,6 +252,7 @@ class BusinessModel {
         'selfOrderEnabled': selfOrderEnabled,
         'tableNumberEnabled': tableNumberEnabled,
         'tableNumberRequired': tableNumberRequired,
+        'adminToolsEnabled': adminToolsEnabled,
         'orderNoteEnabled': orderNoteEnabled,
       };
 }

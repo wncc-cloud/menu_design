@@ -31,6 +31,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool _selfOrderEnabled = false;
   bool _tableNumberEnabled = true;
   bool _tableNumberRequired = false;
+  bool _adminToolsEnabled = true;
   bool _orderNoteEnabled = true;
   bool _saving = false;
   bool _logoUploading = false;
@@ -74,6 +75,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     _selfOrderEnabled = b.selfOrderEnabled;
     _tableNumberEnabled = b.tableNumberEnabled;
     _tableNumberRequired = b.tableNumberRequired;
+    _adminToolsEnabled = b.adminToolsEnabled;
     _orderNoteEnabled = b.orderNoteEnabled;
   }
 
@@ -90,6 +92,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       selfOrderEnabled: _selfOrderEnabled,
       tableNumberEnabled: _tableNumberEnabled,
       tableNumberRequired: _tableNumberRequired,
+      adminToolsEnabled: _adminToolsEnabled,
       orderNoteEnabled: _orderNoteEnabled,
     );
   }
@@ -391,6 +394,24 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ),
                     value: _orderNoteEnabled,
                     onChanged: (v) => setState(() => _orderNoteEnabled = v),
+                  ),
+                  const SizedBox(height: 32),
+
+                  _SectionLabel('Admin tools'),
+                  const SizedBox(height: 12),
+                  SwitchListTile(
+                    key: const Key('settings-admin-tools'),
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Bulk & merge tools'),
+                    subtitle: const Text(
+                      'Select mode with bulk actions (move, price, show/hide, delete), '
+                      'Merge sections and the quick-edit sheet. Turn this off if '
+                      'something goes wrong: these tools disappear on the next page '
+                      'load, while search, Find, Menu check, the sold-out switch and '
+                      'the normal Edit / Delete / Hide stay. No menu data is changed.',
+                    ),
+                    value: _adminToolsEnabled,
+                    onChanged: (v) => setState(() => _adminToolsEnabled = v),
                   ),
                   const SizedBox(height: 32),
 

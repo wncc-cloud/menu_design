@@ -13,6 +13,7 @@ import '../auth/auth_provider.dart';
 import '../items/widgets/item_form.dart' show formatPriceForEditing;
 import '../sections/sections_provider.dart';
 import 'admin_ops.dart';
+import 'admin_tools_switch.dart';
 import 'op_toast.dart';
 import 'section_flows.dart';
 
@@ -190,7 +191,8 @@ class _QuickEditItemDialogState extends ConsumerState<QuickEditItemDialog> {
   Widget build(BuildContext context) {
     final draft = ref.watch(draftStreamProvider).asData?.value;
     final item = draft?.items.where((i) => i.id == widget.itemId).firstOrNull;
-    final readOnly = !(ref.watch(permissionServiceProvider)?.canManageItems ?? false);
+    final toolsOn = ref.watch(adminToolsOnProvider); // 1a-F: owner's off switch
+    final readOnly = !((ref.watch(permissionServiceProvider)?.canManageItems ?? false) && toolsOn);
     final reserved = _sectionId == chefOnlySectionId;
     final ctx = _ctx;
 
@@ -215,6 +217,11 @@ class _QuickEditItemDialogState extends ConsumerState<QuickEditItemDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (!toolsOn)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: Text(AdminCopy.toolsOffNote, style: TextStyle(fontSize: 12, color: Color(0xFF8A5300))),
+                  ),
                 TextFormField(
                   key: const Key('qe-name'),
                   controller: _name,
@@ -419,7 +426,8 @@ class _QuickEditSectionDialogState extends ConsumerState<QuickEditSectionDialog>
   @override
   Widget build(BuildContext context) {
     final draft = ref.watch(draftStreamProvider).asData?.value;
-    final canManage = ref.watch(permissionServiceProvider)?.canManageSections ?? false;
+    final toolsOn = ref.watch(adminToolsOnProvider); // 1a-F: owner's off switch
+    final canManage = (ref.watch(permissionServiceProvider)?.canManageSections ?? false) && toolsOn;
     final canMerge = canManage && (ref.watch(permissionServiceProvider)?.canManageItems ?? false);
     final readOnly = !canManage;
     final n = draft?.items.where((i) => i.sectionId == widget.sectionId).length ?? 0;
@@ -434,6 +442,11 @@ class _QuickEditSectionDialogState extends ConsumerState<QuickEditSectionDialog>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (!toolsOn)
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 10),
+                  child: Text(AdminCopy.toolsOffNote, style: TextStyle(fontSize: 12, color: Color(0xFF8A5300))),
+                ),
               TextField(
                 key: const Key('qs-name'),
                 controller: _name,

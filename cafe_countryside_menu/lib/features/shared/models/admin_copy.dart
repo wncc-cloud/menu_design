@@ -63,7 +63,9 @@ class AdminCopy {
   static const duplicateSectionWarning = 'Another section already has this name.';
   static const savedLine = 'Saved';
   static const couldNotSave = "Couldn't save — check your connection. Nothing was changed.";
-  static const couldNotPublish = "Couldn't publish — check your connection. Customers still see the old menu.";
+  static const toolsOffNote =
+      'Bulk & quick-edit tools are switched off in Settings. Use Edit on the Items or Sections page to change this.';
+  static const couldNotPublish ="Couldn't publish — check your connection. Customers still see the old menu.";
   static const notSaved ='Not saved — nothing was changed.';
   static const draftNotReady = "The draft isn't ready yet — try again in a moment.";
   static const savingTimedOut =

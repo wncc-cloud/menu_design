@@ -6,13 +6,17 @@ import '../../menu/models/item_model.dart' show chefOnlySectionId;
 import '../../shared/models/draft_ops.dart';
 import '../../shared/models/promotion_models.dart' show chefSpecialKey;
 import '../auth/auth_provider.dart';
+import '../ops/admin_tools_switch.dart';
 import '../ops/quick_edit.dart';
 import '../ops/section_flows.dart';
 import '../sections/sections_provider.dart';
 
 /// Fix buttons open the editors that can actually repair a problem, so only
 /// people who may edit see them (staff cannot).
-bool canFixProblems(WidgetRef ref) => ref.watch(permissionServiceProvider)?.canManageItems ?? false;
+/// Their targets (quick edit, Merge) are among the tools the owner can switch
+/// off (1a-F): the list stays, the Fix buttons go.
+bool canFixProblems(WidgetRef ref) =>
+    (ref.watch(permissionServiceProvider)?.canManageItems ?? false) && ref.watch(adminToolsOnProvider);
 
 /// Opens the right editor for [p]. Never changes anything by itself: Merge still
 /// needs its Apply, quick edit its Save.
