@@ -1,5 +1,5 @@
 // Owner ask 2026-09-27 (restored): on the PENDING order-status screen the
-// "pay at the counter" instruction slides between English and Hindi (auto every
+// "pay at the counter" instruction slides between Hindi (first) and English (auto every
 // 5 s, swipeable, with page dots), and the step tracker shows 3 steps.
 // (Widget tests render with the wide 'Ahem' test font, so narrow-phone / large-text
 // overflow is checked in the real browser instead, not here.)
@@ -52,42 +52,43 @@ Future<void> _pump(WidgetTester tester, {Size size = const Size(900, 1000), doub
 }
 
 void main() {
-  testWidgets('pending screen: English first, a 3-step tracker, both languages present', (tester) async {
+  testWidgets('pending screen: HINDI first, a 3-step tracker', (tester) async {
     await _pump(tester);
-    expect(find.textContaining(_en), findsOneWidget);
+    expect(find.textContaining(_hi), findsOneWidget);
+    expect(find.textContaining(_en), findsNothing, reason: 'English is the second slide');
     expect(find.text('Show code'), findsOneWidget);
     expect(find.text('Pay at counter'), findsOneWidget);
     expect(find.text('Order confirmed'), findsOneWidget);
   });
 
-  testWidgets('it slides to Hindi by itself after 5 s and back after 5 s more', (tester) async {
+  testWidgets('it slides to English by itself after 5 s and back to Hindi after 5 s more', (tester) async {
     await _pump(tester);
     await tester.pump(const Duration(seconds: 5));
     await tester.pump(const Duration(milliseconds: 600));
-    expect(find.textContaining(_hi), findsOneWidget);
+    expect(find.textContaining(_en), findsOneWidget);
     await tester.pump(const Duration(seconds: 5));
     await tester.pump(const Duration(milliseconds: 600));
-    expect(find.textContaining(_en), findsOneWidget);
+    expect(find.textContaining(_hi), findsOneWidget);
   });
 
   testWidgets('a swipe jumps straight to the other language', (tester) async {
     await _pump(tester);
     await tester.drag(find.byType(PageView), const Offset(-300, 0));
     await tester.pump(const Duration(milliseconds: 600));
-    expect(find.textContaining(_hi), findsOneWidget);
+    expect(find.textContaining(_en), findsOneWidget);
   });
 
   testWidgets('after a swipe the auto-slide waits a fresh 5 s, so the customer keeps their place', (tester) async {
     await _pump(tester);
     await tester.pump(const Duration(seconds: 4)); // almost due
-    await tester.drag(find.byType(PageView), const Offset(-300, 0)); // customer swipes to Hindi
+    await tester.drag(find.byType(PageView), const Offset(-300, 0)); // customer swipes to English
     await tester.pump(const Duration(milliseconds: 600));
-    expect(find.textContaining(_hi), findsOneWidget);
+    expect(find.textContaining(_en), findsOneWidget);
     await tester.pump(const Duration(seconds: 4)); // the OLD timer would have fired by now
-    expect(find.textContaining(_hi), findsOneWidget, reason: 'still reading Hindi');
+    expect(find.textContaining(_en), findsOneWidget, reason: 'still reading English');
     for (var i = 0; i < 14; i++) {
       await tester.pump(const Duration(milliseconds: 500));
     }
-    expect(find.textContaining(_en), findsOneWidget, reason: 'then it carries on');
+    expect(find.textContaining(_hi), findsOneWidget, reason: 'then it carries on');
   });
 }

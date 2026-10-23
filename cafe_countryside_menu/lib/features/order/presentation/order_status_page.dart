@@ -1043,8 +1043,8 @@ class _BilingualInstructionBannerState extends State<_BilingualInstructionBanner
                   controller: _controller,
                   onPageChanged: (page) => setState(() => _page = page),
                   children: [
+                    _card(widget.textHi), // Hindi first (owner, 2026-10-23), then English
                     _card(widget.textEn),
-                    _card(widget.textHi),
                   ],
                 ),
               ),
