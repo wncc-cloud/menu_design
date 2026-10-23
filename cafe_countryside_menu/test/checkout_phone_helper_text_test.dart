@@ -1,8 +1,7 @@
-// Café owner's instruction, 2026-09-25: the customer-facing checkout must
-// never mention WhatsApp — the phone field just needs a plain, neutral reason
-// for asking. Text-only; no logic changed. Overrides `businessProvider` so no
-// Firebase init is needed (see widget_test.dart's note on why this project's
-// widget tests are limited).
+// Phone field wording. Owner, 2026-09-27 (deployed that day): WhatsApp is preferred,
+// any number is fine. It sits in the helper text, because a label that long is cut
+// off on a phone. This supersedes the 2026-09-25 "never mention WhatsApp" rule.
+// Overrides businessProvider so no Firebase init is needed (see widget_test.dart).
 import 'package:cafe_countryside_menu/features/menu/models/item_model.dart';
 import 'package:cafe_countryside_menu/features/menu/presentation/menu_provider.dart';
 import 'package:cafe_countryside_menu/features/order/presentation/checkout_page.dart';
@@ -14,7 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
-  testWidgets('checkout: the phone label carries the WhatsApp wording; nothing else on the page mentions it', (tester) async {
+  testWidgets('checkout: the phone helper carries the WhatsApp wording in full; nothing else on the page mentions it', (tester) async {
     final container = ProviderContainer(
       overrides: [
         businessProvider.overrideWith(
@@ -53,16 +52,15 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.widgetWithText(TextFormField, kCheckoutPhoneLabel), findsOneWidget);
-    expect(find.text('So we can reach you about your order if needed.'), findsOneWidget);
+    expect(find.text(kCheckoutPhoneHelper), findsOneWidget);
 
-    // WhatsApp is mentioned in the phone label ONLY (the owner's wording, 27 Sep),
-    // never anywhere else on the page.
+    // WhatsApp is mentioned in the phone helper ONLY (the owner's wording, 27 Sep).
     final mentions = tester
         .widgetList<Text>(find.byType(Text))
         .where((w) => (w.data ?? '').toLowerCase().contains('whatsapp'))
         .map((w) => w.data)
         .toList();
-    expect(mentions, [kCheckoutPhoneLabel]);
-
+    expect(mentions, [kCheckoutPhoneHelper]);
+    expect(kCheckoutPhoneLabel, 'Phone', reason: 'short label: never ellipsized');
   });
 }

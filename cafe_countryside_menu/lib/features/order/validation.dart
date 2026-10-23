@@ -13,9 +13,8 @@ bool isValidPhone(String value) {
 }
 
 /// phase_plan/phase11_6.md's order-status page — scales the poll
-/// interval with the remaining window so every customer session polls
-/// roughly the same ~18 times regardless of how long the café owner
-/// has configured `orderRequestExpiryMinutes` to be, clamped to a
+/// interval as remaining-window / 18 (windows of 4.5 min or more get ~18
+/// polls; the default 3 min gets 12, one every 15 s), clamped to a
 /// 15-30 second range (billing_cafe phase12a.md 12a-B: floor raised from
 /// 8 s to 15 s — every poll is a billed Firestore read on the POS project).
 int calculatePollIntervalSeconds({required DateTime expiresAt, required DateTime now}) {

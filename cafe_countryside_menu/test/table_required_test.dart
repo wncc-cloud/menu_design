@@ -179,6 +179,13 @@ void main() {
       expect(find.text('Please enter your table number.'), findsWidgets);
     });
 
+    testWidgets('ordering switched OFF after the page loaded: the fresh read at Place Order stops it, nothing is sent', (tester) async {
+      final orders = await _open(tester, cached: _biz(), fresh: _biz().copyWith(selfOrderEnabled: false));
+      await _fillBasics(tester);
+      await _place(tester);
+      expect(orders.created, isEmpty);
+    });
+
     testWidgets('required but the table question is switched OFF: no field, orders normally', (tester) async {
       final orders = await _open(tester, cached: _biz(enabled: false, required: true));
       expect(find.widgetWithText(TextFormField, 'Table number'), findsNothing);

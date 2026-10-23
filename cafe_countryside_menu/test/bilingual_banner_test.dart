@@ -76,4 +76,18 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600));
     expect(find.textContaining(_hi), findsOneWidget);
   });
+
+  testWidgets('after a swipe the auto-slide waits a fresh 5 s, so the customer keeps their place', (tester) async {
+    await _pump(tester);
+    await tester.pump(const Duration(seconds: 4)); // almost due
+    await tester.drag(find.byType(PageView), const Offset(-300, 0)); // customer swipes to Hindi
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.textContaining(_hi), findsOneWidget);
+    await tester.pump(const Duration(seconds: 4)); // the OLD timer would have fired by now
+    expect(find.textContaining(_hi), findsOneWidget, reason: 'still reading Hindi');
+    for (var i = 0; i < 14; i++) {
+      await tester.pump(const Duration(milliseconds: 500));
+    }
+    expect(find.textContaining(_en), findsOneWidget, reason: 'then it carries on');
+  });
 }

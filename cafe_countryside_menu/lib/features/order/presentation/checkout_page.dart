@@ -21,9 +21,15 @@ import '../validation.dart';
 import 'widgets/honeypot_field.dart';
 import '../../../core/logging/client_log.dart';
 
-/// Owner-requested wording (2026-09-27, deployed that day): says WhatsApp is
-/// preferred because the order number is sent there, but any number works.
-const kCheckoutPhoneLabel = 'Phone (We prefer Whatsapp as we send order number there, but any number is fine)';
+/// Phone field. The owner's wording (2026-09-27, deployed that day) says
+/// WhatsApp is preferred because the order number is sent there, but any number
+/// works. It lives in the helper text, not the label: a single-line label of
+/// that length is cut off ("...number there,...") on a phone, which hid the
+/// "any number is fine" half.
+const kCheckoutPhoneLabel = 'Phone';
+const kCheckoutPhoneHelper =
+    'We prefer Whatsapp as we send order number there, but any number is fine. '
+    'So we can reach you about your order if needed.';
 
 class CheckoutPage extends ConsumerStatefulWidget {
   const CheckoutPage({super.key});
@@ -143,6 +149,18 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     try {
       final BusinessModel? freshBiz = await ref.read(freshBusinessFetchProvider)();
       if (freshBiz != null) {
+        // Ordering switched off after this page loaded: stop now (the cached
+        // copy this page watches can be up to 20 minutes old).
+        if (!freshBiz.selfOrderEnabled) {
+          ref.invalidate(businessProvider);
+          if (mounted) {
+            setState(() {
+              _submitting = false;
+              _errorMessage = null;
+            });
+          }
+          return;
+        }
         tableNumberEnabled = freshBiz.tableNumberEnabled;
         tableRequired = freshBiz.tableNumberMustBeEntered;
         orderNoteEnabled = freshBiz.orderNoteEnabled;
@@ -376,11 +394,11 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
     // even though the menu page already hides every entry point to it.
     final selfOrderEnabled = business?.selfOrderEnabled ?? false;
     // phase12.md §12.3-B — only an explicit `false` counts as closed.
-    // phase12a.md 12a-A — this is the ONLY place the café status is read
-    // before submit (the menu page no longer reads it), and it is watched
-    // only when the order form is actually shown, so an empty-cart or
-    // kill-switched visit costs no POS read. `cafeOpenProvider` is
-    // autoDispose, so every arrival here is already a fresh fetch.
+    // phase12a.md 12a-A (checkout half): the café status is watched here only
+    // when the order form is actually shown, so an empty-cart or kill-switched
+    // visit costs no POS read. NOTE: the menu page still reads it too (Phase 1's
+    // closed strip and closed-café pop-up need it), so the arrival refresh in
+    // initState stays: the menu keeps the provider alive and its answer can be stale.
     final cafeClosed = selfOrderEnabled &&
         cart.isNotEmpty &&
         ref.watch(cafeOpenProvider).asData?.value == false;
@@ -538,12 +556,10 @@ class _CheckoutPageState extends ConsumerState<CheckoutPage> {
                       decoration: const InputDecoration(
                         labelText: kCheckoutPhoneLabel,
                         hintText: '10 digit number',
-                        // Café owner's instruction, 2026-09-25: no WhatsApp
-                        // mention anywhere on the customer-facing menu site.
-                        // A plain, message-channel-neutral reason for the
-                        // phone number, so the field still explains itself.
-                        helperText: "So we can reach you about your order if needed.",
-                        helperMaxLines: 2,
+                        // WhatsApp wording: owner, 2026-09-27 (supersedes the
+                        // 2026-09-25 "no WhatsApp" rule). Helper, not label: see above.
+                        helperText: kCheckoutPhoneHelper,
+                        helperMaxLines: 4,
                       ),
                       keyboardType: TextInputType.phone,
                       validator: (v) {

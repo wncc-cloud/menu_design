@@ -173,11 +173,11 @@ class _OrderStatusPageState extends ConsumerState<OrderStatusPage> {
         return;
       }
 
-      // phase_plan/phase11_6.md — scales with the actual remaining
-      // window (a close proxy for the configured
-      // orderRequestExpiryMinutes, since the first poll happens right
-      // after submit) so ~18 polls happen regardless of how long the
-      // café owner has configured the window to be.
+      // phase_plan/phase11_6.md — scales with the remaining window (a close
+      // proxy for orderRequestExpiryMinutes, since the first poll happens
+      // right after submit), clamped to 15-30 s since phase 12a-B: windows of
+      // 4.5 min or more get ~18 polls, the default 3 min gets 12 (every 15 s),
+      // so a claim or confirmation can take up to 15 s to show.
       if (_pollTimer == null && expiresAt != null && !DateTime.now().isAfter(expiresAt)) {
         final intervalSeconds = calculatePollIntervalSeconds(expiresAt: expiresAt, now: DateTime.now());
         _pollTimer = Timer.periodic(Duration(seconds: intervalSeconds), (_) => _pollOnce());
@@ -703,20 +703,24 @@ class _StepTracker extends StatelessWidget {
       final stepNumber = i + 1;
       if (i > 0) {
         steps.add(Container(
-          width: 28,
+          width: 16,
           height: 2,
-          margin: const EdgeInsets.symmetric(horizontal: 6),
+          margin: const EdgeInsets.only(left: 4, right: 4, top: 11),
           color: const Color(0xFFE0E0E0),
         ));
       }
-      steps.add(_step(
-        number: stepNumber,
-        label: _labels[i],
-        done: stepNumber < activeStep,
-        active: stepNumber == activeStep,
+      // Flexible + centred, wrapping labels: three labels never overflow a
+      // 320 px phone or a large-text setting, they just wrap to two lines.
+      steps.add(Flexible(
+        child: _step(
+          number: stepNumber,
+          label: _labels[i],
+          done: stepNumber < activeStep,
+          active: stepNumber == activeStep,
+        ),
       ));
     }
-    return Row(mainAxisAlignment: MainAxisAlignment.center, children: steps);
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: steps);
   }
 
   Widget _step({required int number, required String label, required bool done, required bool active}) {
@@ -740,6 +744,9 @@ class _StepTracker extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 11,
             color: highlighted ? accentColor : Colors.grey[500],
@@ -944,20 +951,57 @@ class _BilingualInstructionBanner extends StatefulWidget {
 }
 
 class _BilingualInstructionBannerState extends State<_BilingualInstructionBanner> {
-  static const _height = 150.0;
   static const _accent = Color(0xFFF57F17);
+  static const _textStyle = TextStyle(
+    color: Color(0xFF6D4C00),
+    fontSize: 16,
+    fontWeight: FontWeight.w800,
+    height: 1.3,
+  );
+  // Card chrome around the text: 2 px border + 14 px padding each side,
+  // 2 px side margins, 26 px icon + 10 px gap.
+  static const _verticalChrome = 2 * 2 + 2 * 14.0;
+  static const _horizontalChrome = 2 * 2 + 2 * 2 + 2 * 14.0 + 26 + 10.0;
 
   late final PageController _controller = PageController();
   Timer? _timer;
   int _page = 0;
+  bool _dragging = false;
 
   @override
   void initState() {
     super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 5), (_) => _advance());
   }
 
+  /// Tall enough for the LONGER of the two texts at the current width and text
+  /// size, so neither language is ever clipped (a fixed height cut off the
+  /// instruction on small phones / large-text settings).
+  double _heightFor(BuildContext context, double cardWidth) {
+    final textWidth = (cardWidth - _horizontalChrome).clamp(80.0, 1000.0);
+    final scaler = MediaQuery.textScalerOf(context);
+    double measure(String t) {
+      final tp = TextPainter(
+        text: TextSpan(text: t, style: _textStyle),
+        textDirection: TextDirection.ltr,
+        textScaler: scaler,
+      )..layout(maxWidth: textWidth);
+      return tp.height;
+    }
+
+    final en = measure(widget.textEn);
+    final hi = measure(widget.textHi);
+    final h = (en > hi ? en : hi) + _verticalChrome;
+    return h < 64 ? 64 : h;
+  }
+
   void _advance() {
+    if (_dragging) return; // never fight the customer's finger
     if (!mounted || !_controller.hasClients) return;
     _controller.animateToPage(
       1 - _page,
@@ -977,18 +1021,33 @@ class _BilingualInstructionBannerState extends State<_BilingualInstructionBanner
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          width: double.infinity,
-          height: _height,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 360),
-            child: PageView(
-              controller: _controller,
-              onPageChanged: (page) => setState(() => _page = page),
-              children: [
-                _card(widget.textEn),
-                _card(widget.textHi),
-              ],
+        // Same 360 px column as the code card and the other banners.
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 360),
+          child: LayoutBuilder(
+            builder: (context, c) => SizedBox(
+              width: double.infinity,
+              height: _heightFor(context, c.maxWidth.isFinite ? c.maxWidth : 360),
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (n) {
+                  if (n is ScrollStartNotification && n.dragDetails != null) {
+                    _dragging = true;
+                    _timer?.cancel();
+                  } else if (n is ScrollEndNotification && _dragging) {
+                    _dragging = false;
+                    _startTimer(); // a fresh 5 s after they let go
+                  }
+                  return false;
+                },
+                child: PageView(
+                  controller: _controller,
+                  onPageChanged: (page) => setState(() => _page = page),
+                  children: [
+                    _card(widget.textEn),
+                    _card(widget.textHi),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -1029,15 +1088,7 @@ class _BilingualInstructionBannerState extends State<_BilingualInstructionBanner
           Icon(widget.icon, size: 26, color: _accent),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(
-                color: Color(0xFF6D4C00),
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                height: 1.3,
-              ),
-            ),
+            child: Text(text, style: _textStyle),
           ),
         ],
       ),
