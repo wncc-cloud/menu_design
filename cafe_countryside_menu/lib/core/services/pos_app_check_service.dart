@@ -92,6 +92,23 @@ class PosAppCheckService {
 
   static FirebaseApp? _posApp;
 
+  // Diagnostics only (Bug Logs): why getToken() had no token. Never changes behaviour.
+  static final Stopwatch _sinceStart = Stopwatch();
+  static String _activateState = 'not-started'; // not-started | pending | ok | failed | skipped
+  static int? _activateMs;
+
+  /// `activation=... activateMs=... sinceStartMs=...` text for log messages.
+  static String get diagnostics =>
+      'activation=$_activateState activateMs=${_activateMs ?? '-'} sinceStartMs=${_sinceStart.elapsedMilliseconds}';
+
+  @visibleForTesting
+  static void debugReset() {
+    _posApp = null;
+    _activateState = 'not-started';
+    _activateMs = null;
+    _sinceStart..stop()..reset();
+  }
+
   /// Never throws — a blocked reCAPTCHA script, restrictive wifi, or a
   /// transient network failure here must never take down this app's
   /// launch (phase_plan/phase11_2.md). `phase11_6.md`'s checkout form
@@ -107,8 +124,11 @@ class PosAppCheckService {
   static Future<void> activate() async {
     final siteKey = _useDevPos ? _devRecaptchaSiteKey : _recaptchaSiteKey;
     if (siteKey.isEmpty) {
+      _activateState = 'skipped';
       return;
     }
+    _activateState = 'pending';
+    _sinceStart..reset()..start();
     try {
       final posApp = await Firebase.initializeApp(
         name: 'appCheckOnly',
@@ -118,9 +138,14 @@ class PosAppCheckService {
           .activate(providerWeb: ReCaptchaEnterpriseProvider(siteKey))
           .timeout(const Duration(seconds: 8));
       _posApp = posApp;
+      _activateMs = _sinceStart.elapsedMilliseconds;
+      _activateState = 'ok';
     } catch (e, st) {
+      _activateMs = _sinceStart.elapsedMilliseconds;
+      _activateState = 'failed';
       debugPrint('[PosAppCheckService] activation failed: $e\n$st');
-      logClientWarn('PosAppCheck.activate', e, stackTrace: st);
+      logClientWarn('PosAppCheck.activate', e,
+          stackTrace: st, message: '$e [$diagnostics]');
     }
   }
 
@@ -142,14 +167,22 @@ class PosAppCheckService {
   /// just a thrown-exception one.
   static Future<String?> getToken() async {
     final app = _posApp;
-    if (app == null) return null;
+    if (app == null) {
+      // Used to return silently, so "Self-ordering isn't available" had no
+      // matching log. Say why: activation still pending (race), failed, or skipped.
+      logClientWarn('PosAppCheck.getToken', 'no token: App Check not active',
+          message: 'no token: App Check not active [$diagnostics]');
+      return null;
+    }
+    final t = Stopwatch()..start();
     try {
       return await FirebaseAppCheck.instanceFor(app: app)
           .getToken()
           .timeout(const Duration(seconds: 8));
     } catch (e, st) {
       debugPrint('[PosAppCheckService] getToken failed: $e\n$st');
-      logClientWarn('PosAppCheck.getToken', e, stackTrace: st);
+      logClientWarn('PosAppCheck.getToken', e,
+          stackTrace: st, message: '$e [getTokenMs=${t.elapsedMilliseconds} $diagnostics]');
       return null;
     }
   }

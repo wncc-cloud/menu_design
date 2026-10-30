@@ -53,8 +53,15 @@ void main() {
   // from the three places Flutter can drop one. FlutterError.presentError
   // keeps the normal console output.
   FlutterError.onError = (details) {
+    // library + context say WHICH widget/build step threw; the minified stack
+    // names alone cannot be read.
+    final where = [
+      if (details.library != null) 'library=${details.library}',
+      if (details.context != null) 'context=${details.context!.toDescription()}',
+      'type=${details.exception.runtimeType}',
+    ].join(' ');
     logClientError('FlutterError', details.exception,
-        stackTrace: details.stack, message: details.exceptionAsString());
+        stackTrace: details.stack, message: '${details.exceptionAsString()} [$where]');
     FlutterError.presentError(details);
   };
   PlatformDispatcher.instance.onError = (error, stack) {
