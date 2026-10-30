@@ -55,11 +55,16 @@ void main() {
   FlutterError.onError = (details) {
     // library + context say WHICH widget/build step threw; the minified stack
     // names alone cannot be read.
-    final where = [
-      if (details.library != null) 'library=${details.library}',
-      if (details.context != null) 'context=${details.context!.toDescription()}',
-      'type=${details.exception.runtimeType}',
-    ].join(' ');
+    String where;
+    try {
+      where = [
+        if (details.library != null) 'library=${details.library}',
+        if (details.context != null) 'context=${details.context!.toDescription()}',
+        'type=${details.exception.runtimeType}',
+      ].join(' ');
+    } catch (_) {
+      where = 'type=${details.exception.runtimeType}'; // never let logging break the handler
+    }
     logClientError('FlutterError', details.exception,
         stackTrace: details.stack, message: '${details.exceptionAsString()} [$where]');
     FlutterError.presentError(details);
