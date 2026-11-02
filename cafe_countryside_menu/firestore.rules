@@ -52,7 +52,7 @@ service cloud.firestore {
     //  * bounded path - anyone (incl. anonymous): id `<source>~<slot>~<bucket>`
     //    with source on a fixed allow-list, slot 0..2 and bucket = 30-minute
     //    number (current +-1). Create-only (update is false), so a second write
-    //    to the same id is refused. Hard cap: 16 x 3 x 48 = 2,304 docs per day,
+    //    to the same id is refused. Hard cap: 17 x 3 x 48 = 2,448 docs per day,
     //    however many requests are sent. No get()/exists() on this path.
     //
     // KILL SWITCH: replace the body of boundedLogOk() with `return false;` and

@@ -190,6 +190,7 @@ class PosAppCheckService {
   /// blocks the app" guarantee true under a real network failure, not
   /// just a thrown-exception one.
   static Future<String?> getToken() async {
+    final total = Stopwatch()..start();
     if (_posApp == null && _activateState == 'pending') {
       // Activation is still running: wait for it (bounded) instead of giving up.
       try {
@@ -207,10 +208,14 @@ class PosAppCheckService {
       return null;
     }
     final t = Stopwatch()..start();
+    // One shared deadline: time already spent waiting for activation comes off the
+    // 8 s token timeout (but never below 3 s), so the whole call stays near 8 s.
+    final left = const Duration(seconds: 8) - total.elapsed;
+    final tokenTimeout = left < const Duration(seconds: 3) ? const Duration(seconds: 3) : left;
     try {
       return await FirebaseAppCheck.instanceFor(app: app)
           .getToken()
-          .timeout(const Duration(seconds: 8));
+          .timeout(tokenTimeout);
     } catch (e, st) {
       debugPrint('[PosAppCheckService] getToken failed: $e\n$st');
       logClientWarn('PosAppCheck.getToken', e,
