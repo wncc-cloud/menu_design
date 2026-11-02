@@ -23,7 +23,7 @@ const SOURCES = [
   'FlutterError', 'PlatformDispatcher', 'runZonedGuarded', 'Checkout.submit', 'Checkout.appCheck',
   'Checkout.freshBusiness', 'Checkout.revalidateCart', 'OrderRequest.create', 'OrderRequest.fetchCafeOpen',
   'OrderRequest.getRequest', 'OrderStatus.poll', 'PosAppCheck.activate', 'PosAppCheck.getToken',
-  'Menu.revalidate', 'MenuCache.read', 'LoginPage.signIn',
+  'Menu.revalidate', 'MenuCache.read', 'LoginPage.signIn', 'Popup.missingExtra',
 ];
 
 const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');

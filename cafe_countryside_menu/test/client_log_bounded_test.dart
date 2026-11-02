@@ -195,7 +195,7 @@ void main() {
       expect(list, isNotNull, reason: 'allow-list not found in boundedLogOk()');
       final inRules = RegExp(r"'([^']+)'").allMatches(list!.group(1)!).map((m) => m.group(1)!).toSet();
       expect(inRules, kCustomerLogSources);
-      expect(kCustomerLogSources, hasLength(16));
+      expect(kCustomerLogSources, hasLength(17));
     });
 
     test('every customer source is an actual source used by the app code', () {

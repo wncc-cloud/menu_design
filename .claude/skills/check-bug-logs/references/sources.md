@@ -22,6 +22,7 @@ admin and has a random id.
 | `Checkout.freshBusiness`, `Checkout.revalidateCart` | WARN | `checkout_page.dart` | A recovered failure: the fresh settings / menu re-read at Place Order failed and the order carried on. Noise unless frequent (weak network). |
 | `OrderRequest.fetchCafeOpen`, `OrderRequest.getRequest` | WARN | `order_request_repository.dart` | Counter status / order lookup timed out or was denied. Treated as "unknown" (fails open). Noise unless frequent. Note: locally this 403s because the counter project is not running. |
 | `Menu.revalidate`, `MenuCache.read` | WARN | `menu/presentation/menu_provider.dart`, `menu/data/menu_cache.dart` | The menu refresh failed and the saved copy stayed on screen. Weak network. |
+| `Popup.missingExtra` | WARN | `menu/presentation/popups/popup_route.dart` | A pop-up route was built without its content (restored history entry); the customer was sent to the menu. Recovered. Many = look at navigation. |
 | `LoginPage.signIn` | WARN | `admin/auth/login_page.dart` | The admin closed the Google popup (expected) or sign-in was blocked. A customer cannot reach this: if many, look at it. |
 
 ## Admin side (signed in, random ids)

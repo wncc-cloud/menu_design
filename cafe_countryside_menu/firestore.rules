@@ -111,7 +111,7 @@ service cloud.firestore {
             'Checkout.revalidateCart', 'OrderRequest.create',
             'OrderRequest.fetchCafeOpen', 'OrderRequest.getRequest',
             'OrderStatus.poll', 'PosAppCheck.activate', 'PosAppCheck.getToken',
-            'Menu.revalidate', 'MenuCache.read', 'LoginPage.signIn'
+            'Menu.revalidate', 'MenuCache.read', 'LoginPage.signIn', 'Popup.missingExtra'
           ]
         && parts[1] in ['0', '1', '2']
         && parts[2].matches('[0-9]{1,12}')

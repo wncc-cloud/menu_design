@@ -54,6 +54,7 @@ const kCustomerLogSources = <String>{
   'Menu.revalidate',
   'MenuCache.read',
   'LoginPage.signIn',
+  'Popup.missingExtra',
 };
 
 /// Only the path of the page, with ids masked, never the query or hash: the

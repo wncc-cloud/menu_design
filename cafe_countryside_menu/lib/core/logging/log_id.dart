@@ -31,6 +31,6 @@ int logBucket(DateTime t) => t.toUtc().millisecondsSinceEpoch ~/ 1800000;
 
 /// Anonymous log id: `<source>~<slot>~<bucket>`. Create-only in the rules, so
 /// only the first log per (source, slot, 30 min) is kept: at most
-/// 16 sources x 3 slots x 48 buckets = 2,304 anonymous documents a day.
+/// 17 sources x 3 slots x 48 buckets = 2,448 anonymous documents a day.
 String boundedLogId(String source, String message, DateTime now) =>
     '$source~${slotFor(message)}~${logBucket(now)}';

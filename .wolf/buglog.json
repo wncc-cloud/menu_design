@@ -1760,6 +1760,87 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-10-23T06:10:26.758Z"
+    },
+    {
+      "id": "bug-110",
+      "timestamp": "2026-10-30T13:04:41.896Z",
+      "error_message": "Significant refactor of ",
+      "file": "cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 8→16 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-30T13:04:41.896Z"
+    },
+    {
+      "id": "bug-111",
+      "timestamp": "2026-10-30T13:04:49.118Z",
+      "error_message": "Incorrect value in code",
+      "file": "cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+      "root_cause": "Had \"activation=<state> activateMs=<n> sinceStartMs=<n",
+      "fix": "Changed to `activation=... activateMs=... sinceStartMs=...`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-30T13:04:49.118Z"
+    },
+    {
+      "id": "bug-112",
+      "timestamp": "2026-10-30T13:27:39.419Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "cafe_countryside_menu/lib/main.dart",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "dart"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-10-30T13:27:39.419Z"
+    },
+    {
+      "id": "bug-113",
+      "timestamp": "2026-11-02T16:50:52.550Z",
+      "error_message": "TypeError: null is not a subtype of PopupSpec (clientLogs FlutterError~2~996465, 63x in 3 days)",
+      "file": "cafe_countryside_menu/lib/features/menu/presentation/popups/popup_route.dart",
+      "root_cause": "popupPage did state.extra as PopupSpec; go_router can build the page with extra==null even though popupRedirect should bounce it (e.g. restored history entry)",
+      "fix": "popupPage checks the type; otherwise returns a blank page that goes to / and logs a WARN. Test: popup_missing_extra_test.dart",
+      "tags": [
+        "go_router",
+        "popup",
+        "null-cast",
+        "bug-logs"
+      ],
+      "related_bugs": [],
+      "occurrences": 63,
+      "last_seen": "2026-11-02T16:50:52.550Z"
+    },
+    {
+      "id": "bug-114",
+      "timestamp": "2026-11-02T16:50:52.550Z",
+      "error_message": "Self-ordering isn't available on this device (PosAppCheck.getToken activation=pending, ~320 logs)",
+      "file": "cafe_countryside_menu/lib/core/services/pos_app_check_service.dart",
+      "root_cause": "getToken() returned null while activate() was still running (median 116 ms after start, activation ~1.2 s); the cafe-open read and the order-status poll ask on page load",
+      "fix": "activate() keeps a Completer; getToken() waits up to 5 s for it. Test: pos_app_check_wait_test.dart",
+      "tags": [
+        "app-check",
+        "race",
+        "bug-logs"
+      ],
+      "related_bugs": [],
+      "occurrences": 320,
+      "last_seen": "2026-11-02T16:50:52.550Z"
     }
   ]
 }

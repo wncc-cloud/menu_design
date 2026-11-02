@@ -38,7 +38,7 @@ node scripts/summarize-bug-logs.mjs            # distinct problems, ranked
 ## 3. Analyse
 
 Work from most to least serious (ERROR > WARN) and most to least frequent. Remember the logging is
-**bounded for customers** (rules: one log per source and slot per 30 min, ≤ 2,304 a day), so counts
+**bounded for customers** (rules: one log per source and slot per 30 min, ≤ 2,448 a day), so counts
 are a *floor*, not exact totals; the first log of a burst is kept.
 
 For each distinct problem:

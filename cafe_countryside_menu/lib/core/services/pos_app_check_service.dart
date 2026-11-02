@@ -11,6 +11,8 @@
 // calls into the POS project need their own Web App registration (and
 // their own reCAPTCHA Enterprise site key, scoped to this app's real
 // domain), distinct from billing_cafe's own existing registration.
+import 'dart:async';
+
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -97,15 +99,34 @@ class PosAppCheckService {
   static String _activateState = 'not-started'; // not-started | pending | ok | failed | skipped
   static int? _activateMs;
 
+  // Completes when activate() finishes (ok or failed). getToken() waits on it:
+  // Bug Logs (2 Nov 2026) showed 163 of 192 token calls came while activation was
+  // still pending (median 116 ms after start; activation takes ~1.2 s).
+  static Completer<void>? _ready;
+  static const _readyWait = Duration(seconds: 5);
+
   /// `activation=... activateMs=... sinceStartMs=...` text for log messages.
   static String get diagnostics =>
       'activation=$_activateState activateMs=${_activateMs ?? '-'} sinceStartMs=${_sinceStart.elapsedMilliseconds}';
+
+  @visibleForTesting
+  static void debugMarkPending() {
+    _activateState = 'pending';
+    _ready = Completer<void>();
+  }
+
+  @visibleForTesting
+  static void debugFinish({required bool ok}) {
+    _activateState = ok ? 'ok' : 'failed';
+    _ready?.complete();
+  }
 
   @visibleForTesting
   static void debugReset() {
     _posApp = null;
     _activateState = 'not-started';
     _activateMs = null;
+    _ready = null;
     _sinceStart..stop()..reset();
   }
 
@@ -128,6 +149,7 @@ class PosAppCheckService {
       return;
     }
     _activateState = 'pending';
+    final ready = _ready = Completer<void>();
     _sinceStart..reset()..start();
     try {
       final posApp = await Firebase.initializeApp(
@@ -146,6 +168,8 @@ class PosAppCheckService {
       debugPrint('[PosAppCheckService] activation failed: $e\n$st');
       logClientWarn('PosAppCheck.activate', e,
           stackTrace: st, message: '$e [$diagnostics]');
+    } finally {
+      if (!ready.isCompleted) ready.complete();
     }
   }
 
@@ -166,6 +190,14 @@ class PosAppCheckService {
   /// blocks the app" guarantee true under a real network failure, not
   /// just a thrown-exception one.
   static Future<String?> getToken() async {
+    if (_posApp == null && _activateState == 'pending') {
+      // Activation is still running: wait for it (bounded) instead of giving up.
+      try {
+        await _ready?.future.timeout(_readyWait);
+      } on TimeoutException {
+        // fall through: logged below as "still pending"
+      }
+    }
     final app = _posApp;
     if (app == null) {
       // Used to return silently, so "Self-ordering isn't available" had no
