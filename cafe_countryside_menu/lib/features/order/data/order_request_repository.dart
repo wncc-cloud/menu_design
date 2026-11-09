@@ -4,6 +4,7 @@
 // cloud_firestore dependency in this project for this feature). Every
 // call attaches an X-Firebase-AppCheck token from PosAppCheckService.
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:http/http.dart' as http;
 
@@ -53,12 +54,32 @@ class OrderRequestRepository {
   /// existed.
   final bool useLocalEmulator;
 
+  /// Tests inject a fake client; real builds leave it null (plain `http`).
+  final http.Client? client;
+
+  /// Wait before the single network-drop retry (tests pass zero).
+  final Duration retryDelay;
+
   const OrderRequestRepository({
     required this.posProjectId,
     required this.posWebApiKey,
     required this.businessId,
     this.useLocalEmulator = false,
+    this.client,
+    this.retryDelay = const Duration(milliseconds: 1500),
   });
+
+  /// Phone clock this far from the server's clock counts as "wrong clock".
+  static const clockSkewThreshold = Duration(seconds: 20);
+
+  /// Server minus phone clock, from the newest `Date` header seen. Free: it
+  /// rides on replies the app already gets. Null until one has been seen.
+  static Duration? lastServerOffset;
+
+  static void _rememberServerOffset(http.Response r) {
+    final o = serverOffsetOf(r);
+    if (o != null) lastServerOffset = o;
+  }
 
   static const _emulatorBase =
       'http://127.0.0.1:8080/v1/projects/demo-why-not-cafe/databases/(default)/documents';
@@ -95,33 +116,127 @@ class OrderRequestRepository {
   /// "why these are excluded" notes); this method encodes it into the
   /// Firestore REST API's typed-value envelope. Returns the new
   /// document's id (parsed from the response's `name` path).
+  ///
+  /// Safe-retry design (adds no cost in the normal case — one request, as
+  /// before):
+  /// * The phone picks the document id (`?documentId=`), so a repeat of the
+  ///   same request can never create a second order.
+  /// * ONE retry, only after a network drop ("Load failed" / "Failed to
+  ///   fetch"), or after a 403 caused by a wrong phone clock (the café's rule
+  ///   needs `expiresAt` within 30 min of the SERVER time; the retry uses
+  ///   times shifted by the server's own `Date` header).
+  /// * If the retry is refused because the first try already landed (409, or
+  ///   403 from the rules seeing an existing doc), a public GET of our own id
+  ///   confirms it and the order counts as placed.
+  /// Every failure is logged once, with the whole story (see [describeRestFailure]).
   Future<String> createRequest(Map<String, dynamic> data) async {
     final token = await _requireToken();
+    final id = newRequestId();
+    final story = <String>[]; // what happened on each attempt, for the Bug Log
+    var body = data;
+    var afterNetworkDrop = false;
 
-    final http.Response response;
+    for (var attempt = 1; attempt <= 2; attempt++) {
+      final http.Response response;
+      try {
+        response = await _post(
+          _createUri(id),
+          {'X-Firebase-AppCheck': token, 'Content-Type': 'application/json'},
+          jsonEncode(_encodeFields(body)),
+        );
+      } catch (e, st) {
+        story.add('attempt$attempt: ${_shortError(e)}');
+        if (attempt == 1) {
+          afterNetworkDrop = true;
+          await Future<void>.delayed(retryDelay);
+          continue;
+        }
+        // Both tries dropped. The first might still have landed: ask.
+        if (await _existsQuietly(id)) {
+          _logRecovered(story, id);
+          return id;
+        }
+        // _shortError: the raw exception text carries the URL (API key + the order id).
+        logClientError('OrderRequest.create', _shortError(e),
+            stackTrace: st, message: _failureMessage(story, 'network error', data));
+        throw const OrderRequestException('Could not place your order — check your connection and try again.');
+      }
+
+      _rememberServerOffset(response);
+      if (response.statusCode == 200) {
+        if (attempt == 2) _logRecovered(story, id);
+        return id;
+      }
+
+      story.add('attempt$attempt: ${describeRestFailure(response)}');
+      if (attempt == 2 && afterNetworkDrop && (response.statusCode == 409 || response.statusCode == 403)) {
+        // "Already exists": the first try did land.
+        if (await _existsQuietly(id)) {
+          _logRecovered(story, id);
+          return id;
+        }
+      }
+      final skew = response.statusCode == 403 ? serverOffsetOf(response) : null;
+      if (attempt == 1 && skew != null && skew.abs() >= clockSkewThreshold) {
+        body = shiftRequestTimes(body, skew);
+        story.add('clockOffsetSec=${skew.inSeconds} -> retrying with server time');
+        continue;
+      }
+      break;
+    }
+
+    logClientError('OrderRequest.create', 'HTTP rejected',
+        message: _failureMessage(story, 'rejected', data));
+    throw const OrderRequestException('Could not place your order — check your connection and try again.');
+  }
+
+  /// The 20-character random id the phone gives its order (same alphabet and
+  /// length as Firestore's own auto ids; secure random so it cannot be guessed,
+  /// because anyone who knows an id can read that order).
+  static String newRequestId([Random? random]) {
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    final r = random ?? Random.secure();
+    return String.fromCharCodes(List.generate(20, (_) => alphabet.codeUnitAt(r.nextInt(alphabet.length))));
+  }
+
+  Uri _createUri(String id) {
+    final base = _collectionUri;
+    return base.replace(queryParameters: {...base.queryParameters, 'documentId': id});
+  }
+
+  /// Plain `http` unless a test injects a client.
+  Future<http.Response> _post(Uri uri, Map<String, String> headers, String body) =>
+      client != null ? client!.post(uri, headers: headers, body: body) : http.post(uri, headers: headers, body: body);
+
+  Future<http.Response> _get(Uri uri, Map<String, String> headers) =>
+      client != null ? client!.get(uri, headers: headers) : http.get(uri, headers: headers);
+
+  /// True when our own order id can be read back. Never throws, never logs.
+  Future<bool> _existsQuietly(String id) async {
     try {
-      response = await http.post(
-        _collectionUri,
-        headers: {'X-Firebase-AppCheck': token, 'Content-Type': 'application/json'},
-        body: jsonEncode(_encodeFields(data)),
-      );
-    } catch (e, st) {
-      logClientError('OrderRequest.create', e, stackTrace: st);
-      throw OrderRequestException('Could not place your order — check your connection and try again.');
+      final token = useLocalEmulator ? 'local-emulator-test-token' : await PosAppCheckService.getToken();
+      if (token == null) return false;
+      final r = await _get(_documentUri(id), {'X-Firebase-AppCheck': token});
+      return r.statusCode == 200;
+    } catch (_) {
+      return false;
     }
+  }
 
-    if (response.statusCode != 200) {
-      logClientError('OrderRequest.create', 'HTTP ${response.statusCode}',
-          message: 'Order request rejected: HTTP ${response.statusCode}');
-      throw OrderRequestException('Could not place your order — check your connection and try again.');
-    }
+  /// One WARN saying a retry saved the order (so we can see how often the
+  /// retry matters). Same source as the errors: no new rules entry needed.
+  void _logRecovered(List<String> story, String id) {
+    logClientWarn('OrderRequest.create', 'recovered by retry',
+        message: 'Order placed after a retry (no customer-visible error) [${story.join(' | ')}]');
+  }
 
-    final json = jsonDecode(response.body) as Map<String, dynamic>;
-    final name = json['name'] as String?;
-    if (name == null) {
-      throw const OrderRequestException('Your order may not have been saved — please try again.');
-    }
-    return name.split('/').last;
+  /// Builds the one ERROR line: what failed, each attempt, the sizes of the fields the café's rule limits (lengths only, never the text),
+  /// and the phone-vs-server clock difference.
+  String _failureMessage(List<String> story, String what, Map<String, dynamic> data) {
+    final offset = lastServerOffset;
+    final text = 'Order request $what [${story.join(' | ')}] '
+        '[clockOffsetSec=${offset == null ? 'unknown' : offset.inSeconds} shape: ${describeRequestShape(data)}]';
+    return text;
   }
 
   Uri get _cafeStatusUri => Uri.parse(
@@ -138,10 +253,17 @@ class OrderRequestRepository {
   Future<bool?> fetchCafeOpen({Duration timeout = const Duration(seconds: 6)}) async {
     try {
       final token = await _requireToken();
-      final response = await http
-          .get(_cafeStatusUri, headers: {'X-Firebase-AppCheck': token})
-          .timeout(timeout);
-      if (response.statusCode != 200) return null;
+      final response = await _get(_cafeStatusUri, {'X-Firebase-AppCheck': token}).timeout(timeout);
+      _rememberServerOffset(response);
+      if (response.statusCode != 200) {
+        // 404 = "not published yet": normal. Anything else used to vanish
+        // silently; now the reason (e.g. App Check refused) reaches Bug Logs.
+        if (response.statusCode != 404) {
+          logClientWarn('OrderRequest.fetchCafeOpen', 'HTTP ${response.statusCode}',
+              message: 'Cafe status read refused: ${describeRestFailure(response)}');
+        }
+        return null;
+      }
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       final fields = json['fields'] as Map<String, dynamic>?;
       final open = fields?['open'] as Map<String, dynamic>?;
@@ -164,16 +286,20 @@ class OrderRequestRepository {
 
     final http.Response response;
     try {
-      response = await http.get(_documentUri(requestId), headers: {'X-Firebase-AppCheck': token});
+      response = await _get(_documentUri(requestId), {'X-Firebase-AppCheck': token});
     } catch (e, st) {
       logClientWarn('OrderRequest.getRequest', e, stackTrace: st);
       throw const OrderRequestException('Could not check your order status right now.');
     }
+    _rememberServerOffset(response);
 
-    if (response.statusCode == 404 || response.statusCode == 403) {
-      return null;
-    }
+    if (response.statusCode == 404) return null;
     if (response.statusCode != 200) {
+      // The order document is publicly readable, so a 403 here means App
+      // Check (or the rules) refused: say so in the log instead of hiding it.
+      logClientWarn('OrderRequest.getRequest', 'HTTP ${response.statusCode}',
+          message: 'Order status read refused: ${describeRestFailure(response)}');
+      if (response.statusCode == 403) return null;
       throw const OrderRequestException('Could not check your order status right now.');
     }
 
@@ -182,6 +308,85 @@ class OrderRequestRepository {
     if (fields == null) return null;
     return _decodeFields(fields);
   }
+}
+
+// ---- Bug Log diagnostics (pure functions, unit-tested) ----
+
+String _shortError(Object e) {
+  final s = e.toString();
+  // The URL carries the public API key and our order id: keep only the reason.
+  final cut = s.indexOf(', uri=');
+  final t = cut > 0 ? s.substring(0, cut) : s;
+  return t.length > 80 ? t.substring(0, 80) : t;
+}
+
+/// One short line about a non-200 reply: `HTTP 403 PERMISSION_DENIED "Missing
+/// or insufficient permissions." serverDate=(the reply's Date header)`. Reads Firestore's JSON
+/// error body (`{"error": {"status", "message"}}`). Never throws; an unreadable
+/// body just leaves those parts out. No tokens, no customer text.
+String describeRestFailure(http.Response r) {
+  var status = '';
+  var message = '';
+  try {
+    final decoded = jsonDecode(r.body);
+    final err = decoded is Map ? decoded['error'] : (decoded is List && decoded.isNotEmpty && decoded.first is Map ? (decoded.first as Map)['error'] : null);
+    if (err is Map) {
+      status = '${err['status'] ?? ''}';
+      message = '${err['message'] ?? ''}';
+    }
+  } catch (_) {}
+  if (message.length > 160) message = message.substring(0, 160);
+  final date = r.headers['date'];
+  return 'HTTP ${r.statusCode}'
+      '${status.isEmpty ? '' : ' $status'}'
+      '${message.isEmpty ? '' : ' "$message"'}'
+      '${date == null ? '' : ' serverDate=$date'}';
+}
+
+/// Server time minus phone time, from the reply's `Date` header (1 s
+/// resolution, minus the reply's travel time: fine for a 20 s threshold).
+/// Null when the header is missing or unreadable.
+Duration? serverOffsetOf(http.Response r, {DateTime? deviceNow}) {
+  final raw = r.headers['date'];
+  if (raw == null) return null;
+  final server = parseHttpDate(raw);
+  return server?.difference((deviceNow ?? DateTime.now()).toUtc());
+}
+
+/// Parses `Mon, 09 Nov 2026 11:10:37 GMT`. Null if it does not match.
+DateTime? parseHttpDate(String s) {
+  final m = RegExp(r'^\w{3}, (\d{1,2}) (\w{3}) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT$').firstMatch(s.trim());
+  if (m == null) return null;
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  final month = months.indexOf(m.group(2)!);
+  if (month < 0) return null;
+  return DateTime.utc(int.parse(m.group(3)!), month + 1, int.parse(m.group(1)!), int.parse(m.group(4)!),
+      int.parse(m.group(5)!), int.parse(m.group(6)!));
+}
+
+/// Copy of [data] with `createdAt` / `expiresAt` moved by [by], so the café's
+/// "expiresAt within 30 min of server time" rule is judged on server time.
+Map<String, dynamic> shiftRequestTimes(Map<String, dynamic> data, Duration by) {
+  final copy = Map<String, dynamic>.of(data);
+  for (final k in const ['createdAt', 'expiresAt']) {
+    final v = copy[k];
+    if (v is DateTime) copy[k] = v.add(by);
+  }
+  return copy;
+}
+
+/// Field SIZES the café's rule limits (lines <= 30, name <= 60, phone <= 20,
+/// table <= 20, notes <= 300), plus the order's lifetime. Numbers only, so a
+/// rule refusal can be told apart from a wrong clock without storing any
+/// customer text.
+String describeRequestShape(Map<String, dynamic> d) {
+  int len(String k) => d[k] is String ? (d[k] as String).length : -1;
+  final lines = d['lines'];
+  final created = d['createdAt'];
+  final expires = d['expiresAt'];
+  final life = created is DateTime && expires is DateTime ? expires.difference(created).inSeconds : null;
+  return 'lines=${lines is List ? lines.length : -1} name=${len('customerName')} phone=${len('customerPhone')} '
+      'table=${len('tableNumber')} notes=${len('orderNotes')} lifeSec=${life ?? -1}';
 }
 
 // ---- Firestore REST API typed-value envelope encoding/decoding ----
