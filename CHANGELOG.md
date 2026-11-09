@@ -24,6 +24,9 @@ All notable changes to the planning documents are recorded here.
 - Settings: "Customers must enter a table number" switch (default OFF, only works while "Ask for a table number" is ON). Checked at Place Order against a fresh read of the setting, so switching it on or off takes effect on the customer's next Place Order
 - Admin tests use an in-memory draft repository; emulator scripts for the rules and the draft transaction; `tool/seed_from_prod.mjs`
 
+### Fixed (order logs)
+- Order placing: one safe retry after a network drop or a slow phone clock (phone-chosen order id, no duplicates); Bug Logs now say WHY an order or status read was refused (Firestore reason, clock offset, field sizes)
+
 ### Changed
 - Every draft write is now a transaction on the freshest draft (`updateDraft`); the old whole-document `_save` is removed (a sold-out toggle made while a form is open is no longer reverted; a section added by another admin survives a reorder)
 - Prices are displayed exactly (₹49.50, not ₹50)

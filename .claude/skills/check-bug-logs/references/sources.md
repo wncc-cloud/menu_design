@@ -49,3 +49,15 @@ admin and has a random id.
 - `unavailable` / `deadline-exceeded` / `TimeoutException`: connection. Not a code bug unless it is constant.
 - `firebase_auth/api-key-not-valid…` with a `local-e2e` build: the local emulator build reloaded after sign-in. Not a real bug.
 - An order error from a local build (`build` starting `local-e2e`) is test noise, never PROD.
+
+## Reading the order logs (added 9 Nov 2026, build after 72f11e2)
+`OrderRequest.create` (ERROR) now holds the whole story in one line:
+`Order request rejected [attempt1: HTTP 403 PERMISSION_DENIED "Missing or insufficient permissions." serverDate=… | clockOffsetSec=419 -> retrying with server time | attempt2: …] [clockOffsetSec=… shape: lines=1 name=5 phone=10 table=0 notes=0 lifeSec=180]`
+- `HTTP <code> <STATUS> "<message>"` is Firestore's own reason. `PERMISSION_DENIED` + a small `clockOffsetSec` = the café's rules or App Check refused (read `billing-cafe/firebase/firestore.rules` → `customerOrderRequests`, create rule). `UNAUTHENTICATED`/"App Check" wording = token problem.
+- `clockOffsetSec` = server time minus phone time. Over ~180 means the phone clock is slow by more than the 3-minute order life, so the rule (`expiresAt` within 30 min of server time) refuses it. The app retries once with server-aligned times; a WARN "Order placed after a retry" means that retry saved the order.
+- `shape:` are field LENGTHS (rule limits: lines ≤ 30, name ≤ 60, phone ≤ 20, table ≤ 20, notes ≤ 300). A value over its limit explains a 403 with a correct clock. `lifeSec` should be 180 (the admin setting × 60).
+- `attemptN: ClientException: Load failed|Failed to fetch` = the phone's network dropped. The app retried once with the SAME order id (cannot duplicate). Two drops in a row + ERROR = a real lost order (café Wi-Fi, iPhone Safari background tab).
+- `OrderRequest.fetchCafeOpen` / `getRequest` WARN "…refused: HTTP 403 …" now say why (App Check vs rules); a 404 on café status is normal and not logged.
+
+## Known expected noise
+- `runZonedGuarded` "Null check operator used on a null value" with a stack through `AnimationController.dispose` ← `_StretchController.animate` (Flutter's Android stretch-overscroll, `overscroll_indicator.dart`): a Flutter framework bug, no visible effect, ~5 per 17 days. Decode with `node scripts/decode-stack.mjs <logId>`. No fix needed; only investigate if the count jumps.
